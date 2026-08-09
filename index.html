@@ -35,14 +35,14 @@
 </section>
 
 <section id="stok" class="page">
-<div class="panel"><h1>📦 Stok Produk</h1><div class="muted">Pantau ketersediaan produk secara real-time.</div><div style="margin-top:11px"><button class="btn" onclick="fetchProductsFromAPI()">↻ Refresh Stok</button> <span id="updateTime" class="muted">Memuat...</span></div></div>
+<div class="panel"><h1>📦 Stok Produk</h1><div class="muted">Pantau ketersediaan produk secara real-time.</div><div style="margin-top:11px"><button class="btn" onclick="initData()">↻ Refresh Stok</button> <span id="updateTime" class="muted">Memuat...</span></div></div>
 <div class="stats"><div class="stat"><b id="total">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="ready">0</b><small>READY</small></div><div class="stat"><b id="empty">0</b><small>HABIS</small></div></div>
 <div class="panel"><input id="stockSearch" class="search" placeholder="🔎 Cari nama produk atau kode..."></div>
 <div id="stockList"></div>
 </section>
 
 <section id="produk" class="page">
-<div class="panel"><h1>📋 Daftar Produk</h1><div class="muted">Semua produk yang tersedia dari server.</div><input id="productSearch" class="search" style="margin-top:12px" placeholder="🔎 Cari produk..."></div>
+<div class="panel"><h1>📋 Daftar Produk</h1><div class="muted">Semua produk yang tersedia.</div><input id="productSearch" class="search" style="margin-top:12px" placeholder="🔎 Cari produk..."></div>
 <div id="productList"></div>
 </section>
 </main>
@@ -50,7 +50,13 @@
 <div id="modal" class="modal"><div class="box"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
 
 <script>
-let products = [];
+// Data produk disatukan di sini (Anda bebas tambah/ubah item di bawah ini)
+let products = [
+  { code: "DATA1", name: "Injected 1GB Utama", type: "Regular", quota: "1 GB", stock: 15, area: "Semua Area" },
+  { code: "DATA2", name: "Injected 2GB Utama", type: "Regular", quota: "2 GB", stock: 8, area: "Semua Area" },
+  { code: "DATA5", name: "Injected 5GB Utama", type: "Regular", quota: "5 GB", stock: 0, area: "Semua Area" },
+  { code: "DATA10", name: "Injected 10GB Utama", type: "Regular", quota: "10 GB", stock: 20, area: "Semua Area" }
+];
 
 function go(id,btn){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
@@ -60,30 +66,11 @@ function go(id,btn){
   window.scrollTo(0,0);
 }
 
-async function fetchProductsFromAPI() {
-  try {
-    const response = await fetch('/api/products');
-    const result = await response.json();
-    
-    if (Array.isArray(result)) {
-      products = result.map(item => ({
-        code: item.code || "CODE",
-        name: item.name || "Produk",
-        type: item.type || "Regular",
-        quota: item.quota || "-",
-        stock: Number(item.stock) || 0,
-        area: "Semua Area"
-      }));
-    }
-
-    updateStats();
-    renderStock();
-    renderProducts();
-    document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
-  } catch (err) {
-    console.error("Gagal memuat produk:", err);
-    document.getElementById("updateTime").textContent = "Gagal memuat data API";
-  }
+function initData() {
+  updateStats();
+  renderStock();
+  renderProducts();
+  document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
 }
 
 function renderStock(){
@@ -143,7 +130,8 @@ document.getElementById("stockSearch").oninput = renderStock;
 document.getElementById("productSearch").oninput = renderProducts;
 document.getElementById("modal").onclick = e => { if(e.target.id === "modal") closeModal(); };
 
-fetchProductsFromAPI();
+// Jalankan sistem saat halaman dibuka
+initData();
 </script>
 </body>
 </html>
