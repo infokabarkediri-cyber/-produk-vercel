@@ -3,21 +3,50 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC Store - Katalog Stok & Penjualan</title>
+<title>IC Store - Analitik & Performa Produk Terjual</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
 .wrap{padding:20px 15px 80px}
 
-/* KOTAK RINGKASAN STATISTIK TERJUAL & READY */
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
-.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.01);position:relative;overflow:hidden}
+/* DASHBOARD STATISTIK UTAMA (5 KOLOM) */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01);position:relative;overflow:hidden}
 .stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
 .stat-card.ready::before{background:#059669}
 .stat-card.sold::before{background:#3b82f6}
-.stat-label{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
-.stat-val{font-size:22px;font-weight:800;color:#0f172a;margin-top:4px}
-.stat-sub{font-size:10px;color:#94a3b8;margin-top:2px}
+.stat-card.sec::before{background:#ec4899}
+.stat-card.rate::before{background:#8b5cf6}
+.stat-card.speed::before{background:#f59e0b}
+.stat-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.stat-val{font-size:16px;font-weight:800;color:#0f172a;margin-top:4px}
+.stat-sub{font-size:9px;color:#94a3b8;margin-top:2px}
+
+/* PANEL MONITORING PRODUK (TERTINGGI & TERENDAH) */
+.insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+.insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
+.insight-title{font-size:13px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.insight-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.insight-item:last-child{border-bottom:0}
+.insight-item b{color:#0f172a}
+.badge-count{background:#f1f5f9;padding:3px 8px;border-radius:6px;font-weight:800;font-size:11px}
+.badge-top{background:#ecfdf5;color:#059669}
+.badge-low{background:#fff1f2;color:#e11d48}
+
+/* KOTAK GRAFIK ANALITIK */
+.chart-container{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.chart-header b{font-size:14px;color:#0f172a}
+.chart-header span{font-size:11px;color:#64748b}
+
+/* PANEL FITUR KEREN TAMBAHAN */
+.features-panel{background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.feature-info b{font-size:13px;display:block;margin-bottom:2px}
+.feature-info span{font-size:11px;color:#94a3b8}
+.action-btns{display:flex;gap:8px}
+.btn-action{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.btn-action:hover{background:rgba(255,255,255,0.2)}
 
 .panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
 .search{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;outline:none;background:#fff;font-size:13px}
@@ -46,27 +75,80 @@
 .toggle-detail.ready-text{color:#059669}
 .footer-brand{text-align:center;font-size:11px;color:#94a3b8;margin-top:30px;font-weight:600}
 
-@media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}.card{padding:10px}.name{font-size:11px}.slot-val{font-size:13px}}
+@media(max-width:1024px){.stats-grid{grid-template-columns:repeat(3,1fr)}.insight-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}.card{padding:10px}.name{font-size:11px}.slot-val{font-size:13px}}
 </style>
 </head>
 <body>
 <header class="top">
-  <div class="title">📦 Katalog Stok & Penjualan</div>
+  <div class="title">📦 Analitik Performa & Stok Pro</div>
   <div class="subtitle" id="updateTime">Menghubungkan...</div>
 </header>
 
 <main class="wrap">
-  <!-- WIDGET STATISTIK PROFESIONAL -->
+  <!-- DASHBOARD STATISTIK UTAMA -->
   <div class="stats-grid">
     <div class="stat-card ready">
-      <div class="stat-label">Total Stok Tersedia</div>
+      <div class="stat-label">Stok Tersedia</div>
       <div class="stat-val" id="statReady">0</div>
       <div class="stat-sub" id="statReadyVariant">0 varian aktif</div>
     </div>
     <div class="stat-card sold">
-      <div class="stat-label">Total Terjual (Non-PDA)</div>
+      <div class="stat-label">Total Terjual</div>
       <div class="stat-val" id="statSold">0</div>
-      <div class="stat-sub">Akumulasi penurunan stok V1-V4</div>
+      <div class="stat-sub">Akumulasi V1-V4</div>
+    </div>
+    <div class="stat-card sec">
+      <div class="stat-label">Rata2 / Detik</div>
+      <div class="stat-val" id="statSec">0.000</div>
+      <div class="stat-sub">Unit per detik</div>
+    </div>
+    <div class="stat-card rate">
+      <div class="stat-label">Rata2 / Menit</div>
+      <div class="stat-val" id="statMin">0.00</div>
+      <div class="stat-sub">Unit per menit</div>
+    </div>
+    <div class="stat-card speed">
+      <div class="stat-label">Rata2 / Jam</div>
+      <div class="stat-val" id="statHour">0.0</div>
+      <div class="stat-sub">Unit per jam</div>
+    </div>
+  </div>
+
+  <!-- PANEL MONITORING PRODUK TERJUAL TERTINGGI & TERENDAH -->
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="insight-title">🔥 Top 3 Produk Terjual Terbanyak</div>
+      <div id="topSoldList"><div style="font-size:11px;color:#94a3b8">Memuat data...</div></div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-title">🧊 Top 3 Produk Terjual Terendah</div>
+      <div id="lowSoldList"><div style="font-size:11px;color:#94a3b8">Memuat data...</div></div>
+    </div>
+  </div>
+
+  <!-- PANEL GRAFIK ANALITIK PENJUALAN REAL-TIME -->
+  <div class="chart-container">
+    <div class="chart-header">
+      <div>
+        <b>📈 Grafik Tren Penjualan Real-Time</b>
+        <span>Pemantauan kecepatan transaksi berdasarkan kategori versi</span>
+      </div>
+    </div>
+    <div style="position: relative; height: 240px; width: 100%;">
+      <canvas id="salesChart"></canvas>
+    </div>
+  </div>
+
+  <!-- FITUR KEREN TAMBAHAN -->
+  <div class="features-panel">
+    <div class="feature-info">
+      <b>🚀 Panel Kendali & Ekspor Data</b>
+      <span>Sinkronisasi otomatis real-time tiap 10 detik tanpa reload halaman.</span>
+    </div>
+    <div class="action-btns">
+      <button class="btn-action" onclick="exportDataCSV()">📥 Export CSV</button>
+      <button class="btn-action" onclick="resetSalesTracker()">🔄 Reset Sesi</button>
     </div>
   </div>
 
@@ -89,8 +171,33 @@
 <script>
 let products = [];
 let initialStockMap = {}; 
+let productSoldMap = {}; // Menyimpan jumlah terjual per kode produk
 let totalSoldUnits = 0;   
 let activeVersion = "ALL";
+let startTime = Date.now(); 
+
+let salesChart;
+function initChart() {
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  salesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'V1 (XLA)', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V2 (XDA)', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V3 (KDA)', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V4 (XLF)', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }
+    }
+  });
+}
 
 const CREDENTIALS = {
   apiKey: "mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5",
@@ -113,6 +220,7 @@ async function fetchProducts() {
     const result = await res.json();
     if (result.success && Array.isArray(result.data)) {
       let currentSoldDiff = 0;
+      let vSoldCounts = { V1: 0, V2: 0, V3: 0, V4: 0 };
 
       products = result.data.map(item => {
         const code = (item.code || "").toUpperCase();
@@ -124,17 +232,21 @@ async function fetchProducts() {
         else if (code.startsWith("PDA")) v = "V5";
 
         let currentStock = item.stock !== undefined ? Number(item.stock) : 0;
+        let soldQty = 0;
 
-        // KECUALIKAN PDA (V5) DARI PENGHITUNGAN TERJUAL
         if (v !== "V5") {
           if (!(code in initialStockMap)) {
             initialStockMap[code] = currentStock;
+            productSoldMap[code] = 0;
           } else {
             let diff = initialStockMap[code] - currentStock;
             if (diff > 0) {
+              soldQty = diff;
               currentSoldDiff += diff;
+              if (v in vSoldCounts) vSoldCounts[v] += diff;
             }
           }
+          productSoldMap[code] = soldQty;
         }
 
         let desc = item.description || "";
@@ -154,6 +266,7 @@ async function fetchProducts() {
           code: item.code,
           name: item.name,
           stock: currentStock,
+          sold: soldQty,
           descText: desc.toLowerCase(),
           areas: areas
         };
@@ -162,7 +275,9 @@ async function fetchProducts() {
       totalSoldUnits = currentSoldDiff;
 
       updateStatistics();
+      updateProductInsights();
       renderStock();
+      updateChartData(vSoldCounts);
       
       const now = new Date();
       document.getElementById("updateTime").textContent = "Sinkron: " + now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
@@ -173,12 +288,56 @@ async function fetchProducts() {
   }
 }
 
+// Analisis Produk Terjual Terbanyak & Terendah
+function updateProductInsights() {
+  let validProducts = products.filter(p => p.v !== "V5");
+  // Urutkan berdasarkan jumlah terjual terbanyak
+  let sortedDesc = [...validProducts].sort((a, b) => b.sold - a.sold);
+  // Urutkan berdasarkan jumlah terjual terendah (tetap mengambil produk valid)
+  let sortedAsc = [...validProducts].sort((a, b) => a.sold - b.sold);
+
+  let topHtml = "";
+  for (let i = 0; i < Math.min(3, sortedDesc.length); i++) {
+    let p = sortedDesc[i];
+    topHtml += `<div class="insight-item">
+      <div><b>${p.code}</b> <span style="font-size:10px;color:#64748b">(${p.name})</span></div>
+      <span class="badge-count badge-top">+${p.sold} unit</span>
+    </div>`;
+  }
+  document.getElementById("topSoldList").innerHTML = topHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data penjualan.</div>';
+
+  let lowHtml = "";
+  for (let i = 0; i < Math.min(3, sortedAsc.length); i++) {
+    let p = sortedAsc[i];
+    lowHtml += `<div class="insight-item">
+      <div><b>${p.code}</b> <span style="font-size:10px;color:#64748b">(${p.name})</span></div>
+      <span class="badge-count badge-low">${p.sold} unit</span>
+    </div>`;
+  }
+  document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data penjualan.</div>';
+}
+
+function updateChartData(vSoldCounts) {
+  const timeLabel = new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+  
+  salesChart.data.labels.push(timeLabel);
+  salesChart.data.datasets[0].data.push(vSoldCounts.V1);
+  salesChart.data.datasets[1].data.push(vSoldCounts.V2);
+  salesChart.data.datasets[2].data.push(vSoldCounts.V3);
+  salesChart.data.datasets[3].data.push(vSoldCounts.V4);
+
+  if (salesChart.data.labels.length > 10) {
+    salesChart.data.labels.shift();
+    salesChart.data.datasets.forEach(ds => ds.data.shift());
+  }
+  salesChart.update();
+}
+
 function updateStatistics() {
   let totalReadyUnits = 0;
   let readyVariantCount = 0;
 
   products.forEach(p => {
-    // Total stok tersedia juga hanya menghitung produk non-PDA atau dihitung total keseluruhan stok angka
     if (p.stock > 0 && p.v !== "V5") {
       totalReadyUnits += p.stock;
     }
@@ -187,9 +346,54 @@ function updateStatistics() {
     }
   });
 
+  let elapsedSeconds = (Date.now() - startTime) / 1000;
+  if (elapsedSeconds < 1) elapsedSeconds = 1; 
+  let elapsedMinutes = elapsedSeconds / 60;
+  let elapsedHours = elapsedMinutes / 60;
+
+  let perSecond = totalSoldUnits / elapsedSeconds;
+  let perMinute = totalSoldUnits / elapsedMinutes;
+  let perHour = totalSoldUnits / elapsedHours;
+
   document.getElementById("statReady").textContent = totalReadyUnits.toLocaleString("id-ID");
   document.getElementById("statReadyVariant").textContent = `${readyVariantCount} varian aktif`;
   document.getElementById("statSold").textContent = totalSoldUnits.toLocaleString("id-ID");
+  document.getElementById("statSec").textContent = perSecond.toFixed(3);
+  document.getElementById("statMin").textContent = perMinute.toFixed(2);
+  document.getElementById("statHour").textContent = perHour.toFixed(1);
+}
+
+setInterval(() => {
+  if (products.length > 0) {
+    updateStatistics();
+  }
+}, 1000);
+
+function resetSalesTracker() {
+  initialStockMap = {};
+  productSoldMap = {};
+  totalSoldUnits = 0;
+  startTime = Date.now();
+  salesChart.data.labels = [];
+  salesChart.data.datasets.forEach(ds => ds.data = []);
+  salesChart.update();
+  fetchProducts();
+  alert("Sesi analitik penjualan berhasil direset!");
+}
+
+function exportDataCSV() {
+  let csvContent = "data:text/csv;charset=utf-8,Kode,Nama,Kategori,Stok,Terjual,Area 1,Area 2,Area 3,Area 4\n";
+  products.forEach(p => {
+    let row = [p.code, `"${p.name}"`, p.v, p.stock, p.sold, p.areas.a1, p.areas.a2, p.areas.a3, p.areas.a4].join(",");
+    csvContent += row + "\n";
+  });
+  let encodedUri = encodeURI(csvContent);
+  let link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "analitik_penjualan_ic_store.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 function setFilter(v, btn) {
@@ -222,7 +426,10 @@ function renderCardsHtml(items) {
         <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
       </div>
       <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-      <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}; color:${isReady ? '#0f172a' : '#dc2626'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : (isReady ? p.stock : 'Habis (0)')}</div>
+      <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}; color:${isReady ? '#0f172a' : '#dc2626'}">
+        ${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : (isReady ? p.stock : 'Habis (0)')}
+      </div>
+      <div style="font-size:10px; color:#3b82f6; font-weight:700; margin-top:2px;">Terjual: ${p.sold} unit</div>
       
       <div class="area-list">
         <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
@@ -256,6 +463,7 @@ function renderStock(){
   document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">Produk tidak ditemukan.</div>';
 }
 
+initChart();
 fetchProducts();
 setInterval(fetchProducts, 10000);
 
