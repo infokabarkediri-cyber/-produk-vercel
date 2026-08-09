@@ -17,7 +17,7 @@
 .search{width:100%;border:1px solid #dfe3e8;border-radius:10px;padding:12px;outline:none;background:#fff}.filters{display:flex;gap:7px;overflow:auto;margin-top:10px}.filter{border:0;background:#e5e7eb;border-radius:9px;padding:9px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.filter.on{background:#111827;color:white}
 .head{text-align:center;padding:14px 15px}.head b{font-size:18px}.head small{color:#9ca3af;display:block;margin-top:2px}
 
-/* DIPAKSA MENJADI 3 KOLOM / GRID */
+/* GRID 3 KOLOM */
 .grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important;padding:2px !important}
 
 .card{border:1px solid #e5e7eb;border-radius:12px;padding:10px;cursor:pointer;background:#fff;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
@@ -36,18 +36,16 @@
 .toggle-detail.ready-text{color:#15803d}
 .result{background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px;font-size:13px;line-height:1.8;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
 
-/* Responsif HP: Tetap dipaksa 3 kolom atau 2 kolom jika layar terlalu kecil */
 @media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:8px}.name{font-size:11px}.slot-val{font-size:14px}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="title"><span style="color:#0284c7">xl</span> JuraganXL</div>
-  <div class="subtitle" id="updateTime">02:32 WIB</div>
+  <div class="subtitle" id="updateTime">-</div>
 </header>
 <nav class="nav">
 <button class="active" onclick="go('home',this)">Beranda</button>
-<button onclick="go('stok',this)">📦 Stok</button>
 <button onclick="go('area',this)">📍 Cek Area</button>
 <button onclick="go('nomor',this)">🔎 Cek Nomor</button>
 <button onclick="go('info',this)">ℹ️ Info</button>
@@ -55,7 +53,7 @@
 
 <main class="wrap">
 <section id="home" class="page active">
-<div class="panel"><h1>Informasi Produk</h1><div class="muted">Gunakan menu di atas untuk melihat stok, area, cek nomor, dan informasi terkait.</div></div>
+<div class="panel"><h1>Informasi Produk</h1><div class="muted">Silakan tekan tombol Lihat Stok di bawah atau tombol Refresh API untuk memperbarui data secara real-time.</div></div>
 <div class="stats">
   <div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div>
   <div class="stat"><b id="homeReady">0</b><small>PRODUK READY</small></div>
@@ -65,19 +63,23 @@
     <small><button class="btn-refresh" onclick="manualRefresh()">🔄 Refresh</button></small>
   </div>
 </div>
-<div class="panel"><h2>📦 Ketersediaan</h2><button class="btn full" onclick="go('stok',document.querySelectorAll('.nav button')[1])">LIHAT STOK</button></div>
+<div class="panel"><h2>📦 Ketersediaan Produk</h2><button class="btn full" onclick="go('stok', null)">LIHAT STOK</button></div>
 </section>
 
 <section id="stok" class="page">
 <div class="panel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="go('home', document.querySelectorAll('.nav button')[0])">← Kembali ke Beranda</button>
+    <button class="btn-refresh" onclick="manualRefresh()">🔄 Refresh Realtime</button>
+  </div>
   <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk...">
   <div class="filters">
     <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
-    <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1 (XLA)</button>
-    <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2 (XDA)</button>
-    <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3 (KDA)</button>
-    <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4 (XLF)</button>
-    <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5 (PDA)</button>
+    <button class="filter" data-v="V1" onclick="setFilter('V1', this)">Akrab V1</button>
+    <button class="filter" data-v="V2" onclick="setFilter('V2', this)">Akrab V2</button>
+    <button class="filter" data-v="V3" onclick="setFilter('V3', this)">Akrab V3</button>
+    <button class="filter" data-v="V4" onclick="setFilter('V4', this)">Akrab V4</button>
+    <button class="filter" data-v="V5" onclick="setFilter('V5', this)">Akrab V5</button>
   </div>
 </div>
 <div id="stockList"></div>
@@ -97,7 +99,7 @@
 </section>
 
 <section id="info" class="page">
-<div class="panel"><h1>ℹ️ Informasi</h1><div class="notice">Halaman informasi layanan dan pemesanan reseller.</div></div>
+<div class="panel"><h1>ℹ️ Informasi</h1><div class="muted">Halaman informasi layanan dan pemesanan reseller.</div></div>
 </section>
 </main>
 
@@ -161,10 +163,10 @@ async function fetchProducts() {
 }
 
 function manualRefresh() {
-  const btn = document.querySelector(".btn-refresh");
-  btn.textContent = "⏳ Memuat...";
+  const btns = document.querySelectorAll(".btn-refresh");
+  btns.forEach(b => b.textContent = "⏳ Memuat...");
   fetchProducts().then(() => {
-    btn.textContent = "🔄 Refresh";
+    btns.forEach(b => b.textContent = "🔄 Refresh");
   });
 }
 
@@ -188,9 +190,8 @@ function toggleCard(elem) {
 function updateStats(){
   const total = products.reduce((a,p)=>a+p.stock,0);
   
-  // Produk ready: Selain PDA dihitung jika stok > 0, khusus PDA dihitung jika stok > 0 (OPEN)
+  // Produk ready: Selain PDA dihitung jika stok > 0, khusus PDA dihitung berapa produk yang OPEN (stok > 0)
   const ready = products.filter(p => {
-    if(p.v === "V5") return p.stock > 0;
     return p.stock > 0;
   }).length;
 
@@ -211,9 +212,17 @@ function renderStock(){
   const groups = {};
   arr.forEach(p => (groups[p.v] ??=[]).push(p));
   
+  const nameMap = {
+    "V1": "Akrab V1",
+    "V2": "Akrab V2",
+    "V3": "Akrab V3",
+    "V4": "Akrab V4",
+    "V5": "Akrab V5"
+  };
+
   let out = "";
   for(const [v, items] of Object.entries(groups)){
-    out += `<div class="head"><b>Produk ${v}</b><small>${items.length} item</small></div><div class="grid">`;
+    out += `<div class="head"><b>Produk ${nameMap[v] || v}</b><small>${items.length} item</small></div><div class="grid">`;
     items.forEach(p => {
       const isPDA = p.v === "V5";
       const isReady = p.stock > 0;
@@ -254,8 +263,11 @@ function checkCity(){
   document.getElementById("cityResult").innerHTML = `<div class="panel">Hasil deteksi area aktif dan siap dipesan.</div>`;
 }
 
+// Inisialisasi & Realtime Auto-refresh setiap 10 detik
 fetchProducts();
 setInterval(fetchProducts, 10000);
+
+document.getElementById("stockSearch").addEventListener("input", renderStock);
 </script>
 </body>
 </html>
