@@ -3,93 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC Store - Katalog Stok Real-Time</title>
+<title>IC Store - Katalog Stok</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-button,input{font:inherit}
+*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
+.top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
+.wrap{padding:20px 15px 80px}
+.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
+.search{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;outline:none;background:#fff;font-size:13px}
+.filters{display:flex;gap:6px;overflow:auto;margin-top:10px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
+.head{text-align:center;padding:16px 10px 8px}.head b{font-size:16px;color:#0f172a}.head small{color:#94a3b8;display:block;margin-top:2px;font-size:11px}
 
-.top{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 2px rgba(0,0,0,0.02);position:sticky;top:0;z-index:10}
-.title{font-size:16px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px}
-.subtitle{font-size:11px;color:#64748b;font-weight:600}
+/* GRID PERSIS SEPERTI SEBELUMNYA: 3 KOLOM SEJAJAR */
+.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important}
+.card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
+.card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
 
-.wrap{max-width:1100px;margin:auto;padding:20px 15px 60px}
+/* Style untuk produk habis/tutup agar tetap rapi */
+.card.habis{background:#fafafa;opacity:0.85}
 
-.panel{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
-.search{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;outline:none;background:#f8fafc;font-size:13px;transition:all 0.2s}
-.search:focus{background:#fff;border-color:#0f172a;box-shadow:0 0 0 3px rgba(15,23,42,0.08)}
-
-.filters{display:flex;gap:6px;overflow:auto;margin-top:12px;padding-bottom:4px}
-.filter{border:1px solid #e2e8f0;background:#f8fafc;color:#475569;border-radius:10px;padding:8px 14px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer;transition:all 0.2s}
-.filter:hover{background:#e2e8f0}
-.filter.on{background:#0f172a;color:#fff;border-color:#0f172a}
-
-.head{display:flex;justify-content:space-between;align-items:baseline;padding:14px 4px 8px;border-bottom:2px solid #e2e8f0;margin-bottom:12px}
-.head b{font-size:15px;color:#0f172a;text-transform:uppercase;letter-spacing:0.5px}
-.head small{color:#64748b;font-size:11px;font-weight:600}
-
-.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:12px !important;margin-bottom:20px}
-
-/* Desain Kartu Produk Modern */
-.card{border:1px solid #e2e8f0;border-radius:14px;padding:14px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.02);transition:all 0.2s}
-.card:hover{border-color:#94a3b8;box-shadow:0 6px 16px rgba(0,0,0,0.05);transform:translateY(-2px)}
-
-/* Styling untuk Produk Habis/Close agar tampak redup tapi tetap jelas */
-.card.habis{background:#fafafa;border-color:#e2e8f0;opacity:0.8}
-
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start}
 .name{font-weight:800;font-size:13px;color:#0f172a}
-
-.badge-habis{font-size:9px;font-weight:800;border-radius:99px;padding:3px 8px;background:#fee2e2;color:#dc2626;letter-spacing:0.3px}
-.badge-ready{font-size:9px;font-weight:800;border-radius:99px;padding:3px 8px;background:#d1fae5;color:#059669;letter-spacing:0.3px}
-
-.slot-label{font-size:9px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
-.slot-val{font-size:16px;font-weight:800;color:#0f172a;margin:2px 0 6px}
-
-.area-list{border-top:1px dashed #e2e8f0;padding-top:8px;margin-top:8px;display:none}
+.badge-habis{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ffeeee;color:#dc2626}
+.badge-ready{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ecfdf5;color:#059669}
+.slot-label{font-size:9px;color:#64748b;font-weight:700;margin-top:8px;text-transform:uppercase}
+.slot-val{font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
-
-.area-row{display:flex;justify-content:space-between;font-size:11px;color:#64748b;padding:3px 0}
-.area-row b{color:#334155}
-
-.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:8px;margin-top:6px}
+.area-row{display:flex;justify-content:space-between;font-size:11px;color:#475569;padding:2px 0}
+.area-row b{color:#0f172a}
+.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
 .toggle-detail.ready-text{color:#059669}
+.footer-brand{text-align:center;font-size:11px;color:#94a3b8;margin-top:30px;font-weight:600}
 
-.footer-brand{text-align:center;font-size:11px;color:#94a3b8;margin-top:40px;font-weight:600}
-
-@media(max-width:768px){
-  .grid{grid-template-columns:repeat(2, 1fr) !important;gap:10px !important}
-}
-@media(max-width:480px){
-  .grid{grid-template-columns:repeat(1, 1fr) !important}
-}
+@media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}.card{padding:10px}.name{font-size:11px}.slot-val{font-size:13px}}
 </style>
 </head>
 <body>
-
 <header class="top">
-  <div class="title">📦 Katalog Stok Real-Time</div>
-  <div class="subtitle" id="updateTime">Memuat...</div>
+  <div class="title">📦 Katalog Stok Produk</div>
+  <div class="subtitle" id="updateTime">-</div>
 </header>
 
 <main class="wrap">
-  <!-- Panel Pencarian & Filter -->
-  <div class="panel">
-    <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk atau nama...">
-    <div class="filters">
-      <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
-      <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
-      <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
-      <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
-      <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
-      <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
-    </div>
+<div class="panel" style="padding:12px 16px;">
+  <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk (misal: XLA14, XLA32)...">
+  <div class="filters">
+    <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
+    <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
+    <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
+    <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
+    <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
+    <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
   </div>
-
-  <!-- Daftar Tampilan Stok -->
-  <div id="stockList"></div>
-
-  <div class="footer-brand">Copyright © IC™ 2026</div>
+</div>
+<div id="stockList"></div>
+<div class="footer-brand">Copyright © IC™ 2026</div>
 </main>
 
 <script>
@@ -150,12 +118,9 @@ async function fetchProducts() {
       renderStock();
       
       const now = new Date();
-      document.getElementById("updateTime").textContent = "Sinkron: " + now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
+      document.getElementById("updateTime").textContent = now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
     }
-  } catch (err) { 
-    console.error(err); 
-    document.getElementById("updateTime").textContent = "Gagal memuat";
-  }
+  } catch (err) { console.error(err); }
 }
 
 function setFilter(v, btn) {
@@ -169,10 +134,41 @@ function toggleCard(elem) {
   elem.classList.toggle("expanded");
   const toggleText = elem.querySelector(".toggle-detail");
   if (elem.classList.contains("expanded")) {
-    toggleText.innerHTML = `Tutup Rincian <span>▲</span>`;
+    toggleText.innerHTML = `Tutup <span>▲</span>`;
   } else {
-    toggleText.innerHTML = `Lihat Rincian <span>▼</span>`;
+    toggleText.innerHTML = `Detail <span>▼</span>`;
   }
+}
+
+function renderCardsHtml(items) {
+  let out = `<div class="grid">`;
+  items.forEach(p => {
+    const isPDA = p.v === "V5";
+    const isReady = p.stock > 0;
+    const cardClass = isReady ? 'card' : 'card habis';
+    
+    out += `<div class="${cardClass}" onclick="toggleCard(this)">
+      <div class="card-top">
+        <div class="name">${p.code}</div>
+        <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
+      </div>
+      <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
+      <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}; color:${isReady ? '#0f172a' : '#dc2626'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : (isReady ? p.stock : 'Habis (0)')}</div>
+      
+      <div class="area-list">
+        <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
+        <div class="area-row"><span>Area 2</span><b>${p.areas.a2}</b></div>
+        <div class="area-row"><span>Area 3</span><b>${p.areas.a3}</b></div>
+        <div class="area-row"><span>Area 4</span><b>${p.areas.a4}</b></div>
+      </div>
+      
+      <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
+        Detail <span>▼</span>
+      </div>
+    </div>`;
+  });
+  out += `</div>`;
+  return out;
 }
 
 function renderStock(){
@@ -181,52 +177,15 @@ function renderStock(){
   
   const groups = {};
   arr.forEach(p => (groups[p.v] ??=[]).push(p));
-
+  
   let out = "";
   for(const [v, items] of Object.entries(groups)){
-    // Menghitung jumlah yang ready dan habis di kategori ini
-    const totalReady = items.filter(i => i.stock > 0).length;
-    
-    out += `<div class="head">
-      <b>Kategori ${v}</b>
-      <small>${totalReady} Ready dari ${items.length} Total</small>
-    </div>`;
-    
-    out += `<div class="grid">`;
-    items.forEach(p => {
-      const isPDA = p.v === "V5";
-      const isReady = p.stock > 0;
-      
-      // Kelas tambahan 'habis' jika stok 0 atau close
-      const cardClass = isReady ? 'card' : 'card habis';
-      
-      out += `<div class="${cardClass}" onclick="toggleCard(this)">
-        <div class="card-top">
-          <div class="name">${p.code}</div>
-          <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
-        </div>
-        <div class="slot-label">${isPDA ? 'Status Layanan' : 'Sisa Slot'}</div>
-        <div class="slot-val" style="color:${isReady ? '#0f172a' : '#dc2626'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : (isReady ? p.stock : 'Habis (0)')}</div>
-        
-        <div class="area-list">
-          <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
-          <div class="area-row"><span>Area 2</span><b>${p.areas.a2}</b></div>
-          <div class="area-row"><span>Area 3</span><b>${p.areas.a3}</b></div>
-          <div class="area-row"><span>Area 4</span><b>${p.areas.a4}</b></div>
-        </div>
-        
-        <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
-          Lihat Rincian <span>▼</span>
-        </div>
-      </div>`;
-    });
-    out += `</div>`;
+    out += `<div class="head"><b>${v}</b><small>${items.length} pilihan</small></div>`;
+    out += renderCardsHtml(items);
   }
-  
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:50px;color:#94a3b8;font-size:13px;background:#fff;border-radius:14px;border:1px solid #e2e8f0;">Produk atau kode yang dicari tidak ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;">Produk tidak ditemukan.</div>';
 }
 
-// Jalankan saat pertama kali dibuka & lakukan auto-refresh tiap 10 detik
 fetchProducts();
 setInterval(fetchProducts, 10000);
 
