@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Informasi Produk</title>
+<title>Cek Stok Supplier & Produk</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e5e7eb;padding:17px 16px}.topin,.wrap{max-width:1080px;margin:auto}.title{font-size:22px;font-weight:900}.subtitle{font-size:11px;color:#6b7280;margin-top:3px}
 .nav{background:#fff;border-bottom:1px solid #e5e7eb;display:flex;overflow:auto;padding:0 10px;position:sticky;top:0;z-index:4}.nav button{border:0;background:none;color:#6b7280;padding:14px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.nav button.active{color:#111827;border-bottom:2px solid #111827}
 .wrap{padding:18px 15px 55px}.page{display:none}.page.active{display:block}
@@ -20,7 +20,7 @@
 </style>
 </head>
 <body>
-<header class="top"><div class="topin"><div class="title">Informasi Produk</div><div class="subtitle">Informasi stok dan detail produk digital</div></div></header>
+<header class="top"><div class="topin"><div class="title">Informasi Produk Supplier</div><div class="subtitle">Pantau stok dan detail produk via API secara real-time</div></div></header>
 <nav class="nav">
 <button class="active" onclick="go('home',this)">Beranda</button>
 <button onclick="go('stok',this)">📦 Stok</button>
@@ -29,20 +29,29 @@
 
 <main class="wrap">
 <section id="home" class="page active">
-<div class="panel"><h1>Informasi Produk</h1><div class="muted">Gunakan menu di atas untuk melihat stok dan produk.</div></div>
-<div class="stats"><div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="homeReady">0</b><small>READY</small></div><div class="stat"><b id="homeEmpty">0</b><small>HABIS</small></div><div class="stat"><b>24/7</b><small>STATUS</small></div></div>
-<div class="panel"><h2>📦 Ketersediaan</h2><button class="btn full" onclick="go('stok',document.querySelectorAll('.nav button')[1])">LIHAT STOK</button></div>
+<div class="panel"><h1>Dashboard</h1><div class="muted">Selamat datang! Data di bawah ini tersambung langsung dari API supplier Anda.</div></div>
+<div class="stats">
+  <div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div>
+  <div class="stat"><b id="homeReady">0</b><small>READY</small></div>
+  <div class="stat"><b id="homeEmpty">0</b><small>HABIS</small></div>
+  <div class="stat"><b>API</b><small>STATUS</small></div>
+</div>
+<div class="panel"><h2>📦 Ketersediaan Produk</h2><button class="btn full" onclick="go('stok',document.querySelectorAll('.nav button')[1])">LIHAT SEMUA STOK</button></div>
 </section>
 
 <section id="stok" class="page">
-<div class="panel"><h1>📦 Stok Produk</h1><div class="muted">Pantau ketersediaan produk secara real-time.</div><div style="margin-top:11px"><button class="btn" onclick="initData()">↻ Refresh Stok</button> <span id="updateTime" class="muted">Memuat...</span></div></div>
-<div class="stats"><div class="stat"><b id="total">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="ready">0</b><small>READY</small></div><div class="stat"><b id="empty">0</b><small>HABIS</small></div></div>
+<div class="panel"><h1>📦 Stok Produk</h1><div class="muted">Pantau ketersediaan produk secara langsung dari server supplier.</div><div style="margin-top:11px"><button class="btn" onclick="fetchProductsFromAPI()">↻ Refresh Data API</button> <span id="updateTime" class="muted">Memuat...</span></div></div>
+<div class="stats">
+  <div class="stat"><b id="total">0</b><small>TOTAL STOK</small></div>
+  <div class="stat"><b id="ready">0</b><small>READY</small></div>
+  <div class="stat"><b id="empty">0</b><small>HABIS</small></div>
+</div>
 <div class="panel"><input id="stockSearch" class="search" placeholder="🔎 Cari nama produk atau kode..."></div>
 <div id="stockList"></div>
 </section>
 
 <section id="produk" class="page">
-<div class="panel"><h1>📋 Daftar Produk</h1><div class="muted">Semua produk yang tersedia.</div><input id="productSearch" class="search" style="margin-top:12px" placeholder="🔎 Cari produk..."></div>
+<div class="panel"><h1>📋 Daftar Produk</h1><div class="muted">Semua produk yang tersedia dari supplier.</div><input id="productSearch" class="search" style="margin-top:12px" placeholder="🔎 Cari produk..."></div>
 <div id="productList"></div>
 </section>
 </main>
@@ -50,13 +59,7 @@
 <div id="modal" class="modal"><div class="box"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
 
 <script>
-// Data produk disatukan di sini (Anda bebas tambah/ubah item di bawah ini)
-let products = [
-  { code: "DATA1", name: "Injected 1GB Utama", type: "Regular", quota: "1 GB", stock: 15, area: "Semua Area" },
-  { code: "DATA2", name: "Injected 2GB Utama", type: "Regular", quota: "2 GB", stock: 8, area: "Semua Area" },
-  { code: "DATA5", name: "Injected 5GB Utama", type: "Regular", quota: "5 GB", stock: 0, area: "Semua Area" },
-  { code: "DATA10", name: "Injected 10GB Utama", type: "Regular", quota: "10 GB", stock: 20, area: "Semua Area" }
-];
+let products = [];
 
 function go(id,btn){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
@@ -66,11 +69,32 @@ function go(id,btn){
   window.scrollTo(0,0);
 }
 
-function initData() {
-  updateStats();
-  renderStock();
-  renderProducts();
-  document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
+async function fetchProductsFromAPI() {
+  document.getElementById("updateTime").textContent = "Mengambil data...";
+  try {
+    const response = await fetch('/api/products');
+    const result = await response.json();
+    
+    if (Array.isArray(result)) {
+      products = result.map(item => ({
+        code: item.code || "CODE",
+        name: item.name || "Produk",
+        type: item.type || "Regular",
+        quota: item.quota || "-",
+        stock: Number(item.stock) || 0,
+        price: item.price || 0,
+        area: item.area || "Semua Area"
+      }));
+    }
+
+    updateStats();
+    renderStock();
+    renderProducts();
+    document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
+  } catch (err) {
+    console.error("Gagal memuat produk:", err);
+    document.getElementById("updateTime").textContent = "Gagal terhubung ke API";
+  }
 }
 
 function renderStock(){
@@ -85,7 +109,7 @@ function renderStock(){
   }
   let out = `<section class="section"><div class="head"><b>Daftar Stok</b><small>${arr.length} produk</small></div><div class="grid">`;
   arr.forEach(p => {
-    out += `<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">📦 ${p.quota}<br>📍 ${p.area}</div><div class="bottom"><span class="stock">${p.stock}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`;
+    out += `<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">📦 ${p.quota}<br>💰 Rp ${Number(p.price).toLocaleString("id-ID")}</div><div class="bottom"><span class="stock">${p.stock}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`;
   });
   out += "</div></section>";
   listEl.innerHTML = out;
@@ -97,7 +121,12 @@ function renderProducts(){
   const listEl = document.getElementById("productList");
   if(!listEl) return;
 
-  listEl.innerHTML = `<section class="section"><div class="head"><b>Semua Produk</b><small>${arr.length} produk</small></div><div class="grid">${arr.map(p=>`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">${p.type} • ${p.quota}</div><div class="bottom"><span>${p.area}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`).join("")}</div></section>`;
+  if(arr.length === 0) {
+    listEl.innerHTML = '<div class="section empty">Tidak ada produk ditemukan.</div>';
+    return;
+  }
+
+  listEl.innerHTML = `<section class="section"><div class="head"><b>Semua Produk</b><small>${arr.length} produk</small></div><div class="grid">${arr.map(p=>`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">${p.type} • ${p.quota}<br>Rp ${Number(p.price).toLocaleString("id-ID")}</div><div class="bottom"><span>${p.area}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`).join("")}</div></section>`;
 }
 
 function updateStats(){
@@ -117,7 +146,7 @@ function showProduct(code){
   const p = products.find(x => x.code === code);
   if(!p) return;
   document.getElementById("modalContent").innerHTML = `<div class="big">${p.name}</div><div class="detail">
-  Kode: <b>${p.code}</b><br>Jenis: <b>${p.type}</b><br>Kuota: <b>${p.quota}</b><br>Area: <b>${p.area}</b><br>Stok: <b>${p.stock}</b><br>Status: <b>${p.stock>0?'🟢 READY':'🔴 HABIS'}</b>
+  Kode: <b>${p.code}</b><br>Jenis: <b>${p.type}</b><br>Kuota: <b>${p.quota}</b><br>Harga: <b>Rp ${Number(p.price).toLocaleString("id-ID")}</b><br>Stok: <b>${p.stock}</b><br>Status: <b>${p.stock>0?'🟢 READY':'🔴 HABIS'}</b>
   </div><button class="btn full" onclick="closeModal()">TUTUP</button>`;
   document.getElementById("modal").classList.add("show");
 }
@@ -130,8 +159,8 @@ document.getElementById("stockSearch").oninput = renderStock;
 document.getElementById("productSearch").oninput = renderProducts;
 document.getElementById("modal").onclick = e => { if(e.target.id === "modal") closeModal(); };
 
-// Jalankan sistem saat halaman dibuka
-initData();
+// Ambil data dari API saat halaman pertama kali dibuka
+fetchProductsFromAPI();
 </script>
 </body>
 </html>
