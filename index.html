@@ -188,13 +188,15 @@ function toggleCard(elem) {
 }
 
 function updateStats(){
-  const total = products.reduce((a,p)=>a+p.stock,0);
+  // Total stok dihitung dari total stok produk biasa, khusus PDA (V5) jika open dihitung 1
+  const total = products.reduce((a, p) => {
+    if (p.v === "V5") {
+      return a + (p.stock > 0 ? 1 : 0);
+    }
+    return a + p.stock;
+  }, 0);
   
-  // Produk ready: Selain PDA dihitung jika stok > 0, khusus PDA dihitung berapa produk yang OPEN (stok > 0)
-  const ready = products.filter(p => {
-    return p.stock > 0;
-  }).length;
-
+  const ready = products.filter(p => p.stock > 0).length;
   const empty = products.filter(p => {
     if(p.v === "V5") return p.stock <= 0;
     return p.stock === 0;
