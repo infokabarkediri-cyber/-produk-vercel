@@ -15,7 +15,7 @@
 .search{width:100%;border:1px solid #dfe3e8;border-radius:10px;padding:12px;outline:none;background:#fff}.filters{display:flex;gap:7px;overflow:auto;margin-top:10px}.filter{border:0;background:#e5e7eb;border-radius:9px;padding:9px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.filter.on{background:#111827;color:white}
 .section{background:transparent;border:0;border-radius:16px;overflow:hidden;margin:13px 0}.head{text-align:center;padding:14px 15px}.head b{font-size:18px}.head small{color:#9ca3af;display:block;margin-top:2px}
 
-/* Grid 3 Kolom per baris persis seperti permintaan */
+/* Tampilan Grid: 3 Kolom per baris */
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:2px}
 
 .card{border:1px solid #e5e7eb;border-radius:14px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
@@ -34,7 +34,7 @@
 .toggle-detail.ready-text{color:#15803d}
 .result{background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px;font-size:13px;line-height:1.8;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
 
-/* Responsif HP */
+/* Responsif untuk layar HP */
 @media(max-width:768px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.grid{grid-template-columns:1fr}}
 </style>
@@ -195,7 +195,7 @@ function renderStock(){
           <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
         </div>
         <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-        <div class="slot-val" style="font-size:${isPDA ? '16px' : '20px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
+        <div class="slot-val" style="font-size:${isPDA ? '15px' : '20px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
         
         <div class="area-list">
           <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
