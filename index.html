@@ -3,22 +3,33 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC Store - Katalog Stok</title>
+<title>IC Store - Ringkasan & Katalog Stok</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
 .wrap{padding:20px 15px 80px}
+
+/* KOTAK RINGKASAN STATISTIK PROFESIONAL */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.01);position:relative;overflow:hidden}
+.stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
+.stat-card.ready::before{background:#059669}
+.stat-card.habis::before{background:#dc2626}
+.stat-label{font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.stat-val{font-size:22px;font-weight:800;color:#0f172a;margin-top:4px}
+.stat-sub{font-size:10px;color:#94a3b8;margin-top:2px}
+
 .panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
 .search{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;outline:none;background:#fff;font-size:13px}
 .filters{display:flex;gap:6px;overflow:auto;margin-top:10px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
-.head{text-align:center;padding:16px 10px 8px}.head b{font-size:16px;color:#0f172a}.head small{color:#94a3b8;display:block;margin-top:2px;font-size:11px}
+.head{display:flex;justify-content:space-between;align-items:baseline;padding:16px 10px 8px;border-bottom:1px solid #e2e8f0;margin-bottom:10px}
+.head b{font-size:15px;color:#0f172a}
+.head small{color:#64748b;font-size:11px;font-weight:600}
 
-/* GRID PERSIS SEPERTI SEBELUMNYA: 3 KOLOM SEJAJAR */
+/* GRID 3 KOLOM RAPI */
 .grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important}
-.card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
+.card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 2px rgba(0,0,0,0.02);transition:all 0.2s ease}
 .card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
-
-/* Style untuk produk habis/tutup agar tetap rapi */
 .card.habis{background:#fafafa;opacity:0.85}
 
 .card-top{display:flex;justify-content:space-between;align-items:flex-start}
@@ -40,24 +51,39 @@
 </head>
 <body>
 <header class="top">
-  <div class="title">📦 Katalog Stok Produk</div>
-  <div class="subtitle" id="updateTime">-</div>
+  <div class="title">📦 Katalog Stok Profesional</div>
+  <div class="subtitle" id="updateTime">Menghubungkan...</div>
 </header>
 
 <main class="wrap">
-<div class="panel" style="padding:12px 16px;">
-  <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk (misal: XLA14, XLA32)...">
-  <div class="filters">
-    <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
-    <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
-    <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
-    <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
-    <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
-    <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
+  <!-- WIDGET RINGKASAN STATISTIK -->
+  <div class="stats-grid">
+    <div class="stat-card ready">
+      <div class="stat-label">Total Stok Tersedia (Ready)</div>
+      <div class="stat-val" id="statReady">0</div>
+      <div class="stat-sub" id="statReadyCount">0 varian aktif</div>
+    </div>
+    <div class="stat-card habis">
+      <div class="stat-label">Total Stok Habis (Close)</div>
+      <div class="stat-val" id="statHabis">0</div>
+      <div class="stat-sub" id="statHabisCount">0 varian kosong</div>
+    </div>
   </div>
-</div>
-<div id="stockList"></div>
-<div class="footer-brand">Copyright © IC™ 2026</div>
+
+  <div class="panel" style="padding:12px 16px;">
+    <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk (misal: XLA14, XLA32)...">
+    <div class="filters">
+      <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
+      <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
+      <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
+      <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
+      <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
+      <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
+    </div>
+  </div>
+
+  <div id="stockList"></div>
+  <div class="footer-brand">Copyright © IC™ 2026</div>
 </main>
 
 <script>
@@ -115,12 +141,39 @@ async function fetchProducts() {
         };
       }).filter(p => p.v !== "OTHER");
       
+      updateStatistics();
       renderStock();
       
       const now = new Date();
-      document.getElementById("updateTime").textContent = now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
+      document.getElementById("updateTime").textContent = "Sinkron: " + now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
     }
-  } catch (err) { console.error(err); }
+  } catch (err) { 
+    console.error(err); 
+    document.getElementById("updateTime").textContent = "Gagal menyinkronkan";
+  }
+}
+
+function updateStatistics() {
+  let totalReadyUnits = 0;
+  let readyVariantCount = 0;
+  let totalHabisUnits = 0;
+  let habisVariantCount = 0;
+
+  products.forEach(p => {
+    if (p.stock > 0) {
+      totalReadyUnits += p.stock;
+      readyVariantCount++;
+    } else {
+      totalHabisUnits += 1; // Menghitung varian yang habis
+      habisVariantCount++;
+    }
+  });
+
+  document.getElementById("statReady").textContent = totalReadyUnits.toLocaleString("id-ID");
+  document.getElementById("statReadyCount").textContent = `${readyVariantCount} varian produk aktif`;
+  
+  document.getElementById("statHabis").textContent = habisVariantCount.toLocaleString("id-ID");
+  document.getElementById("statHabisCount").textContent = `Varian kosong / close`;
 }
 
 function setFilter(v, btn) {
@@ -180,10 +233,11 @@ function renderStock(){
   
   let out = "";
   for(const [v, items] of Object.entries(groups)){
-    out += `<div class="head"><b>${v}</b><small>${items.length} pilihan</small></div>`;
+    const readyInGroup = items.filter(i => i.stock > 0).length;
+    out += `<div class="head"><b>Kategori ${v}</b><small>${readyInGroup} Ready dari ${items.length} Total</small></div>`;
     out += renderCardsHtml(items);
   }
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;">Produk tidak ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">Produk tidak ditemukan.</div>';
 }
 
 fetchProducts();
