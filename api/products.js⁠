@@ -6,7 +6,7 @@ module.exports = async function handler(req, res) {
     const apiResponse = await fetch('https://api.ics-provider.com/v1/products', {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer TOKEN_API_ICS_ANDA',
+        'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
         'Content-Type': 'application/json'
       }
     });
