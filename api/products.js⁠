@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Mengizinkan akses dari luar (CORS)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
@@ -8,6 +7,7 @@ export default async function handler(req, res) {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ICS_sk_9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
@@ -15,7 +15,6 @@ export default async function handler(req, res) {
 
     const result = await apiResponse.json();
 
-    // Cek apakah data ada di dalam result.data atau langsung berupa array
     const rawData = result.data || result;
     const listArray = Array.isArray(rawData) ? rawData : [];
 
@@ -32,4 +31,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: "Gagal mengambil data", details: err.message });
   }
-} // <-- Pastikan kurung kurawal penutup ini ada di paling bawah!
+}
