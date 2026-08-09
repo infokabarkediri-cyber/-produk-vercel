@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const apiResponse = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ICS_sk_9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', // Ganti dengan token asli Anda
+        'Authorization': 'Bearer ICS_sk_9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
@@ -32,4 +32,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: "Gagal mengambil data", details: err.message });
   }
-}
+} // <-- Pastikan kurung kurawal penutup ini ada di paling bawah!
