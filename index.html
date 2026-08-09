@@ -3,162 +3,106 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC Store - Cek & Katalog</title>
+<title>IC Store - Katalog & Cek</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
-.top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
-.nav{background:#fff;border-bottom:1px solid #e2e8f0;display:flex;overflow:auto;padding:0 12px;position:sticky;top:0;z-index:4}.nav button{border:0;background:none;color:#64748b;padding:14px 20px;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}.nav button.active{color:#0f172a;border-bottom:2px solid #0f172a}
-.wrap{padding:20px 15px 80px}.page{display:none}.page.active{display:block}
-.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}.panel h1{font-size:16px;margin:0 0 10px;color:#0f172a}.muted{font-size:13px;color:#64748b;line-height:1.5;margin-bottom:12px}
-.search{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;outline:none;background:#fff;font-size:13px}.filters{display:flex;gap:6px;overflow:auto;margin-top:10px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
-.head{text-align:center;padding:16px 10px 8px}.head b{font-size:16px;color:#0f172a}.head small{color:#94a3b8;display:block;margin-top:2px;font-size:11px}
-.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important}
-.card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
-.card-top{display:flex;justify-content:space-between;align-items:flex-start}
-.name{font-weight:800;font-size:13px;color:#0f172a}
-.badge-habis{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ffeeee;color:#dc2626}
-.badge-ready{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ecfdf5;color:#059669}
-.slot-val{font-size:14px;font-weight:800;color:#0f172a;margin-top:8px}
-.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none;font-size:10px;color:#64748b}
-.card.expanded .area-list{display:block}
-.result{background:#f8fafc;border-radius:10px;padding:14px;margin-top:12px;font-size:13px;display:none}
-.btn{border:0;background:#0f172a;color:#fff;border-radius:10px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;width:100%;margin-top:8px}
-.footer-brand{text-align:center;font-size:11px;color:#94a3b8;margin-top:30px;font-weight:600}
-@media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}}
+*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.wrap{max-width:600px;margin:auto;padding:20px 15px 50px}.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px}
+h1{font-size:16px;margin:0 0 10px;color:#0f172a}.search{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px;margin-bottom:8px}
+.btn{border:0;background:#0f172a;color:#fff;border-radius:10px;padding:12px;font-weight:800;width:100%;cursor:pointer}
+.result{background:#f8fafc;border-radius:10px;padding:14px;margin-top:12px;font-size:13px;display:none;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.card{border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center;font-size:11px}
+.footer{text-align:center;font-size:11px;color:#94a3b8;margin-top:30px}
 </style>
 </head>
 <body>
-<header class="top">
-  <div class="title">✨ Cek & Katalog</div>
-  <div class="subtitle" id="updateTime">-</div>
-</header>
-<nav class="nav">
-<button class="active" onclick="go('cek',this)">🔎 Cek (Nomor & Area)</button>
-<button onclick="go('stok',this)">📦 Stok Produk</button>
-</nav>
 
 <main class="wrap">
-<!-- HALAMAN CEK -->
-<section id="cek" class="page active">
+  <!-- PANEL CEK -->
   <div class="panel">
-    <h1>🔎 Cek Nomor Pelanggan</h1>
-    <input id="number" class="search" placeholder="Contoh: 0812xxxxxxx" inputmode="numeric">
+    <h1>🔎 Cek Nomor & Paket</h1>
+    <input id="number" class="search" placeholder="08xxxxxxxxxx" inputmode="numeric">
     <button class="btn" onclick="checkNumber()">Periksa Nomor</button>
     <div id="numberResult" class="result"></div>
   </div>
+
   <div class="panel">
     <h1>📍 Cek Area</h1>
-    <input id="cityInput" class="search" placeholder="Contoh: Semarang, Solo, Jakarta">
+    <input id="cityInput" class="search" placeholder="Contoh: Semarang">
     <button class="btn" onclick="checkCity()">Cari Area</button>
+    <div id="cityResult" class="result"></div>
   </div>
-  <div id="cityResult"></div>
-</section>
 
-<!-- HALAMAN STOK -->
-<section id="stok" class="page">
+  <!-- PANEL STOK -->
   <div class="panel">
-    <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk...">
-    <div class="filters">
-      <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
-      <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
-      <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
-      <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
-      <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
-      <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
-    </div>
+    <h1>📦 Stok Produk</h1>
+    <input id="stockSearch" class="search" placeholder="Cari kode...">
+    <div id="stockList" class="grid"></div>
   </div>
-  <div id="stockList"></div>
-</section>
 
-<div class="footer-brand">Copyright © IC™ 2026</div>
+  <div class="footer">Copyright © IC™ 2026</div>
 </main>
 
 <script>
-let products = [];
-let activeVersion = "ALL";
 const CREDENTIALS = {
+  apiKey: "mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5",
   xClient: "9951786330457fbb6300783a",
-  xPax: "3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9",
-  apiKey: "mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5"
+  xPax: "3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9"
 };
 
-function go(id,btn){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-  if(btn) btn.classList.add("active");
+let products = [];
+
+async function checkNumber() {
+  const n = document.getElementById("number").value.trim();
+  const r = document.getElementById("numberResult");
+  if (!/^08\d{8,11}$/.test(n)) return alert("Format harus 08xxx");
+  
+  r.style.display = "block"; r.innerHTML = "⏳ Memproses...";
+  try {
+    const res = await fetch('https://api.ics-store.my.id/api/v1/sidompul/cek', {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${CREDENTIALS.apiKey}`,
+        'X-Client': CREDENTIALS.xClient,
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({ "nomer": n, "x-pak": CREDENTIALS.xPax })
+    });
+    const data = await res.json();
+    if(data.status === "success") {
+      r.innerHTML = `✅ ${data.data.info_kartu.operator} | ${data.data.info_kartu.masa_aktif}<br>📦 ${data.data.info_paket[0]?.nama_paket || 'No Paket'}`;
+    } else { r.innerHTML = "❌ " + data.keterangan; }
+  } catch(e) { r.innerHTML = "❌ Gagal koneksi."; }
 }
 
 async function fetchProducts() {
-  try {
-    const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
-      method: 'GET',
-      headers: { 
-        'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
-        'x-client': CREDENTIALS.xClient,
-        'x-pax': CREDENTIALS.xPax,
-        'x-api-key': CREDENTIALS.apiKey
-      }
-    });
-    const result = await res.json();
-    if (result.success) {
-      products = result.data.map(item => {
-        const code = (item.code || "").toUpperCase();
-        let v = "OTHER";
-        if (code.startsWith("XLA")) v = "V1"; else if (code.startsWith("XDA")) v = "V2";
-        else if (code.startsWith("KDA")) v = "V3"; else if (code.startsWith("XLF")) v = "V4";
-        else if (code.startsWith("PDA")) v = "V5";
-        return { v, code: item.code, name: item.name, stock: Number(item.stock || 0), descText: (item.description || "").toLowerCase(), rawAreas: (item.description || "").split("\n").filter(l => l.trim().length > 2) };
-      }).filter(p => p.v !== "OTHER");
-      renderStock();
-      document.getElementById("updateTime").textContent = new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'}) + " WIB";
-    }
-  } catch (err) { console.error(err); }
-}
-
-function setFilter(v, btn) {
-  activeVersion = v;
-  document.querySelectorAll(".filters .filter").forEach(b => b.classList.remove("on"));
-  btn.classList.add("on");
-  renderStock();
-}
-
-function renderStock(){
-  const q = document.getElementById("stockSearch").value.toLowerCase();
-  const arr = products.filter(p => (activeVersion === "ALL" || p.v === activeVersion) && `${p.name} ${p.code}`.toLowerCase().includes(q));
-  let out = "";
-  const groups = {}; arr.forEach(p => (groups[p.v] ??=[]).push(p));
-  for(const [v, items] of Object.entries(groups)){
-    out += `<div class="head"><b>${v}</b></div><div class="grid">`;
-    items.forEach(p => {
-      const isReady = p.stock > 0;
-      out += `<div class="card" onclick="this.classList.toggle('expanded')">
-        <div class="name">${p.code}</div>
-        <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (p.v==='V5'?'OPEN':'READY') : (p.v==='V5'?'CLOSE':'HABIS')}</span>
-        <div class="slot-val">${p.v==='V5' ? (isReady?'🟢 OPEN':'🔴 CLOSE') : p.stock}</div>
-        <div class="area-list">${p.rawAreas.join('<br>')}</div>
-      </div>`;
-    });
-    out += `</div>`;
+  const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
+    headers: { 'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 'x-client': CREDENTIALS.xClient, 'x-pax': CREDENTIALS.xPax, 'x-api-key': CREDENTIALS.apiKey }
+  });
+  const json = await res.json();
+  if(json.success) {
+    products = json.data;
+    renderStock();
   }
-  document.getElementById("stockList").innerHTML = out;
 }
 
-function checkCity(){
-  const k = document.getElementById("cityInput").value.trim().toLowerCase();
-  const matched = products.filter(p => p.stock > 0 && p.descText.includes(k));
-  document.getElementById("cityResult").innerHTML = matched.length > 0 ? `<div class="panel" style="background:#ecfdf5"><b>Hasil untuk "${k}":</b><br>${matched.map(m=>m.code).join(', ')}</div>` : `<div class="panel">Tidak ada produk ready untuk ${k}</div>`;
+function renderStock() {
+  const q = document.getElementById("stockSearch").value.toLowerCase();
+  const html = products.filter(p => p.code.toLowerCase().includes(q)).map(p => 
+    `<div class="card"><b>${p.code}</b><br>${p.stock > 0 ? '🟢' : '🔴'}</div>`
+  ).join('');
+  document.getElementById("stockList").innerHTML = html;
 }
 
-function checkNumber(){
-  const n = document.getElementById("number").value.trim();
-  document.getElementById("numberResult").style.display="block";
-  document.getElementById("numberResult").innerHTML = /^08\d{8,11}$/.test(n) ? `✅ Nomor ${n} valid.` : `❌ Format salah.`;
+function checkCity() {
+  const k = document.getElementById("cityInput").value.toLowerCase();
+  const match = products.filter(p => p.description.toLowerCase().includes(k));
+  document.getElementById("cityResult").style.display = "block";
+  document.getElementById("cityResult").innerHTML = match.length ? match.map(m=>m.code).join(', ') : "Tidak ada.";
 }
 
-fetchProducts();
-setInterval(fetchProducts, 30000);
 document.getElementById("stockSearch").addEventListener("input", renderStock);
+fetchProducts();
 </script>
 </body>
 </html>
