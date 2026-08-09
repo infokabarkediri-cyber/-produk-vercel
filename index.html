@@ -3,99 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC Store - Katalog Produk</title>
+<title>IC Store - Cek & Katalog</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
-.nav{background:#fff;border-bottom:1px solid #e2e8f0;display:flex;overflow:auto;padding:0 12px;position:sticky;top:0;z-index:4}.nav button{border:0;background:none;color:#64748b;padding:14px 14px;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}.nav button.active{color:#0f172a;border-bottom:2px solid #0f172a}
+.nav{background:#fff;border-bottom:1px solid #e2e8f0;display:flex;overflow:auto;padding:0 12px;position:sticky;top:0;z-index:4}.nav button{border:0;background:none;color:#64748b;padding:14px 20px;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}.nav button.active{color:#0f172a;border-bottom:2px solid #0f172a}
 .wrap{padding:20px 15px 80px}.page{display:none}.page.active{display:block}
-.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}.panel h1{font-size:17px;margin:0 0 6px;color:#0f172a}.muted{font-size:13px;color:#64748b;line-height:1.5}
+.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}.panel h1{font-size:16px;margin:0 0 10px;color:#0f172a}.muted{font-size:13px;color:#64748b;line-height:1.5;margin-bottom:12px}
 .search{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;outline:none;background:#fff;font-size:13px}.filters{display:flex;gap:6px;overflow:auto;margin-top:10px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
 .head{text-align:center;padding:16px 10px 8px}.head b{font-size:16px;color:#0f172a}.head small{color:#94a3b8;display:block;margin-top:2px;font-size:11px}
-
 .grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important}
-.card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
-.card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
+.card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
 .card-top{display:flex;justify-content:space-between;align-items:flex-start}
 .name{font-weight:800;font-size:13px;color:#0f172a}
 .badge-habis{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ffeeee;color:#dc2626}
 .badge-ready{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ecfdf5;color:#059669}
-.slot-label{font-size:9px;color:#64748b;font-weight:700;margin-top:8px;text-transform:uppercase}
-.slot-val{font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px}
-.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
+.slot-val{font-size:14px;font-weight:800;color:#0f172a;margin-top:8px}
+.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none;font-size:10px;color:#64748b}
 .card.expanded .area-list{display:block}
-.area-row{display:flex;justify-content:space-between;font-size:11px;color:#475569;padding:2px 0}
-.area-row b{color:#0f172a}
-.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
-.toggle-detail.ready-text{color:#059669}
-.result{background:#f8fafc;border-radius:10px;padding:14px;margin-top:12px;font-size:13px;line-height:1.6;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
-.btn{border:0;background:#0f172a;color:#fff;border-radius:10px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;width:100%}
+.result{background:#f8fafc;border-radius:10px;padding:14px;margin-top:12px;font-size:13px;display:none}
+.btn{border:0;background:#0f172a;color:#fff;border-radius:10px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;width:100%;margin-top:8px}
 .footer-brand{text-align:center;font-size:11px;color:#94a3b8;margin-top:30px;font-weight:600}
-
-@media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}.card{padding:10px}.name{font-size:11px}.slot-val{font-size:13px}}
+@media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}}
 </style>
 </head>
 <body>
 <header class="top">
-  <div class="title">✨ Cek Area & Produk</div>
+  <div class="title">✨ Cek & Katalog</div>
   <div class="subtitle" id="updateTime">-</div>
 </header>
 <nav class="nav">
-<button class="active" onclick="go('area',this)">📍 Cek Area</button>
-<button onclick="go('stok',this)">📦 Semua Produk</button>
-<button onclick="go('nomor',this)">🔎 Cek Nomor</button>
+<button class="active" onclick="go('cek',this)">🔎 Cek (Nomor & Area)</button>
+<button onclick="go('stok',this)">📦 Stok Produk</button>
 </nav>
 
 <main class="wrap">
-<!-- HALAMAN UTAMA: CEK AREA & REKOMENDASI -->
-<section id="area" class="page active">
-<div class="panel">
-  <h1>📍 Cek Area & Rekomendasi</h1>
-  <div class="muted">Masukkan nama kota tujuan Anda untuk langsung melihat rekomendasi produk yang ready di area tersebut.</div>
-  <div class="row" style="margin-top:12px">
+<!-- HALAMAN CEK -->
+<section id="cek" class="page active">
+  <div class="panel">
+    <h1>🔎 Cek Nomor Pelanggan</h1>
+    <input id="number" class="search" placeholder="Contoh: 0812xxxxxxx" inputmode="numeric">
+    <button class="btn" onclick="checkNumber()">Periksa Nomor</button>
+    <div id="numberResult" class="result"></div>
+  </div>
+  <div class="panel">
+    <h1>📍 Cek Area</h1>
     <input id="cityInput" class="search" placeholder="Contoh: Semarang, Solo, Jakarta">
-    <button class="btn" style="width:auto;padding:0 20px" onclick="checkCity()">Cek Area</button>
+    <button class="btn" onclick="checkCity()">Cari Area</button>
   </div>
-</div>
-<div id="cityResult"></div>
-<div class="footer-brand">Copyright © IC™ 2026</div>
+  <div id="cityResult"></div>
 </section>
 
-<!-- HALAMAN SEMUA PRODUK -->
+<!-- HALAMAN STOK -->
 <section id="stok" class="page">
-<div class="panel" style="padding:12px 16px;">
-  <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk...">
-  <div class="filters">
-    <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
-    <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
-    <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
-    <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
-    <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
-    <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
+  <div class="panel">
+    <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk...">
+    <div class="filters">
+      <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
+      <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
+      <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
+      <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
+      <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
+      <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
+    </div>
   </div>
-</div>
-<div id="stockList"></div>
-<div class="footer-brand">Copyright © IC™ 2026</div>
+  <div id="stockList"></div>
 </section>
 
-<!-- HALAMAN CEK NOMOR -->
-<section id="nomor" class="page">
-<div class="panel">
-  <h1>🔎 Cek Nomor Pelanggan</h1>
-  <div class="muted">Pastikan nomor tujuan aktif dan sesuai format.</div>
-  <input id="number" class="search" style="margin-top:12px" placeholder="08xxxxxxxxxx" inputmode="numeric">
-  <button class="btn" style="margin-top:10px" onclick="checkNumber()">Periksa Nomor</button>
-  <div id="numberResult" class="result"></div>
-</div>
 <div class="footer-brand">Copyright © IC™ 2026</div>
-</section>
 </main>
 
 <script>
 let products = [];
 let activeVersion = "ALL";
-
-// Kredensial API yang disematkan
 const CREDENTIALS = {
   xClient: "9951786330457fbb6300783a",
   xPax: "3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9",
@@ -107,7 +87,6 @@ function go(id,btn){
   document.getElementById(id).classList.add("active");
   document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
   if(btn) btn.classList.add("active");
-  window.scrollTo(0,0);
 }
 
 async function fetchProducts() {
@@ -116,46 +95,23 @@ async function fetchProducts() {
       method: 'GET',
       headers: { 
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
-        'Accept': 'application/json',
         'x-client': CREDENTIALS.xClient,
         'x-pax': CREDENTIALS.xPax,
         'x-api-key': CREDENTIALS.apiKey
       }
     });
     const result = await res.json();
-    if (result.success && Array.isArray(result.data)) {
+    if (result.success) {
       products = result.data.map(item => {
         const code = (item.code || "").toUpperCase();
         let v = "OTHER";
-        if (code.startsWith("XLA")) v = "V1";
-        else if (code.startsWith("XDA")) v = "V2";
-        else if (code.startsWith("KDA")) v = "V3";
-        else if (code.startsWith("XLF")) v = "V4";
+        if (code.startsWith("XLA")) v = "V1"; else if (code.startsWith("XDA")) v = "V2";
+        else if (code.startsWith("KDA")) v = "V3"; else if (code.startsWith("XLF")) v = "V4";
         else if (code.startsWith("PDA")) v = "V5";
-
-        let desc = item.description || "";
-        let areas = [];
-        const lines = desc.split("\n");
-        lines.forEach(l => {
-          if (l.trim().length > 2 && !l.includes("http")) {
-            areas.push(l.trim());
-          }
-        });
-
-        return {
-          v: v,
-          code: item.code,
-          name: item.name,
-          stock: item.stock !== undefined ? Number(item.stock) : 0,
-          descText: desc.toLowerCase(),
-          rawAreas: areas
-        };
+        return { v, code: item.code, name: item.name, stock: Number(item.stock || 0), descText: (item.description || "").toLowerCase(), rawAreas: (item.description || "").split("\n").filter(l => l.trim().length > 2) };
       }).filter(p => p.v !== "OTHER");
-      
       renderStock();
-      
-      const now = new Date();
-      document.getElementById("updateTime").textContent = now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'}) + " WIB";
+      document.getElementById("updateTime").textContent = new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'}) + " WIB";
     }
   } catch (err) { console.error(err); }
 }
@@ -167,96 +123,41 @@ function setFilter(v, btn) {
   renderStock();
 }
 
-function toggleCard(elem) {
-  elem.classList.toggle("expanded");
-  const toggleText = elem.querySelector(".toggle-detail");
-  if (elem.classList.contains("expanded")) {
-    toggleText.innerHTML = `Tutup <span>▲</span>`;
-  } else {
-    toggleText.innerHTML = `Detail <span>▼</span>`;
-  }
-}
-
-function renderCardsHtml(items) {
-  let out = `<div class="grid">`;
-  items.forEach(p => {
-    const isPDA = p.v === "V5";
-    const isReady = p.stock > 0;
-    
-    out += `<div class="card" onclick="toggleCard(this)">
-      <div class="card-top">
-        <div class="name">${p.code}</div>
-        <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
-      </div>
-      <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-      <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
-      
-      <div class="area-list">
-        <div style="font-size:10px;color:#64748b;white-space:pre-line;line-height:1.4">${p.rawAreas.join('\n') || '-'}</div>
-      </div>
-      
-      <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
-        Detail Cek <span>▼</span>
-      </div>
-    </div>`;
-  });
-  out += `</div>`;
-  return out;
-}
-
 function renderStock(){
-  const q = (document.getElementById("stockSearch").value || "").toLowerCase();
+  const q = document.getElementById("stockSearch").value.toLowerCase();
   const arr = products.filter(p => (activeVersion === "ALL" || p.v === activeVersion) && `${p.name} ${p.code}`.toLowerCase().includes(q));
-  
-  const groups = {};
-  arr.forEach(p => (groups[p.v] ??=[]).push(p));
-
   let out = "";
+  const groups = {}; arr.forEach(p => (groups[p.v] ??=[]).push(p));
   for(const [v, items] of Object.entries(groups)){
-    out += `<div class="head"><b>${v}</b><small>${items.length} pilihan</small></div>`;
-    out += renderCardsHtml(items);
+    out += `<div class="head"><b>${v}</b></div><div class="grid">`;
+    items.forEach(p => {
+      const isReady = p.stock > 0;
+      out += `<div class="card" onclick="this.classList.toggle('expanded')">
+        <div class="name">${p.code}</div>
+        <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (p.v==='V5'?'OPEN':'READY') : (p.v==='V5'?'CLOSE':'HABIS')}</span>
+        <div class="slot-val">${p.v==='V5' ? (isReady?'🟢 OPEN':'🔴 CLOSE') : p.stock}</div>
+        <div class="area-list">${p.rawAreas.join('<br>')}</div>
+      </div>`;
+    });
+    out += `</div>`;
   }
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;">Produk tidak ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out;
 }
 
 function checkCity(){
-  const keyword = document.getElementById("cityInput").value.trim().toLowerCase();
-  const resDiv = document.getElementById("cityResult");
-  
-  if(!keyword) {
-    resDiv.innerHTML = `<div class="panel muted">Silakan ketik nama kota terlebih dahulu.</div>`;
-    return;
-  }
-
-  const matched = products.filter(p => p.stock > 0 && p.descText.includes(keyword));
-
-  if(matched.length === 0) {
-    resDiv.innerHTML = `<div class="panel">
-      <h1>Hasil Pencarian: "${keyword}"</h1>
-      <div class="muted" style="color:#dc2626">Mohon maaf, belum ada produk ready untuk area/kota tersebut saat ini. Silakan cek kota terdekat lainnya.</div>
-    </div>`;
-    return;
-  }
-
-  let html = `<div class="panel" style="margin-bottom:10px;background:#ecfdf5;border-color:#a7f3d0;">
-    <h1 style="color:#065f46">✨ Rekomendasi untuk "${keyword}"</h1>
-    <div class="muted" style="color:#047857">Berikut adalah produk yang ready dan mendukung untuk area tersebut:</div>
-  </div>`;
-  
-  html += renderCardsHtml(matched);
-  resDiv.innerHTML = html;
+  const k = document.getElementById("cityInput").value.trim().toLowerCase();
+  const matched = products.filter(p => p.stock > 0 && p.descText.includes(k));
+  document.getElementById("cityResult").innerHTML = matched.length > 0 ? `<div class="panel" style="background:#ecfdf5"><b>Hasil untuk "${k}":</b><br>${matched.map(m=>m.code).join(', ')}</div>` : `<div class="panel">Tidak ada produk ready untuk ${k}</div>`;
 }
 
 function checkNumber(){
   const n = document.getElementById("number").value.trim();
-  const r = document.getElementById("numberResult");
-  r.style.display = "block";
-  r.innerHTML = /^08\d{8,11}$/.test(n) ? `Nomor: <b>${n}</b><br>Status: <b style="color:#059669">🟢 Valid & Siap Diproses</b>` : `❌ Format nomor tidak valid.`;
+  document.getElementById("numberResult").style.display="block";
+  document.getElementById("numberResult").innerHTML = /^08\d{8,11}$/.test(n) ? `✅ Nomor ${n} valid.` : `❌ Format salah.`;
 }
 
 fetchProducts();
-setInterval(fetchProducts, 10000);
-
+setInterval(fetchProducts, 30000);
 document.getElementById("stockSearch").addEventListener("input", renderStock);
 </script>
 </body>
