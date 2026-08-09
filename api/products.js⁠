@@ -3,7 +3,7 @@ module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
 
   try {
-    const apiResponse = await fetch('https://api.ics-provider.com/v1/products', {
+    const apiResponse = await fetch('https://api.ics-store.my.id/api/reseller', {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
