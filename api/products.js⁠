@@ -1,9 +1,6 @@
-module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'application/json');
-
+export default async function handler(req, res) {
   try {
-    const apiResponse = await fetch('https://api.ics-store.my.id/api/reseller', {
+    const apiResponse = await fetch(''https://api.ics-store.my.id/api/reseller, {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
@@ -11,9 +8,20 @@ module.exports = async function handler(req, res) {
       }
     });
 
-    const data = await apiResponse.json();
-    return res.status(200).json(data);
-  } catch (error) {
-    return res.status(500).json({ error: 'Gagal mengambil data dari API ICS', details: error.message });
+    const result = await apiResponse.json();
+
+    // Menyesuaikan dengan struktur data JSON dari provider Anda
+    const products = (result.data || []).map(item => ({
+      code: item.code || "-",
+      name: item.name || "Produk",
+      type: item.category || item.type || "Regular",
+      quota: item.description || "-",
+      stock: Number(item.stock) || 0,
+      area: "Semua area"
+    }));
+
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({ error: "Gagal mengambil data dari provider" });
   }
-};
+}
