@@ -11,21 +11,17 @@ export default async function handler(req, res) {
       }
     });
 
-    const result = await apiResponse.json();
-    const listArray = Array.isArray(result.data) ? result.data : (Array.isArray(result) ? result : []);
+    const textData = await apiResponse.text();
+    
+    // Cek apakah balasan dari server berupa JSON atau HTML/Error
+    try {
+      const json = JSON.parse(textData);
+      return res.status(200).json(json);
+    } catch (e) {
+      return res.status(500).json({ error: "Server supplier tidak mengembalikan format JSON", raw: textData });
+    }
 
-    const products = listArray.map(item => ({
-      code: item.code || item.product_code || "-",
-      name: item.name || item.product_name || "Produk",
-      type: item.category || item.type || "Regular",
-      quota: item.description || item.note || "-",
-      stock: item.stock !== undefined ? Number(item.stock) : 0,
-      price: item.price || 0,
-      area: "Semua Area"
-    }));
-
-    return res.status(200).json(products);
   } catch (err) {
-    return res.status(500).json({ error: "Gagal mengambil data dari supplier", details: err.message });
+    return res.status(500).json({ error: "Gagal fetch ke server supplier", details: err.message });
   }
 }
