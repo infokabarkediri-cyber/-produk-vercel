@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC Store - Cek Produk</title>
+<title>IC Store - Katalog Produk</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
@@ -37,47 +37,48 @@
 </head>
 <body>
 <header class="top">
-  <div class="title">✨ Katalog Layanan</div>
+  <div class="title">✨ Cek Area & Produk</div>
   <div class="subtitle" id="updateTime">-</div>
 </header>
 <nav class="nav">
-<button class="active" onclick="go('home',this)">📦 Katalog Produk</button>
-<button onclick="go('area',this)">📍 Cek Area</button>
+<button class="active" onclick="go('area',this)">📍 Cek Area</button>
+<button onclick="go('stok',this)">📦 Semua Produk</button>
 <button onclick="go('nomor',this)">🔎 Cek Nomor</button>
-<button onclick="go('info',this)">ℹ️ Informasi</button>
 </nav>
 
 <main class="wrap">
-<section id="home" class="page active">
+<!-- HALAMAN UTAMA: CEK AREA & REKOMENDASI -->
+<section id="area" class="page active">
 <div class="panel">
-  <h1>Silakan Pilih Produk</h1>
-  <div class="muted">Informasi ketersediaan produk, kuota area, dan status layanan diperbarui secara otomatis setiap detik untuk kenyamanan transaksi Anda.</div>
+  <h1>📍 Cek Area & Rekomendasi</h1>
+  <div class="muted">Masukkan nama kota tujuan Anda untuk langsung melihat rekomendasi produk yang ready di area tersebut.</div>
+  <div class="row" style="margin-top:12px">
+    <input id="cityInput" class="search" placeholder="Contoh: Semarang, Solo, Jakarta">
+    <button class="btn" style="width:auto;padding:0 20px" onclick="checkCity()">Cek Area</button>
+  </div>
 </div>
+<div id="cityResult"></div>
+<div class="footer-brand">Copyright © IC™ 2026</div>
+</section>
+
+<!-- HALAMAN SEMUA PRODUK -->
+<section id="stok" class="page">
 <div class="panel" style="padding:12px 16px;">
-  <input id="stockSearch" class="search" placeholder="🔎 Cari produk atau kode cepat...">
+  <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk...">
   <div class="filters">
     <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
-    <button class="filter" data-v="V1" onclick="setFilter('V1', this)">Akrab V1</button>
-    <button class="filter" data-v="V2" onclick="setFilter('V2', this)">Akrab V2</button>
-    <button class="filter" data-v="V3" onclick="setFilter('V3', this)">Akrab V3</button>
-    <button class="filter" data-v="V4" onclick="setFilter('V4', this)">Akrab V4</button>
-    <button class="filter" data-v="V5" onclick="setFilter('V5', this)">Akrab V5</button>
+    <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
+    <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
+    <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
+    <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
+    <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
   </div>
 </div>
 <div id="stockList"></div>
 <div class="footer-brand">Copyright © IC™ 2026</div>
 </section>
 
-<section id="area" class="page">
-<div class="panel">
-  <h1>📍 Cek Area Produk</h1>
-  <div class="muted">Masukkan nama kota untuk melihat ketersediaan wilayah jangkauan.</div>
-  <div class="row" style="margin-top:12px"><input id="cityInput" class="search" placeholder="Contoh: Semarang, Solo"><button class="btn" style="width:auto;padding:0 20px" onclick="checkCity()">Cek</button></div>
-</div>
-<div id="cityResult"></div>
-<div class="footer-brand">Copyright © IC™ 2026</div>
-</section>
-
+<!-- HALAMAN CEK NOMOR -->
 <section id="nomor" class="page">
 <div class="panel">
   <h1>🔎 Cek Nomor Pelanggan</h1>
@@ -85,14 +86,6 @@
   <input id="number" class="search" style="margin-top:12px" placeholder="08xxxxxxxxxx" inputmode="numeric">
   <button class="btn" style="margin-top:10px" onclick="checkNumber()">Periksa Nomor</button>
   <div id="numberResult" class="result"></div>
-</div>
-<div class="footer-brand">Copyright © IC™ 2026</div>
-</section>
-
-<section id="info" class="page">
-<div class="panel">
-  <h1>ℹ️ Informasi Layanan</h1>
-  <div class="muted">Gunakan katalog di atas untuk memantau produk secara real-time. Hubungi admin utama jika ada kendala transaksi.</div>
 </div>
 <div class="footer-brand">Copyright © IC™ 2026</div>
 </section>
@@ -128,14 +121,13 @@ async function fetchProducts() {
         else if (code.startsWith("PDA")) v = "V5";
 
         let desc = item.description || "";
-        let areas = { a1: "-", a2: "-", a3: "-", a4: "-" };
+        let areas = [];
         const lines = desc.split("\n");
-        let idx = 1;
         lines.forEach(l => {
-          let match = l.match(/(\d+\s*GB)/i);
-          if (match && idx <= 4) {
-            areas['a' + idx] = match[0];
-            idx++;
+          let match = l.match(/([a-zA-Z\s]+(?:\d+\s*GB)?)/i);
+          // Mengambil teks area yang terdeteksi
+          if (l.trim().length > 2 && !l.includes("http")) {
+            areas.push(l.trim());
           }
         });
 
@@ -144,14 +136,15 @@ async function fetchProducts() {
           code: item.code,
           name: item.name,
           stock: item.stock !== undefined ? Number(item.stock) : 0,
-          areas: areas
+          descText: desc.toLowerCase(),
+          rawAreas: areas
         };
       }).filter(p => p.v !== "OTHER");
       
       renderStock();
       
       const now = new Date();
-      document.getElementById("updateTime").textContent = now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
+      document.getElementById("updateTime").textContent = now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'}) + " WIB";
     }
   } catch (err) { console.error(err); }
 }
@@ -173,51 +166,75 @@ function toggleCard(elem) {
   }
 }
 
+function renderCardsHtml(items) {
+  let out = `<div class="grid">`;
+  items.forEach(p => {
+    const isPDA = p.v === "V5";
+    const isReady = p.stock > 0;
+    
+    out += `<div class="card" onclick="toggleCard(this)">
+      <div class="card-top">
+        <div class="name">${p.code}</div>
+        <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
+      </div>
+      <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
+      <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
+      
+      <div class="area-list">
+        <div style="font-size:10px;color:#64748b;white-space:pre-line;line-height:1.4">${p.rawAreas.join('\n') || '-'}</div>
+      </div>
+      
+      <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
+        Detail Cek <span>▼</span>
+      </div>
+    </div>`;
+  });
+  out += `</div>`;
+  return out;
+}
+
 function renderStock(){
   const q = (document.getElementById("stockSearch").value || "").toLowerCase();
   const arr = products.filter(p => (activeVersion === "ALL" || p.v === activeVersion) && `${p.name} ${p.code}`.toLowerCase().includes(q));
   
   const groups = {};
   arr.forEach(p => (groups[p.v] ??=[]).push(p));
-  
-  const nameMap = {
-    "V1": "Akrab V1",
-    "V2": "Akrab V2",
-    "V3": "Akrab V3",
-    "V4": "Akrab V4",
-    "V5": "Akrab V5"
-  };
 
   let out = "";
   for(const [v, items] of Object.entries(groups)){
-    out += `<div class="head"><b>${nameMap[v] || v}</b><small>${items.length} pilihan tersedia</small></div><div class="grid">`;
-    items.forEach(p => {
-      const isPDA = p.v === "V5";
-      const isReady = p.stock > 0;
-      
-      out += `<div class="card" onclick="toggleCard(this)">
-        <div class="card-top">
-          <div class="name">${p.code}</div>
-          <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
-        </div>
-        <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-        <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
-        
-        <div class="area-list">
-          <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
-          <div class="area-row"><span>Area 2</span><b>${p.areas.a2}</b></div>
-          <div class="area-row"><span>Area 3</span><b>${p.areas.a3}</b></div>
-          <div class="area-row"><span>Area 4</span><b>${p.areas.a4}</b></div>
-        </div>
-        
-        <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
-          Detail <span>▼</span>
-        </div>
-      </div>`;
-    });
-    out += "</div>";
+    out += `<div class="head"><b>${v}</b><small>${items.length} pilihan</small></div>`;
+    out += renderCardsHtml(items);
   }
   document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;">Produk tidak ditemukan.</div>';
+}
+
+function checkCity(){
+  const keyword = document.getElementById("cityInput").value.trim().toLowerCase();
+  const resDiv = document.getElementById("cityResult");
+  
+  if(!keyword) {
+    resDiv.innerHTML = `<div class="panel muted">Silakan ketik nama kota terlebih dahulu.</div>`;
+    return;
+  }
+
+  // Filter produk yang ready DAN deskripsinya mengandung nama kota yang dicari
+  const matched = products.filter(p => p.stock > 0 && p.descText.includes(keyword));
+
+  if(matched.length === 0) {
+    resDiv.innerHTML = `<div class="panel">
+      <h1>Hasil Pencarian: "${keyword}"</h1>
+      <div class="muted" style="color:#dc2626">Mohon maaf, belum ada produk ready untuk area/kota tersebut saat ini. Silakan cek kota terdekat lainnya.</div>
+    </div>`;
+    return;
+  }
+
+  let html = `<div class="panel" style="margin-bottom:10px;background:#ecfdf5;border-color:#a7f3d0;">
+    <h1 style="color:#065f46">✨ Rekomendasi untuk "${keyword}"</h1>
+    <div class="muted" style="color:#047857">Berikut adalah produk yang ready dan mendukung untuk area tersebut:</div>
+  </div>`;
+  
+  html += renderCardsHtml(matched);
+  resDiv.innerHTML = html;
 }
 
 function checkNumber(){
@@ -225,10 +242,6 @@ function checkNumber(){
   const r = document.getElementById("numberResult");
   r.style.display = "block";
   r.innerHTML = /^08\d{8,11}$/.test(n) ? `Nomor: <b>${n}</b><br>Status: <b style="color:#059669">🟢 Valid & Siap Diproses</b>` : `❌ Format nomor tidak valid.`;
-}
-
-function checkCity(){
-  document.getElementById("cityResult").innerHTML = `<div class="panel">Hasil pencarian area wilayah aktif dan siap dipesan.</div>`;
 }
 
 fetchProducts();
