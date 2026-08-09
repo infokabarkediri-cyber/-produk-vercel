@@ -95,6 +95,13 @@
 let products = [];
 let activeVersion = "ALL";
 
+// Kredensial API yang disematkan
+const CREDENTIALS = {
+  xClient: "9951786330457fbb6300783a",
+  xPax: "3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9",
+  apiKey: "mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5"
+};
+
 function go(id,btn){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -107,7 +114,13 @@ async function fetchProducts() {
   try {
     const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
-      headers: { 'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 'Accept': 'application/json' }
+      headers: { 
+        'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
+        'Accept': 'application/json',
+        'x-client': CREDENTIALS.xClient,
+        'x-pax': CREDENTIALS.xPax,
+        'x-api-key': CREDENTIALS.apiKey
+      }
     });
     const result = await res.json();
     if (result.success && Array.isArray(result.data)) {
@@ -124,8 +137,6 @@ async function fetchProducts() {
         let areas = [];
         const lines = desc.split("\n");
         lines.forEach(l => {
-          let match = l.match(/([a-zA-Z\s]+(?:\d+\s*GB)?)/i);
-          // Mengambil teks area yang terdeteksi
           if (l.trim().length > 2 && !l.includes("http")) {
             areas.push(l.trim());
           }
@@ -217,7 +228,6 @@ function checkCity(){
     return;
   }
 
-  // Filter produk yang ready DAN deskripsinya mengandung nama kota yang dicari
   const matched = products.filter(p => p.stock > 0 && p.descText.includes(keyword));
 
   if(matched.length === 0) {
