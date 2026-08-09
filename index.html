@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Informasi Produk</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}
+.top{background:#fff;border-bottom:1px solid #e5e7eb;padding:17px 16px}.topin,.wrap{max-width:1080px;margin:auto}.title{font-size:22px;font-weight:900}.subtitle{font-size:11px;color:#6b7280;margin-top:3px}
+.nav{background:#fff;border-bottom:1px solid #e5e7eb;display:flex;overflow:auto;padding:0 10px;position:sticky;top:0;z-index:4}.nav button{border:0;background:none;color:#6b7280;padding:14px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.nav button.active{color:#111827;border-bottom:2px solid #111827}
+.wrap{padding:18px 15px 55px}.page{display:none}.page.active{display:block}
+.panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;margin-bottom:13px}.panel h1,.panel h2{margin:0 0 5px}.panel h1{font-size:22px}.panel h2{font-size:18px}.muted{font-size:12px;color:#6b7280;line-height:1.6}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:13px 0}.stat{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px}.stat b{display:block;font-size:20px}.stat small{font-size:10px;color:#6b7280}
+.btn{border:0;background:#111827;color:#fff;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.btn.light{background:#e5e7eb;color:#111827}.btn.green{background:#16a34a;color:white}.btn.full{width:100%;margin-top:10px}
+.search{width:100%;border:1px solid #dfe3e8;border-radius:10px;padding:12px;outline:none;background:#fff}.filters{display:flex;gap:7px;overflow:auto;margin-top:10px}.filter{border:0;background:#e5e7eb;border-radius:9px;padding:9px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.filter.on{background:#111827;color:white}
+.section{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;margin:13px 0}.head{display:flex;justify-content:space-between;align-items:center;padding:14px 15px;border-bottom:1px solid #eee}.head b{font-size:15px}.head small{color:#9ca3af}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px}.card{border:1px solid #e5e7eb;border-radius:13px;padding:13px;cursor:pointer;background:#fff}.card:hover{box-shadow:0 5px 16px #0001}.name{font-weight:850;font-size:13px}.code{font-size:10px;color:#9ca3af;margin-top:3px}.meta{font-size:11px;color:#6b7280;margin:9px 0}.bottom{display:flex;justify-content:space-between;align-items:end}.stock{font-size:20px;font-weight:900}.ready,.sold{font-size:10px;font-weight:900;border-radius:99px;padding:5px 8px}.ready{background:#dcfce7;color:#15803d}.sold{background:#fee2e2;color:#b91c1c}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.show{display:flex}.box{width:min(100%,540px);background:#fff;border-radius:22px 22px 0 0;padding:20px;max-height:88vh;overflow:auto}.close{float:right;border:0;background:#f1f5f9;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer}.big{font-size:21px;font-weight:900;margin-top:7px}.detail{font-size:13px;color:#6b7280;line-height:1.9;margin:10px 0}.empty{text-align:center;padding:35px;color:#9ca3af}
+.notice{border-left:4px solid #111827;background:#f8fafc;padding:12px 13px;border-radius:8px;font-size:12px;line-height:1.6}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topin"><div class="title">Informasi Produk</div><div class="subtitle">Informasi stok dan detail produk digital reseller</div></div></header>
+<nav class="nav">
+<button class="active" onclick="go('home',this)">Beranda</button>
+<button onclick="go('stok',this)">📦 Stok</button>
+<button onclick="go('produk',this)">📋 Produk</button>
+<button onclick="go('info',this)">ℹ️ Info</button>
+</nav>
+
+<main class="wrap">
+<section id="home" class="page active">
+<div class="panel"><h1>Selamat Datang</h1><div class="muted">Gunakan menu di atas untuk melihat stok dan ketersediaan produk secara real-time.</div></div>
+<div class="stats"><div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="homeReady">0</b><small>PRODUK READY</small></div><div class="stat"><b id="homeEmpty">0</b><small>PRODUK HABIS</small></div><div class="stat"><b>24/7</b><small>SISTEM</small></div></div>
+<div class="panel"><h2>📦 Ketersediaan Stok</h2><button class="btn full" onclick="go('stok',document.querySelectorAll('.nav button')[1])">LIHAT STOK PRODUK</button></div>
+</section>
+
+<section id="stok" class="page">
+<div class="panel"><h1>📦 Stok Produk</h1><div class="muted">Pantau ketersediaan produk langsung dari sistem.</div><div style="margin-top:11px"><button class="btn" onclick="fetchProductsFromAPI()">↻ Refresh Data</button> <span id="updateTime" class="muted">Memuat...</span></div></div>
+<div class="stats"><div class="stat"><b id="total">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="ready">0</b><small>READY</small></div><div class="stat"><b id="empty">0</b><small>HABIS</small></div></div>
+<div class="panel"><input id="stockSearch" class="search" placeholder="🔎 Cari nama produk, kode, atau kuota"></div>
+<div id="stockList"></div>
+</section>
+
+<section id="produk" class="page">
+<div class="panel"><h1>📋 Daftar Produk</h1><input id="productSearch" class="search" style="margin-top:12px" placeholder="🔎 Cari produk..."></div>
+<div id="productList"></div>
+</section>
+
+<section id="info" class="page">
+<div class="panel"><h1>ℹ️ Informasi</h1><div class="notice">Halaman ini terhubung otomatis ke sistem untuk membantu reseller melihat stok terbaru. Harga tidak ditampilkan di sini dan mengikuti kebijakan reseller masing-masing.</div></div>
+</section>
+</main>
+
+<div id="modal" class="modal"><div class="box"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
+
+<script>
+let products = [];
+
+async function fetchProductsFromAPI() {
+  try {
+    const response = await fetch('/api/products');
+    const result = await response.json();
+    
+    products = result.map(item => ({
+      v: item.version || "V1",
+      code: item.code || "CODE",
+      name: item.name || "Produk",
+      type: item.type || "Regular",
+      quota: item.quota || "-",
+      stock: Number(item.stock) || 0,
+      area: item.area || "Semua area"
+    }));
+
+    updateStats();
+    renderStock();
+    renderProducts();
+    document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
+  } catch (err) {
+    console.error("Gagal memuat produk:", err);
+    document.getElementById("updateTime").textContent = "Gagal memuat data API";
+  }
+}
+
+function go(id,btn){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));if(btn)btn.classList.add("active");window.scrollTo(0,0)}
+
+function renderStock(){
+  const q=(document.getElementById("stockSearch").value||"").toLowerCase();
+  const arr=products.filter(p=>`${p.name} ${p.code} ${p.quota}`.toLowerCase().includes(q));
+  let out="";
+  if(arr.length === 0) {
+    document.getElementById("stockList").innerHTML='<div class="section empty">Tidak ada produk ditemukan.</div>';
+    return;
+  }
+  out+=`<section class="section"><div class="head"><b>Daftar Stok</b><small>${arr.length} produk</small></div><div class="grid">`;
+  arr.forEach(p=>out+=`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">📦 ${p.quota}<br>📍 ${p.area}</div><div class="bottom"><span class="stock">${p.stock}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`);
+  out+="</div></section>";
+  document.getElementById("stockList").innerHTML=out;
+}
+
+function renderProducts(){
+  const q=(document.getElementById("productSearch").value||"").toLowerCase();
+  const arr=products.filter(p=>`${p.name} ${p.code} ${p.quota} ${p.type}`.toLowerCase().includes(q));
+  document.getElementById("productList").innerHTML=`<section class="section"><div class="head"><b>Semua Produk</b><small>${arr.length} produk</small></div><div class="grid">${arr.map(p=>`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">${p.type} • ${p.quota}</div><div class="bottom"><span>${p.area}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`).join("")}</div></section>`;
+}
+
+function updateStats(){
+  const total=products.reduce((a,p)=>a+p.stock,0), ready=products.filter(p=>p.stock>0).length, empty=products.filter(p=>p.stock===0).length;
+  document.getElementById("total").textContent=total.toLocaleString("id-ID");
+  document.getElementById("ready").textContent=ready;
+  document.getElementById("empty").textContent=empty;
+  document.getElementById("homeTotal").textContent=total.toLocaleString("id-ID");
+  document.getElementById("homeReady").textContent=ready;
+  document.getElementById("homeEmpty").textContent=empty;
+}
+
+function showProduct(code){
+  const p=products.find(x=>x.code===code);
+  if(!p) return;
+  document.getElementById("modalContent").innerHTML=`<div class="big">${p.name}</div><div class="detail">
+  Kode: <b>${p.code}</b><br>Jenis: <b>${p.type}</b><br>Kuota: <b>${p.quota}</b><br>Area: <b>${p.area}</b><br>Stok: <b>${p.stock}</b><br>Status: <b>${p.stock>0?'🟢 READY':'🔴 HABIS'}</b><br><br>Harga mengikuti ketentuan reseller.
+  </div><button class="btn full" onclick="closeModal()">TUTUP</button>`;
+  document.getElementById("modal").classList.add("show");
+}
+
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+
+document.getElementById("stockSearch").oninput=renderStock;
+document.getElementById("productSearch").oninput=renderProducts;
+document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
+
+fetchProductsFromAPI();
+</script>
+</body>
+</html>
