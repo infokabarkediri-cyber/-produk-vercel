@@ -82,21 +82,33 @@
 
 <script>
 let products = [];
-
 async function fetchProductsFromAPI() {
   try {
     const response = await fetch('/api/products');
     const result = await response.json();
     
+    // Menyesuaikan properti dari format JSON API ICS Store Anda
     products = result.map(item => ({
-      v: item.version || "V1",
+      v: "V1",
       code: item.code || "CODE",
       name: item.name || "Produk",
       type: item.type || "Regular",
-      quota: item.quota || "-",
+      quota: item.quota || "-", // Mengambil dari description yang sudah di-mapping di serverless
       stock: Number(item.stock) || 0,
-      area: item.area || "Semua area"
+      area: "Semua Area"
     }));
+
+    updateStats();
+    renderStock();
+    renderProducts();
+    document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
+  } catch (err) {
+    console.error("Gagal memuat produk:", err);
+    document.getElementById("updateTime").textContent = "Gagal memuat data API";
+  }
+}
+
+
 
     updateStats();
     renderStock();
