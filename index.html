@@ -6,17 +6,19 @@
 <title>JuraganXL - Informasi Produk</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}
-.top{background:#fff;border-bottom:1px solid #e5e7eb;padding:15px 16px;display:flex;justify-content:space-between;align-items:center}.topin,.wrap{max-width:1200px;margin:auto}.title{font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px}.subtitle{font-size:11px;color:#6b7280}
+.top{background:#fff;border-bottom:1px solid #e5e7eb;padding:15px 16px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px}.subtitle{font-size:11px;color:#6b7280}
 .nav{background:#fff;border-bottom:1px solid #e5e7eb;display:flex;overflow:auto;padding:0 10px;position:sticky;top:0;z-index:4}.nav button{border:0;background:none;color:#6b7280;padding:14px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.nav button.active{color:#111827;border-bottom:2px solid #111827}
 .wrap{padding:18px 15px 75px}.page{display:none}.page.active{display:block}
 .panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;margin-bottom:13px}.panel h1,.panel h2{margin:0 0 5px}.panel h1{font-size:20px}.panel h2{font-size:16px}.muted{font-size:12px;color:#6b7280;line-height:1.6}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:13px 0}.stat{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px}.stat b{display:block;font-size:18px}.stat small{font-size:10px;color:#6b7280}
-.btn{border:0;background:#111827;color:#fff;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.btn.light{background:#e5e7eb;color:#111827}.btn.full{width:100%;margin-top:10px}
+.btn{border:0;background:#111827;color:#fff;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.btn.full{width:100%;margin-top:10px}
+.btn-refresh{background:#0284c7;color:#fff;border:0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.btn-refresh:hover{background:#0369a1}
 .search{width:100%;border:1px solid #dfe3e8;border-radius:10px;padding:12px;outline:none;background:#fff}.filters{display:flex;gap:7px;overflow:auto;margin-top:10px}.filter{border:0;background:#e5e7eb;border-radius:9px;padding:9px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.filter.on{background:#111827;color:white}
-.section{background:transparent;border:0;border-radius:16px;overflow:hidden;margin:13px 0}.head{text-align:center;padding:14px 15px}.head b{font-size:18px}.head small{color:#9ca3af;display:block;margin-top:2px}
+.head{text-align:center;padding:14px 15px}.head b{font-size:18px}.head small{color:#9ca3af;display:block;margin-top:2px}
 
-/* Tampilan Grid: 3 Kolom per baris */
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:2px}
+/* GRID 3 KOLOM PER BARIS */
+.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:12px !important;padding:2px !important}
 
 .card{border:1px solid #e5e7eb;border-radius:14px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
 .card:hover{box-shadow:0 5px 16px rgba(0,0,0,0.06)}
@@ -25,7 +27,7 @@
 .badge-habis{font-size:9px;font-weight:900;border-radius:99px;padding:3px 8px;background:#fee2e2;color:#b91c1c}
 .badge-ready{font-size:9px;font-weight:900;border-radius:99px;padding:3px 8px;background:#dcfce7;color:#15803d}
 .slot-label{font-size:9px;color:#6b7280;font-weight:700;margin-top:8px;text-transform:uppercase}
-.slot-val{font-size:20px;font-weight:900;color:#111827;margin-bottom:6px}
+.slot-val{font-size:18px;font-weight:900;color:#111827;margin-bottom:6px}
 .area-list{border-top:1px solid #f3f4f6;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
 .area-row{display:flex;justify-content:space-between;font-size:11px;color:#4b5563;padding:2px 0}
@@ -34,9 +36,9 @@
 .toggle-detail.ready-text{color:#15803d}
 .result{background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px;font-size:13px;line-height:1.8;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
 
-/* Responsif untuk layar HP */
-@media(max-width:768px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.grid{grid-template-columns:1fr}}
+/* Responsif HP */
+@media(max-width:768px){.grid{grid-template-columns:repeat(2, 1fr) !important}}
+@media(max-width:480px){.grid{grid-template-columns:1fr !important}}
 </style>
 </head>
 <body>
@@ -55,7 +57,15 @@
 <main class="wrap">
 <section id="home" class="page active">
 <div class="panel"><h1>Informasi Produk</h1><div class="muted">Gunakan menu di atas untuk melihat stok, area, cek nomor, dan informasi terkait.</div></div>
-<div class="stats"><div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="homeReady">0</b><small>PRODUK READY</small></div><div class="stat"><b id="homeEmpty">0</b><small>PRODUK HABIS</small></div><div class="stat"><b>API</b><small>STATUS</small></div></div>
+<div class="stats">
+  <div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div>
+  <div class="stat"><b id="homeReady">0</b><small>PRODUK READY</small></div>
+  <div class="stat"><b id="homeEmpty">0</b><small>PRODUK HABIS</small></div>
+  <div class="stat">
+    <b>API</b>
+    <small><button class="btn-refresh" onclick="manualRefresh()">🔄 Refresh</button></small>
+  </div>
+</div>
 <div class="panel"><h2>📦 Ketersediaan</h2><button class="btn full" onclick="go('stok',document.querySelectorAll('.nav button')[1])">LIHAT STOK</button></div>
 </section>
 
@@ -144,8 +154,19 @@ async function fetchProducts() {
       
       updateStats();
       renderStock();
+      
+      const now = new Date();
+      document.getElementById("updateTime").textContent = now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
     }
   } catch (err) { console.error(err); }
+}
+
+function manualRefresh() {
+  const btn = document.querySelector(".btn-refresh");
+  btn.textContent = "⏳ Memuat...";
+  fetchProducts().then(() => {
+    btn.textContent = "🔄 Refresh";
+  });
 }
 
 function setFilter(v, btn) {
@@ -166,9 +187,19 @@ function toggleCard(elem) {
 }
 
 function updateStats(){
+  // Total stok keseluruhan (non-PDA atau semua ditotal)
   const total = products.reduce((a,p)=>a+p.stock,0);
-  const ready = products.filter(p=>p.stock>0).length;
-  const empty = products.filter(p=>p.stock===0).length;
+  
+  // Produk ready: Selain PDA dihitung jika stok > 0, khusus PDA dihitung jika stok > 0 (OPEN)
+  const ready = products.filter(p => {
+    if(p.v === "V5") return p.stock > 0;
+    return p.stock > 0;
+  }).length;
+
+  const empty = products.filter(p => {
+    if(p.v === "V5") return p.stock <= 0;
+    return p.stock === 0;
+  }).length;
   
   if(document.getElementById("homeTotal")) document.getElementById("homeTotal").textContent = total.toLocaleString("id-ID");
   if(document.getElementById("homeReady")) document.getElementById("homeReady").textContent = ready;
@@ -195,7 +226,7 @@ function renderStock(){
           <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
         </div>
         <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-        <div class="slot-val" style="font-size:${isPDA ? '15px' : '20px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
+        <div class="slot-val" style="font-size:${isPDA ? '16px' : '20px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
         
         <div class="area-list">
           <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
@@ -225,7 +256,11 @@ function checkCity(){
   document.getElementById("cityResult").innerHTML = `<div class="panel">Hasil deteksi area aktif dan siap dipesan.</div>`;
 }
 
+// Inisialisasi Pertama
 fetchProducts();
+
+// Auto Refresh Realtime setiap 10 detik secara otomatis di background
+setInterval(fetchProducts, 10000);
 </script>
 </body>
 </html>
