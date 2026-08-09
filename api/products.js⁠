@@ -6,22 +6,20 @@ export default async function handler(req, res) {
     const apiResponse = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ICS_sk_9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
+        'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     });
 
     const result = await apiResponse.json();
-
-    // Mengambil array dari result.data sesuai struktur JSON dari API Anda
     const listArray = Array.isArray(result.data) ? result.data : [];
 
-    // Filter produk (Ganti kata "AKRAB" atau "XL" sesuai produk yang ingin ditampilkan di web Anda)
+    // Filter khusus produk yang berkaitan dengan Akrab / Paket Data XL / Axis
     const filteredList = listArray.filter(item => {
       const name = (item.name || "").toUpperCase();
       const code = (item.code || "").toUpperCase();
-      return name.includes("AKRAB") || name.includes("XL") || code.includes("XDA");
+      return name.includes("AKRAB") || name.includes("SUPERMINI") || code.includes("PDA") || code.includes("KDA");
     });
 
     const products = filteredList.map(item => ({
@@ -30,7 +28,8 @@ export default async function handler(req, res) {
       type: item.category || item.type || "Regular",
       quota: item.description || "-",
       stock: item.stock !== undefined ? item.stock : 0,
-      price: item.price || 0
+      price: item.price || 0,
+      status: item.status || "empty"
     }));
 
     return res.status(200).json(products);
