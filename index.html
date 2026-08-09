@@ -3,46 +3,76 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Informasi Stok Produk Pilihan</title>
+<title>Cek Stok Produk</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:15px}
-.container{max-width:900px;margin:auto}
-.header{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:15px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
-.title{font-size:20px;font-weight:700;margin-bottom:4px}
-.subtitle{font-size:12px;color:#64748b}
-.search-box{width:100%;padding:12px 14px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;margin-top:12px;outline:none}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:12px}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px rgba(0,0,0,0.03)}
-.product-name{font-weight:700;font-size:13px;color:#0f172a;margin-bottom:6px;line-height:1.3}
-.product-desc{font-size:12px;color:#64748b;margin-bottom:12px;background:#f1f5f9;padding:8px;border-radius:6px;font-family:monospace;white-space:pre-line}
-.card-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed #e2e8f0;padding-top:8px}
-.stock-badge{font-size:11px;font-weight:700;padding:4px 8px;border-radius:20px}
-.stock-ready{background:#dcfce7;color:#15803d}
-.stock-empty{background:#fee2e2;color:#b91c1c}
-.info-status{font-size:12px;color:#64748b;margin-top:8px;display:inline-block}
+body{background:#f4f6f9;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding-bottom:70px}
+.header{background:#fff;padding:16px;text-align:center;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:10}
+.brand-title{font-size:18px;font-weight:800;color:#0f172a}
+.update-time{font-size:11px;color:#64748b;margin-top:2px}
+
+/* Container & Section */
+.container{max-width:900px;margin:auto;padding:15px}
+.section-header{text-align:center;margin:15px 0}
+.badge-category{background:#dcfce7;color:#15803d;padding:4px 10px;font-size:11px;font-weight:700;border-radius:20px;display:inline-block;margin-bottom:5px}
+.section-title{font-size:20px;font-weight:800;color:#0f172a}
+.section-count{font-size:12px;color:#64748b;margin-top:2px}
+
+/* Search */
+.search-box{width:100%;padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;font-size:14px;margin-bottom:15px;outline:none;background:#fff}
+
+/* Grid Card */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.04);position:relative}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.product-code{font-weight:800;font-size:16px;color:#0f172a}
+.status-badge{font-size:10px;font-weight:800;padding:4px 8px;border-radius:20px}
+.status-ready{background:#dcfce7;color:#15803d}
+.status-empty{background:#fee2e2;color:#b91c1c}
+
+.slot-box{margin-bottom:12px}
+.slot-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase}
+.slot-value{font-size:22px;font-weight:900;color:#0f172a}
+
+.product-desc{font-size:12px;color:#475569;background:#f8fafc;padding:10px;border-radius:8px;font-family:monospace;white-space:pre-line;border:1px solid #e2e8f0}
+
+/* Bottom Navigation Bar */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;display:flex;justify-content:space-around;padding:8px 0;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,0.05)}
+.nav-item{background:none;border:none;display:flex;flex-direction:column;align-items:center;cursor:pointer;color:#64748b;font-size:11px;font-weight:700;flex:1;padding:4px}
+.nav-item.active{color:#2563eb}
+.nav-item span.icon{font-size:18px;margin-bottom:2px}
+
+.loading{text-align:center;padding:40px;color:#64748b;font-size:14px}
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="header">
-    <div class="title">📦 Stok Produk Pilihan</div>
-    <div class="subtitle">Khusus kode: XLA, XDA, KDA, XLF, PDA</div>
-    <input type="text" id="searchInput" class="search-box" placeholder="🔎 Cari nama, kode, atau kuota..." oninput="filterData()">
-    <span id="statusInfo" class="info-status">Memuat data...</span>
-  </div>
-
-  <div id="productGrid" class="grid"></div>
+<div class="header">
+  <div class="brand-title">Juragan Store API</div>
+  <div class="update-time" id="updateTime">Memuat data...</div>
 </div>
 
-<script>
-let rawProducts = [];
-// Awalan kode yang diizinkan sesuai permintaan Anda
-const allowedPrefixes = ['XLA', 'XDA', 'KDA', 'XLF', 'PDA'];
+<div class="container">
+  <input type="text" id="searchInput" class="search-box" placeholder="🔎 Cari produk di versi ini..." oninput="renderContent()">
+  <div id="mainContent">
+    <div class="loading">Mengambil data dari server...</div>
+  </div>
+</div>
 
-async function loadProducts() {
-  const statusInfo = document.getElementById("statusInfo");
+<!-- Navigasi Bawah Versi Produk -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchTab('XLA', this)"><span class="icon">📦</span>V1 (XLA)</button>
+  <button class="nav-item" onclick="switchTab('XDA', this)"><span class="icon">⚡</span>V2 (XDA)</button>
+  <button class="nav-item" onclick="switchTab('KDA', this)"><span class="icon">🔥</span>V3 (KDA)</button>
+  <button class="nav-item" onclick="switchTab('XLF', this)"><span class="icon">🚀</span>V4 (XLF)</button>
+  <button class="nav-item" onclick="switchTab('PDA', this)"><span class="icon">💎</span>V5 (PDA)</button>
+</nav>
+
+<script>
+let allProducts = {};
+let currentTab = 'XLA';
+
+async function fetchProducts() {
   try {
     const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
@@ -55,66 +85,86 @@ async function loadProducts() {
     const result = await res.json();
     
     if (result.success && Array.isArray(result.data)) {
-      // HANYA AMBIL PRODUK YANG KODENYA DIMULAI DENGAN DAFTAR DI ATAS
-      rawProducts = result.data.filter(item => {
-        const code = (item.code || "").toUpperCase();
-        return allowedPrefixes.some(prefix => code.startsWith(prefix));
-      });
+      // Kelompokkan produk berdasarkan awalan kodenya
+      allProducts = {
+        'XLA': result.data.filter(p => (p.code || "").toUpperCase().startsWith('XLA')),
+        'XDA': result.data.filter(p => (p.code || "").toUpperCase().startsWith('XDA')),
+        'KDA': result.data.filter(p => (p.code || "").toUpperCase().startsWith('KDA')),
+        'XLF': result.data.filter(p => (p.code || "").toUpperCase().startsWith('XLF')),
+        'PDA': result.data.filter(p => (p.code || "").toUpperCase().startsWith('PDA')),
+      };
 
-      statusInfo.textContent = `Berhasil memuat ${rawProducts.length} produk pilihan.`;
-      filterData();
+      document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID");
+      renderContent();
     } else {
-      statusInfo.textContent = "Gagal memproses data dari server.";
+      document.getElementById("mainContent").innerHTML = '<div class="loading">Gagal memuat struktur data.</div>';
     }
   } catch (err) {
-    statusInfo.textContent = "Gagal terhubung ke API.";
-    console.error(err);
+    document.getElementById("mainContent").innerHTML = '<div class="loading">Gagal terhubung ke API supplier.</div>';
   }
 }
 
-function filterData() {
-  const query = document.getElementById("searchInput").value.toLowerCase();
-  
-  const filtered = rawProducts.filter(item => {
-    return (item.name || "").toLowerCase().includes(query) ||
-           (item.description || "").toLowerCase().includes(query) ||
-           (item.code || "").toLowerCase().includes(query);
-  });
-
-  renderGrid(filtered);
+function switchTab(tabKey, btnElement) {
+  currentTab = tabKey;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  btnElement.classList.add('active');
+  document.getElementById("searchInput").value = "";
+  renderContent();
+  window.scrollTo(0, 0);
 }
 
-function renderGrid(list) {
-  const grid = document.getElementById("productGrid");
+function renderContent() {
+  const container = document.getElementById("mainContent");
+  const query = (document.getElementById("searchInput").value || "").toLowerCase();
   
+  const list = (allProducts[currentTab] || []).filter(p => 
+    (p.code || "").toLowerCase().includes(query) || 
+    (p.name || "").toLowerCase().includes(query) || 
+    (p.description || "").toLowerCase().includes(query)
+  );
+
+  let html = `
+    <div class="section-header">
+      <div class="badge-category">${currentTab}</div>
+      <div class="section-title">Produk Versi ${currentTab}</div>
+      <div class="section-count">${list.length} item tersedia</div>
+    </div>
+  `;
+
   if (list.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Produk tidak ditemukan.</div>';
+    html += '<div class="loading">Tidak ada produk ditemukan di versi ini.</div>';
+    container.innerHTML = html;
     return;
   }
 
-  let html = "";
+  html += '<div class="grid">';
   list.forEach(p => {
     const isReady = p.stock > 0;
     html += `
       <div class="card">
         <div>
-          <div class="product-name">${p.name}</div>
-          <div class="product-desc">${p.description || "-"}</div>
-        </div>
-        <div class="card-footer">
-          <span style="font-size:11px; font-weight:600; color:#64748b;">Kode: ${p.code}</span>
-          <span class="stock-badge ${isReady ? 'stock-ready' : 'stock-empty'}">
-            ${isReady ? 'Stok: ' + p.stock : 'HABIS'}
-          </span>
+          <div class="card-top">
+            <span class="product-code">${p.code}</span>
+            <span class="status-badge ${isReady ? 'status-ready' : 'status-empty'}">
+              ${isReady ? 'READY' : 'HABIS'}
+            </span>
+          </div>
+          <div class="slot-box">
+            <div class="slot-label">Stok / Slot</div>
+            <div class="slot-value">${p.stock}</div>
+          </div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; margin-bottom:6px;">${p.name}</div>
+          <div class="product-desc">${p.description || "Tidak ada rincian kuota"}</div>
         </div>
       </div>
     `;
   });
+  html += '</div>';
 
-  grid.innerHTML = html;
+  container.innerHTML = html;
 }
 
-loadProducts();
+fetchProducts();
 </script>
 </body>
 </html>
