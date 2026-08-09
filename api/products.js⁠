@@ -7,29 +7,21 @@ export default async function handler(req, res) {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Accept': 'application/json'
       }
     });
 
     const result = await apiResponse.json();
-    const listArray = Array.isArray(result.data) ? result.data : [];
+    const listArray = Array.isArray(result.data) ? result.data : (Array.isArray(result) ? result : []);
 
-    // Filter khusus produk yang berkaitan dengan Akrab / Paket Data XL / Axis
-    const filteredList = listArray.filter(item => {
-      const name = (item.name || "").toUpperCase();
-      const code = (item.code || "").toUpperCase();
-      return name.includes("AKRAB") || name.includes("SUPERMINI") || code.includes("PDA") || code.includes("KDA");
-    });
-
-    const products = filteredList.map(item => ({
-      code: item.code || "-",
-      name: item.name || "Produk",
+    const products = listArray.map(item => ({
+      code: item.code || item.product_code || "-",
+      name: item.name || item.product_name || "Produk",
       type: item.category || item.type || "Regular",
-      quota: item.description || "-",
-      stock: item.stock !== undefined ? item.stock : 0,
+      quota: item.description || item.note || "-",
+      stock: item.stock !== undefined ? Number(item.stock) : 0,
       price: item.price || 0,
-      status: item.status || "empty"
+      status: item.status || (item.stock > 0 ? "available" : "empty")
     }));
 
     return res.status(200).json(products);
