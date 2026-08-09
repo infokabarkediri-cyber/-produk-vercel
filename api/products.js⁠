@@ -1,27 +1,35 @@
 export default async function handler(req, res) {
+  // Mengizinkan akses dari luar (CORS)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+
   try {
-    const apiResponse = await fetch(''https://api.ics-store.my.id/api/reseller, {
+    const apiResponse = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ICS_sk_9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
+        'Authorization': 'Bearer ICS_sk_9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', // Ganti dengan token asli Anda
+        'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     });
 
     const result = await apiResponse.json();
 
-    // Menyesuaikan dengan struktur data JSON dari provider Anda
-    const products = (result.data || []).map(item => ({
-      code: item.code || "-",
-      name: item.name || "Produk",
+    // Cek apakah data ada di dalam result.data atau langsung berupa array
+    const rawData = result.data || result;
+    const listArray = Array.isArray(rawData) ? rawData : [];
+
+    const products = listArray.map(item => ({
+      code: item.code || item.product_code || "-",
+      name: item.name || item.product_name || "Produk",
       type: item.category || item.type || "Regular",
-      quota: item.description || "-",
-      stock: Number(item.stock) || 0,
-      area: "Semua area"
+      quota: item.description || item.note || "-",
+      stock: Number(item.stock) !== undefined ? Number(item.stock) : 99,
+      price: item.price || 0
     }));
 
-    res.status(200).json(products);
+    return res.status(200).json(products);
   } catch (err) {
-    res.status(500).json({ error: "Gagal mengambil data dari provider" });
+    return res.status(500).json({ error: "Gagal mengambil data", details: err.message });
   }
 }
