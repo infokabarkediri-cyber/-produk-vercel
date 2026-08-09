@@ -15,7 +15,7 @@ body{background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFo
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:12px}
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px rgba(0,0,0,0.03)}
 .product-name{font-weight:700;font-size:13px;color:#0f172a;margin-bottom:6px;line-height:1.3}
-.product-desc{font-size:12px;color:#64748b;margin-bottom:12px;background:#f1f5f9;padding:6px 8px;border-radius:6px;font-family:monospace}
+.product-desc{font-size:12px;color:#64748b;margin-bottom:12px;background:#f1f5f9;padding:8px;border-radius:6px;font-family:monospace;white-space:pre-line}
 .card-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed #e2e8f0;padding-top:8px}
 .stock-badge{font-size:11px;font-weight:700;padding:4px 8px;border-radius:20px}
 .stock-ready{background:#dcfce7;color:#15803d}
@@ -28,8 +28,8 @@ body{background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFo
 <div class="container">
   <div class="header">
     <div class="title">📦 Stok Produk Pilihan</div>
-    <div class="subtitle">Menampilkan khusus kode: XLA, XDA, KDA, XLF, PDA</div>
-    <input type="text" id="searchInput" class="search-box" placeholder="🔎 Cari di antara produk pilihan..." oninput="filterData()">
+    <div class="subtitle">Khusus kode: XLA, XDA, KDA, XLF, PDA</div>
+    <input type="text" id="searchInput" class="search-box" placeholder="🔎 Cari nama, kode, atau kuota..." oninput="filterData()">
     <span id="statusInfo" class="info-status">Memuat data...</span>
   </div>
 
@@ -38,7 +38,7 @@ body{background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFo
 
 <script>
 let rawProducts = [];
-// Daftar awalan kode yang dizinkan sesuai permintaan Anda
+// Awalan kode yang diizinkan sesuai permintaan Anda
 const allowedPrefixes = ['XLA', 'XDA', 'KDA', 'XLF', 'PDA'];
 
 async function loadProducts() {
@@ -55,16 +55,16 @@ async function loadProducts() {
     const result = await res.json();
     
     if (result.success && Array.isArray(result.data)) {
-      // HANYA AMBIL PRODUK YANG KODENYA SESUAI DENGAN DAFTAR DI ATAS
+      // HANYA AMBIL PRODUK YANG KODENYA DIMULAI DENGAN DAFTAR DI ATAS
       rawProducts = result.data.filter(item => {
         const code = (item.code || "").toUpperCase();
         return allowedPrefixes.some(prefix => code.startsWith(prefix));
       });
 
-      statusInfo.textContent = `Menampilkan ${rawProducts.length} produk pilihan.`;
+      statusInfo.textContent = `Berhasil memuat ${rawProducts.length} produk pilihan.`;
       filterData();
     } else {
-      statusInfo.textContent = "Gagal memproses data.";
+      statusInfo.textContent = "Gagal memproses data dari server.";
     }
   } catch (err) {
     statusInfo.textContent = "Gagal terhubung ke API.";
@@ -88,7 +88,7 @@ function renderGrid(list) {
   const grid = document.getElementById("productGrid");
   
   if (list.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Tidak ada produk yang cocok.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Produk tidak ditemukan.</div>';
     return;
   }
 
@@ -99,7 +99,7 @@ function renderGrid(list) {
       <div class="card">
         <div>
           <div class="product-name">${p.name}</div>
-          <div class="product-desc">📝 ${p.description || "-"}</div>
+          <div class="product-desc">${p.description || "-"}</div>
         </div>
         <div class="card-footer">
           <span style="font-size:11px; font-weight:600; color:#64748b;">Kode: ${p.code}</span>
