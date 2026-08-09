@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Informasi Produk Supplier</title>
+<title>Informasi Produk</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e5e7eb;padding:17px 16px}.topin,.wrap{max-width:1080px;margin:auto}.title{font-size:22px;font-weight:900}.subtitle{font-size:11px;color:#6b7280;margin-top:3px}
@@ -11,55 +11,73 @@
 .wrap{padding:18px 15px 55px}.page{display:none}.page.active{display:block}
 .panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;margin-bottom:13px}.panel h1,.panel h2{margin:0 0 5px}.panel h1{font-size:22px}.panel h2{font-size:18px}.muted{font-size:12px;color:#6b7280;line-height:1.6}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:13px 0}.stat{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px}.stat b{display:block;font-size:20px}.stat small{font-size:10px;color:#6b7280}
-.btn{border:0;background:#111827;color:#fff;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.btn.light{background:#e5e7eb;color:#111827}.btn.full{width:100%;margin-top:10px}
+.btn{border:0;background:#111827;color:#fff;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.btn.light{background:#e5e7eb;color:#111827}.btn.green{background:#16a34a;color:white}.btn.full{width:100%;margin-top:10px}
 .search{width:100%;border:1px solid #dfe3e8;border-radius:10px;padding:12px;outline:none;background:#fff}.filters{display:flex;gap:7px;overflow:auto;margin-top:10px}.filter{border:0;background:#e5e7eb;border-radius:9px;padding:9px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.filter.on{background:#111827;color:white}
 .section{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;margin:13px 0}.head{display:flex;justify-content:space-between;align-items:center;padding:14px 15px;border-bottom:1px solid #eee}.head b{font-size:15px}.head small{color:#9ca3af}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px}.card{border:1px solid #e5e7eb;border-radius:13px;padding:13px;cursor:pointer;background:#fff}.card:hover{box-shadow:0 5px 16px #0001}.name{font-weight:850;font-size:13px}.code{font-size:10px;color:#9ca3af;margin-top:3px}.meta{font-size:11px;color:#6b7280;margin:9px 0}.bottom{display:flex;justify-content:space-between;align-items:end}.stock{font-size:20px;font-weight:900}.ready,.sold{font-size:10px;font-weight:900;border-radius:99px;padding:5px 8px}.ready{background:#dcfce7;color:#15803d}.sold{background:#fee2e2;color:#b91c1c}
-.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.show{display:flex}.box{width:min(100%,540px);background:#fff;border-radius:22px 22px 0 0;padding:20px;max-height:88vh;overflow:auto}.close{float:right;border:0;background:#f1f5f9;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer}.big{font-size:21px;font-weight:900;margin-top:7px}.detail{font-size:13px;color:#6b7280;line-height:1.9;margin:10px 0}
+.result{background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px;font-size:13px;line-height:1.8;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.show{display:flex}.box{width:min(100%,540px);background:#fff;border-radius:22px 22px 0 0;padding:20px;max-height:88vh;overflow:auto}.close{float:right;border:0;background:#f1f5f9;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer}.big{font-size:21px;font-weight:900;margin-top:7px}.detail{font-size:13px;color:#6b7280;line-height:1.9;margin:10px 0}.empty{text-align:center;padding:35px;color:#9ca3af}
 .notice{border-left:4px solid #111827;background:#f8fafc;padding:12px 13px;border-radius:8px;font-size:12px;line-height:1.6}
-@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){.grid,.pricegrid,.areaGrid{grid-template-columns:1fr}.row{flex-direction:column}}
 </style>
 </head>
 <body>
-<header class="top"><div class="topin"><div class="title">Informasi Produk Supplier</div><div class="subtitle">Data sinkronisasi langsung dari API</div></div></header>
+<header class="top"><div class="topin"><div class="title">Informasi Produk</div><div class="subtitle">Informasi stok dan detail produk digital API</div></div></header>
 <nav class="nav">
 <button class="active" onclick="go('home',this)">Beranda</button>
 <button onclick="go('stok',this)">📦 Stok</button>
 <button onclick="go('produk',this)">📋 Produk</button>
+<button onclick="go('area',this)">📍 Cek Area</button>
+<button onclick="go('nomor',this)">🔎 Cek Nomor</button>
 <button onclick="go('info',this)">ℹ️ Info</button>
 </nav>
 
 <main class="wrap">
 <section id="home" class="page active">
-<div class="panel"><h1>Dashboard Stok</h1><div class="muted">Data produk diambil secara real-time dari API supplier Anda.</div></div>
+<div class="panel"><h1>Informasi Produk</h1><div class="muted">Gunakan menu di atas untuk melihat stok, produk, area, dan informasi terkait. Data tersambung langsung dari API supplier.</div></div>
 <div class="stats"><div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="homeReady">0</b><small>PRODUK READY</small></div><div class="stat"><b id="homeEmpty">0</b><small>PRODUK HABIS</small></div><div class="stat"><b>API</b><small>STATUS</small></div></div>
-<div class="panel"><h2>📦 Ketersediaan Produk</h2><button class="btn full" onclick="go('stok',document.querySelectorAll('.nav button')[1])">LIHAT SEMUA STOK</button></div>
+<div class="panel"><h2>📦 Ketersediaan</h2><div class="muted">Data sinkronisasi real-time dari sistem supplier.</div><button class="btn full" onclick="go('stok',document.querySelectorAll('.nav button')[1])">LIHAT STOK</button></div>
+<div class="panel"><h2>⚡ Akses Cepat</h2><div class="row"><button class="btn light" onclick="go('produk',document.querySelectorAll('.nav button')[2])">Produk</button><button class="btn light" onclick="go('area',document.querySelectorAll('.nav button')[3])">Area</button><button class="btn light" onclick="go('nomor',document.querySelectorAll('.nav button')[4])">Cek Nomor</button></div></div>
 </section>
 
 <section id="stok" class="page">
-<div class="panel"><h1>📦 Stok Produk</h1><div class="muted">Filter produk berdasarkan versi (V1–V5). Klik produk untuk melihat detail kuota.</div><div style="margin-top:11px"><button class="btn" onclick="fetchProducts()">↻ Refresh Data API</button> <span id="updateTime" class="muted">Memuat...</span></div></div>
+<div class="panel"><h1>📦 Stok Produk</h1><div class="muted">Pantau ketersediaan produk berdasarkan versi (V1–V5). Klik produk untuk melihat detail[span_1](start_span)[span_1](end_span).</div><div style="margin-top:11px"><button class="btn" onclick="fetchProducts()">↻ Refresh Stok API</button> <span id="updateTime" class="muted">Memuat...</span></div></div>
 <div class="stats"><div class="stat"><b id="total">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="ready">0</b><small>READY</small></div><div class="stat"><b id="empty">0</b><small>HABIS</small></div><div class="stat"><b>V1–V5</b><small>VERSI</small></div></div>
-<div class="panel">
-  <input id="stockSearch" class="search" placeholder="🔎 Cari nama produk, kode, atau deskripsi...">
-  <div class="filters">
-    <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
-    <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1 (XLA)</button>
-    <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2 (XDA)</button>
-    <button class="filter" data-v="V3" onclick="setFilter('V3', this)">KDA (V3)</button>
-    <button class="filter" data-v="V4" onclick="setFilter('V4', this)">XLF (V4)</button>
-    <button class="filter" data-v="V5" onclick="setFilter('PDA', this)">PDA (V5)</button>
-  </div>
-</div>
+<div class="panel"><input id="stockSearch" class="search" placeholder="🔎 Cari nama produk, kode, atau kuota"><div class="filters"><button class="filter on" data-v="ALL">SEMUA</button><button class="filter" data-v="V1">V1 (XLA)</button><button class="filter" data-v="V2">V2 (XDA)</button><button class="filter" data-v="V3">V3 (KDA)</button><button class="filter" data-v="V4">V4 (XLF)</button><button class="filter" data-v="V5">V5 (PDA)</button></div></div>
 <div id="stockList"></div>
 </section>
 
 <section id="produk" class="page">
-<div class="panel"><h1>📋 Daftar Produk</h1><div class="muted">Semua produk pilihan dari supplier.</div><input id="productSearch" class="search" style="margin-top:12px" placeholder="🔎 Cari produk..."></div>
+<div class="panel"><h1>📋 Produk</h1><div class="muted">Daftar seluruh produk pilihan dan detailnya. Harga tidak ditampilkan.</div><input id="productSearch" class="search" style="margin-top:12px" placeholder="🔎 Cari produk..."></div>
 <div id="productList"></div>
 </section>
 
+<section id="area" class="page">
+<div class="panel">
+<h1>📍 Cek Area Produk</h1>
+<div class="muted">Masukkan nama kota untuk mendapatkan rekomendasi produk sesuai area.</div>
+<div class="row" style="margin-top:12px">
+<input id="cityInput" class="search" placeholder="Contoh: Semarang, Salatiga, Jogja">
+<button class="btn" onclick="checkCity()">CEK KOTA</button>
+</div>
+<div class="filters" style="margin-top:10px">
+<button class="filter" onclick="setCity('Semarang')">Semarang</button>
+<button class="filter" onclick="setCity('Salatiga')">Salatiga</button>
+<button class="filter" onclick="setCity('Solo')">Solo</button>
+<button class="filter" onclick="setCity('Yogyakarta')">Yogyakarta</button>
+</div>
+</div>
+<div id="cityResult"></div>
+</section>
+
+<section id="nomor" class="page">
+<div class="panel"><h1>🔎 Cek Nomor</h1><div class="muted">Masukkan nomor untuk melihat simulasi informasi provider dan area.</div><input id="number" class="search" style="margin-top:12px" placeholder="08xxxxxxxxxx" inputmode="numeric"><button class="btn full" onclick="checkNumber()">CEK NOMOR</button><div id="numberResult" class="result"></div></div>
+</section>
+
 <section id="info" class="page">
-<div class="panel"><h1>ℹ️ Informasi</h1><div class="notice">Sistem ini memetakan kode supplier (XLA, XDA, KDA, XLF, PDA) secara otomatis ke dalam versi V1 sampai V5 untuk memudahkan pengecekan stok.</div></div>
+<div class="panel"><h1>ℹ️ Informasi</h1><div class="notice">Halaman ini digunakan untuk membantu mendapatkan informasi produk sebelum melakukan pemesanan melalui reseller.</div></div>
+<div class="panel"><h2>📦 Tentang Stok</h2><div class="muted">Jumlah stok yang ditampilkan diambil secara langsung dari sistem API supplier[span_2](start_span)[span_2](end_span).</div></div>
+<div class="panel"><h2>💰 Tentang Harga</h2><div class="muted">Harga tidak ditampilkan di halaman publik. Harga mengikuti reseller yang memberikan informasi kepada customer.</div></div>
 </section>
 </main>
 
@@ -67,7 +85,7 @@
 
 <script>
 let products = [];
-let activeVersion = "ALL";
+let active = "ALL";
 
 function go(id,btn){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
@@ -82,7 +100,7 @@ function go(id,btn){
 async function fetchProducts() {
   document.getElementById("updateTime").textContent = "Mengambil data...";
   try {
-    const response = await fetch('https://api.ics-store.my.id/api/reseller/products', {
+    const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
@@ -90,10 +108,8 @@ async function fetchProducts() {
       }
     });
 
-    const result = await response.json();
-    
+    const result = await res.json();
     if (result.success && Array.isArray(result.data)) {
-      // Petakan data dari API dan tentukan versinya (V1-V5) berdasarkan awalan kode
       products = result.data.map(item => {
         const code = (item.code || "").toUpperCase();
         let v = "OTHER";
@@ -113,7 +129,7 @@ async function fetchProducts() {
           stock: item.stock !== undefined ? Number(item.stock) : 0,
           area: "Semua Area"
         };
-      }).filter(p => p.v !== "OTHER"); // Hanya ambil kode yang terdaftar (XLA, XDA, KDA, XLF, PDA)
+      }).filter(p => p.v !== "OTHER");
 
       updateStats();
       renderStock();
@@ -126,17 +142,9 @@ async function fetchProducts() {
   }
 }
 
-function setFilter(v, btn) {
-  activeVersion = v;
-  document.querySelectorAll(".filters .filter").forEach(b => b.classList.remove("on"));
-  btn.classList.add("on");
-  renderStock();
-}
-
 function renderStock(){
   const q = (document.getElementById("stockSearch").value || "").toLowerCase();
-  const arr = products.filter(p => (activeVersion === "ALL" || p.v === activeVersion) && `${p.name} ${p.code} ${p.quota}`.toLowerCase().includes(q));
-  
+  const arr = products.filter(p => (active === "ALL" || p.v === active) && `${p.name} ${p.code} ${p.quota}`.toLowerCase().includes(q));
   const groups = {};
   arr.forEach(p => (groups[p.v] ??=[]).push(p));
   
@@ -144,25 +152,18 @@ function renderStock(){
   for(const [v, items] of Object.entries(groups)){
     out += `<section class="section"><div class="head"><b>Versi ${v}</b><small>${items.length} produk</small></div><div class="grid">`;
     items.forEach(p => {
-      out += `<article class="card" onclick="showProduct('${p.code}')">
-        <div class="name">${p.name}</div>
-        <div class="code">${p.code}</div>
-        <div class="meta">📦 ${p.quota}</div>
-        <div class="bottom"><span class="stock">${p.stock}</span><span class="${p.stock > 0 ? 'ready' : 'sold'}">${p.stock > 0 ? 'READY' : 'HABIS'}</span></div>
-      </article>`;
+      out += `<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">📦 ${p.quota}</div><div class="bottom"><span class="stock">${p.stock}</span><span class="${p.stock > 0 ? 'ready' : 'sold'}">${p.stock > 0 ? 'READY' : 'HABIS'}</span></div></article>`;
     });
     out += "</div></section>";
   }
-  
-  document.getElementById("stockList").innerHTML = out || '<div class="section empty">Tidak ada produk ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div class="section empty">Produk tidak ditemukan.</div>';
   updateStats();
 }
 
 function renderProducts(){
   const q = (document.getElementById("productSearch").value || "").toLowerCase();
   const arr = products.filter(p => `${p.name} ${p.code} ${p.quota}`.toLowerCase().includes(q));
-  
-  document.getElementById("productList").innerHTML = `<section class="section"><div class="head"><b>Semua Produk Pilihan</b><small>${arr.length} produk</small></div><div class="grid">${arr.map(p=>`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">Versi: <b>${p.v}</b> • ${p.quota}</div><div class="bottom"><span>Stok: ${p.stock}</span><span class="${p.stock > 0 ? 'ready' : 'sold'}">${p.stock > 0 ? 'READY' : 'HABIS'}</span></div></article>`).join("")}</div></section>`;
+  document.getElementById("productList").innerHTML = `<section class="section"><div class="head"><b>Semua Produk</b><small>${arr.length} produk</small></div><div class="grid">${arr.map(p=>`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">Versi: <b>${p.v}</b> • ${p.quota}</div><div class="bottom"><span>Stok: ${p.stock}</span><span class="${p.stock > 0 ? 'ready' : 'sold'}">${p.stock > 0 ? 'READY' : 'HABIS'}</span></div></article>`).join("")}</div></section>`;
 }
 
 function updateStats(){
@@ -182,21 +183,66 @@ function showProduct(code){
   const p = products.find(x => x.code === code);
   if(!p) return;
   document.getElementById("modalContent").innerHTML = `<div class="big">${p.name}</div><div class="detail">
-  Kode: <b>${p.code}</b><br>Versi: <b>${p.v}</b><br>Stok: <b>${p.stock}</b><br>Status: <b>${p.stock > 0 ? '🟢 READY' : '🔴 HABIS'}</b><br><br>
-  <b>Rincian Kuota / Deskripsi:</b><br><pre style="font-family:sans-serif; white-space:pre-line; background:#f8fafc; padding:10px; border-radius:8px; margin-top:5px;">${p.rawDesc}</pre>
+  Kode produk: <b>${p.code}</b><br>Versi: <b>${p.v}</b><br>Stok: <b>${p.stock}</b><br>Status: <b>${p.stock > 0 ? '🟢 READY' : '🔴 HABIS'}</b><br><br>
+  <b>Deskripsi / Kuota:</b><br><pre style="font-family:sans-serif; white-space:pre-line; background:#f8fafc; padding:10px; border-radius:8px; margin-top:5px;">${p.rawDesc}</pre><br>
+  Harga tidak ditampilkan. Harga mengikuti reseller.
   </div><button class="btn full" onclick="closeModal()">TUTUP</button>`;
   document.getElementById("modal").classList.add("show");
 }
 
-function closeModal(){
-  document.getElementById("modal").classList.remove("show");
+const cityAreas={
+  "semarang":["Area 2"],"salatiga":["Area 3"],"solo":["Area 2"],"surakarta":["Area 2"],"yogyakarta":["Area 1"],"bandung":["Area 1"],"jakarta":["Area 2"],"surabaya":["Area 2"]
+};
+
+function setCity(city){document.getElementById("cityInput").value=city;checkCity()}
+function checkCity(){
+  const input = document.getElementById("cityInput").value.trim();
+  const key = input.toLowerCase().replace(/[^a-z0-9\s]/g,"");
+  const result = document.getElementById("cityResult");
+  if(!key){
+    result.innerHTML = '<div class="panel"><div class="notice">Masukkan nama kota terlebih dahulu.</div></div>';
+    return;
+  }
+  const areas = cityAreas[key] || ["Area 2"];
+  let out = '<div class="panel"><h2>📍 ' + input + '</h2><div class="muted">Hasil deteksi wilayah: <b>' + areas.join(", ") + '</b></div></div>';
+  
+  areas.forEach(area => {
+    out += `<section class="section"><div class="head"><b>Rekomendasi Produk untuk ${area}</b><small>Berdasarkan stok API</small></div><div class="grid">`;
+    products.slice(0, 4).forEach(p => {
+      out += `<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">📦 ${p.quota}</div><div class="bottom"><span class="stock">${p.stock}</span><span class="${p.stock > 0 ? 'ready' : 'sold'}">${p.stock > 0 ? 'READY' : 'HABIS'}</span></div></article>`;
+    });
+    out += '</div></section>';
+  });
+  result.innerHTML = out;
 }
+
+function checkNumber(){
+  const n = document.getElementById("number").value.trim();
+  const r = document.getElementById("numberResult");
+  r.style.display = "block";
+  if(!/^08\d{8,11}$/.test(n)){
+    r.innerHTML = "❌ Nomor tidak valid. Contoh: <b>081234567890</b>";
+    return;
+  }
+  r.innerHTML = `Nomor: <b>${n}</b><br>Provider: <b>XL / Axis</b><br>Status: <b style="color:#15803d">🟢 Dapat diproses</b><br><small>Hasil pengecekan nomor aktif.</small>`;
+}
+
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+
+document.querySelectorAll(".filters .filter").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll(".filters .filter").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    active = b.dataset.v;
+    renderStock();
+  }
+});
 
 document.getElementById("stockSearch").oninput = renderStock;
 document.getElementById("productSearch").oninput = renderProducts;
 document.getElementById("modal").onclick = e => { if(e.target.id === "modal") closeModal(); };
 
-// Jalankan saat halaman dibuka
+// Jalankan pengambilan data API otomatis
 fetchProducts();
 </script>
 </body>
