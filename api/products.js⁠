@@ -1,0 +1,19 @@
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Content-Type', 'application/json');
+
+  try {
+    const apiResponse = await fetch('https://api.ics-provider.com/v1/products', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer TOKEN_API_ICS_ANDA',
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await apiResponse.json();
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({ error: 'Gagal mengambil data dari API ICS', details: error.message });
+  }
+};
