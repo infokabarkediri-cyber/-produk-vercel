@@ -14,23 +14,29 @@
 .btn{border:0;background:#111827;color:#fff;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.btn.light{background:#e5e7eb;color:#111827}.btn.full{width:100%;margin-top:10px}
 .search{width:100%;border:1px solid #dfe3e8;border-radius:10px;padding:12px;outline:none;background:#fff}.filters{display:flex;gap:7px;overflow:auto;margin-top:10px}.filter{border:0;background:#e5e7eb;border-radius:9px;padding:9px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.filter.on{background:#111827;color:white}
 .section{background:transparent;border:0;border-radius:16px;overflow:hidden;margin:13px 0}.head{text-align:center;padding:14px 15px}.head b{font-size:18px}.head small{color:#9ca3af;display:block;margin-top:2px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:2px}
-.card{border:1px solid #e5e7eb;border-radius:16px;padding:16px;cursor:pointer;background:#fff;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
+
+/* Diubah menjadi 3 kolom per baris agar lebih minimalis */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:2px}
+
+.card{border:1px solid #e5e7eb;border-radius:14px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
 .card:hover{box-shadow:0 5px 16px rgba(0,0,0,0.06)}
 .card-top{display:flex;justify-content:space-between;align-items:flex-start}
-.name{font-weight:900;font-size:16px;color:#111827}
-.badge-habis{font-size:10px;font-weight:900;border-radius:99px;padding:4px 10px;background:#fee2e2;color:#b91c1c}
-.badge-ready{font-size:10px;font-weight:900;border-radius:99px;padding:4px 10px;background:#dcfce7;color:#15803d}
-.slot-label{font-size:10px;color:#6b7280;font-weight:700;margin-top:10px;text-transform:uppercase}
-.slot-val{font-size:24px;font-weight:900;color:#111827;margin-bottom:8px}
-.area-list{border-top:1px solid #f3f4f6;padding-top:8px;margin-top:8px;display:none}
+.name{font-weight:900;font-size:14px;color:#111827}
+.badge-habis{font-size:9px;font-weight:900;border-radius:99px;padding:3px 8px;background:#fee2e2;color:#b91c1c}
+.badge-ready{font-size:9px;font-weight:900;border-radius:99px;padding:3px 8px;background:#dcfce7;color:#15803d}
+.slot-label{font-size:9px;color:#6b7280;font-weight:700;margin-top:8px;text-transform:uppercase}
+.slot-val{font-size:20px;font-weight:900;color:#111827;margin-bottom:6px}
+.area-list{border-top:1px solid #f3f4f6;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
-.area-row{display:flex;justify-content:space-between;font-size:12px;color:#4b5563;padding:3px 0}
+.area-row{display:flex;justify-content:space-between;font-size:11px;color:#4b5563;padding:2px 0}
 .area-row b{color:#111827}
-.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#b91c1c;border-top:1px solid #f3f4f6;padding-top:8px;margin-top:8px}
+.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;color:#b91c1c;border-top:1px solid #f3f4f6;padding-top:6px;margin-top:6px}
 .toggle-detail.ready-text{color:#15803d}
 .result{background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px;font-size:13px;line-height:1.8;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
-@media(max-width:720px){.grid{grid-template-columns:1fr}}
+
+/* Responsif untuk HP layar kecil menjadi 2 kolom */
+@media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -39,16 +45,23 @@
   <div class="subtitle" id="updateTime">02:02 WIB</div>
 </header>
 <nav class="nav">
-<button class="active" onclick="go('stok',this)">📦 Stok</button>
-<button onclick="go('produk',this)">📋 Produk</button>
+<button class="active" onclick="go('home',this)">Beranda</button>
+<button onclick="go('stok',this)">📦 Stok</button>
 <button onclick="go('area',this)">📍 Cek Area</button>
 <button onclick="go('nomor',this)">🔎 Cek Nomor</button>
+<button onclick="go('info',this)">ℹ️ Info</button>
 </nav>
 
 <main class="wrap">
-<section id="stok" class="page active">
+<section id="home" class="page active">
+<div class="panel"><h1>Informasi Produk</h1><div class="muted">Gunakan menu di atas untuk melihat stok, area, cek nomor, dan informasi terkait.</div></div>
+<div class="stats"><div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div><div class="stat"><b id="homeReady">0</b><small>PRODUK READY</small></div><div class="stat"><b id="homeEmpty">0</b><small>PRODUK HABIS</small></div><div class="stat"><b>API</b><small>STATUS</small></div></div>
+<div class="panel"><h2>📦 Ketersediaan</h2><button class="btn full" onclick="go('stok',document.querySelectorAll('.nav button')[1])">LIHAT STOK</button></div>
+</section>
+
+<section id="stok" class="page">
 <div class="panel">
-  <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk (misal: XDA19)...">
+  <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk...">
   <div class="filters">
     <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
     <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1 (XLA)</button>
@@ -61,14 +74,10 @@
 <div id="stockList"></div>
 </section>
 
-<section id="produk" class="page">
-<div class="panel"><h1>📋 Semua Produk</h1><input id="productSearch" class="search" style="margin-top:12px" placeholder="🔎 Cari produk..."></div>
-<div id="productList"></div>
-</section>
-
 <section id="area" class="page">
 <div class="panel">
 <h1>📍 Cek Area Produk</h1>
+<div class="muted">Masukkan nama kota untuk rekomendasi area.</div>
 <div class="row" style="margin-top:12px"><input id="cityInput" class="search" placeholder="Contoh: Semarang, Solo"><button class="btn" onclick="checkCity()">CEK</button></div>
 </div>
 <div id="cityResult"></div>
@@ -76,6 +85,10 @@
 
 <section id="nomor" class="page">
 <div class="panel"><h1>🔎 Cek Nomor</h1><input id="number" class="search" style="margin-top:12px" placeholder="08xxxxxxxxxx" inputmode="numeric"><button class="btn full" onclick="checkNumber()">CEK</button><div id="numberResult" class="result"></div></div>
+</section>
+
+<section id="info" class="page">
+<div class="panel"><h1>ℹ️ Informasi</h1><div class="notice">Halaman informasi layanan dan pemesanan reseller.</div></div>
 </section>
 </main>
 
@@ -108,11 +121,8 @@ async function fetchProducts() {
         else if (code.startsWith("XLF")) v = "V4";
         else if (code.startsWith("PDA")) v = "V5";
 
-        // Parsing teks area 1-4 secara otomatis dari deskripsi API jika ada angka GB
         let desc = item.description || "";
         let areas = { a1: "-", a2: "-", a3: "-", a4: "-" };
-        
-        // Contoh regex sederhana mendeteksi angka dalam deskripsi per baris/area
         const lines = desc.split("\n");
         let idx = 1;
         lines.forEach(l => {
@@ -132,8 +142,8 @@ async function fetchProducts() {
         };
       }).filter(p => p.v !== "OTHER");
       
+      updateStats();
       renderStock();
-      renderProducts();
     }
   } catch (err) { console.error(err); }
 }
@@ -149,10 +159,20 @@ function toggleCard(elem) {
   elem.classList.toggle("expanded");
   const toggleText = elem.querySelector(".toggle-detail");
   if (elem.classList.contains("expanded")) {
-    toggleText.innerHTML = `Tutup Detail <span>▲</span>`;
+    toggleText.innerHTML = `Tutup <span>▲</span>`;
   } else {
-    toggleText.innerHTML = `Stok Habis <span>▼</span>`;
+    toggleText.innerHTML = `Detail <span>▼</span>`;
   }
+}
+
+function updateStats(){
+  const total = products.filter(p=>p.v !== "V5").reduce((a,p)=>a+p.stock,0);
+  const ready = products.filter(p=>p.v !== "V5" && p.stock>0).length;
+  const empty = products.filter(p=>p.v !== "V5" && p.stock===0).length;
+  
+  if(document.getElementById("homeTotal")) document.getElementById("homeTotal").textContent = total.toLocaleString("id-ID");
+  if(document.getElementById("homeReady")) document.getElementById("homeReady").textContent = ready;
+  if(document.getElementById("homeEmpty")) document.getElementById("homeEmpty").textContent = empty;
 }
 
 function renderStock(){
@@ -166,14 +186,16 @@ function renderStock(){
   for(const [v, items] of Object.entries(groups)){
     out += `<div class="head"><b>Produk ${v}</b><small>${items.length} item</small></div><div class="grid">`;
     items.forEach(p => {
-      const isReady = p.stock > 0;
+      const isPDA = p.v === "V5";
+      const isReady = isPDA ? (p.stock > 0) : (p.stock > 0);
+      
       out += `<div class="card" onclick="toggleCard(this)">
         <div class="card-top">
           <div class="name">${p.code}</div>
-          <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? 'READY' : 'HABIS'}</span>
+          <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
         </div>
-        <div class="slot-label">Slot</div>
-        <div class="slot-val">${p.stock}</div>
+        <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
+        <div class="slot-val" style="font-size:${isPDA ? '16px' : '20px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
         
         <div class="area-list">
           <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
@@ -183,19 +205,13 @@ function renderStock(){
         </div>
         
         <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
-          ${isReady ? 'Lihat Detail' : 'Stok Habis'} <span>▼</span>
+          Detail <span>▼</span>
         </div>
       </div>`;
     });
     out += "</div>";
   }
   document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#9ca3af">Tidak ada produk ditemukan.</div>';
-}
-
-function renderProducts(){
-  const q = (document.getElementById("productSearch").value || "").toLowerCase();
-  const arr = products.filter(p => `${p.name} ${p.code}`.toLowerCase().includes(q));
-  document.getElementById("productList").innerHTML = `<div class="grid">${arr.map(p=>`<div class="card"><div class="name">${p.code}</div><div style="font-size:12px;color:#6b7280;margin-top:5px">${p.name}</div><div style="margin-top:10px;font-weight:900">Stok: ${p.stock}</div></div>`).join("")}</div>`;
 }
 
 function checkNumber(){
