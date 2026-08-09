@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JuraganXL - Informasi Produk</title>
+<title>IC - Informasi Produk</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e5e7eb;padding:15px 16px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1400px;margin:auto}.title{font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px}.subtitle{font-size:11px;color:#6b7280}
@@ -17,9 +17,7 @@
 .search{width:100%;border:1px solid #dfe3e8;border-radius:10px;padding:12px;outline:none;background:#fff}.filters{display:flex;gap:7px;overflow:auto;margin-top:10px}.filter{border:0;background:#e5e7eb;border-radius:9px;padding:9px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.filter.on{background:#111827;color:white}
 .head{text-align:center;padding:14px 15px}.head b{font-size:18px}.head small{color:#9ca3af;display:block;margin-top:2px}
 
-/* GRID 3 KOLOM */
 .grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important;padding:2px !important}
-
 .card{border:1px solid #e5e7eb;border-radius:12px;padding:10px;cursor:pointer;background:#fff;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
 .card:hover{box-shadow:0 5px 16px rgba(0,0,0,0.06)}
 .card-top{display:flex;justify-content:space-between;align-items:flex-start}
@@ -35,13 +33,14 @@
 .toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#b91c1c;border-top:1px solid #f3f4f6;padding-top:4px;margin-top:4px}
 .toggle-detail.ready-text{color:#15803d}
 .result{background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px;font-size:13px;line-height:1.8;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
+.footer-brand{text-align:center;font-size:11px;color:#9ca3af;margin-top:20px;font-weight:700}
 
 @media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:8px}.name{font-size:11px}.slot-val{font-size:14px}}
 </style>
 </head>
 <body>
 <header class="top">
-  <div class="title"><span style="color:#0284c7">xl</span> JuraganXL</div>
+  <div class="title"><span style="color:#0284c7">IC</span> Store</div>
   <div class="subtitle" id="updateTime">-</div>
 </header>
 <nav class="nav">
@@ -56,20 +55,21 @@
 <div class="panel"><h1>Informasi Produk</h1><div class="muted">Silakan tekan tombol Lihat Stok di bawah atau tombol Refresh API untuk memperbarui data secara real-time.</div></div>
 <div class="stats">
   <div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div>
-  <div class="stat"><b id="homeReady">0</b><small>PRODUK READY</small></div>
-  <div class="stat"><b id="homeEmpty">0</b><small>PRODUK HABIS</small></div>
+  <div class="stat"><b id="homeReady">0</b><small>READY</small></div>
+  <div class="stat"><b id="homeEmpty">0</b><small>TERJUAL</small></div>
   <div class="stat">
     <b>API</b>
     <small><button class="btn-refresh" onclick="manualRefresh()">🔄 Refresh</button></small>
   </div>
 </div>
 <div class="panel"><h2>📦 Ketersediaan Produk</h2><button class="btn full" onclick="go('stok', null)">LIHAT STOK</button></div>
+<div class="footer-brand">Powered by IC</div>
 </section>
 
 <section id="stok" class="page">
 <div class="panel">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-    <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="go('home', document.querySelectorAll('.nav button')[0])">← Kembali ke Beranda</button>
+    <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="go('home', document.querySelectorAll('.nav button')[0])">← Kembali</button>
     <button class="btn-refresh" onclick="manualRefresh()">🔄 Refresh Realtime</button>
   </div>
   <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk...">
@@ -83,6 +83,7 @@
   </div>
 </div>
 <div id="stockList"></div>
+<div class="footer-brand">Powered by IC</div>
 </section>
 
 <section id="area" class="page">
@@ -92,20 +93,24 @@
 <div class="row" style="margin-top:12px"><input id="cityInput" class="search" placeholder="Contoh: Semarang, Solo"><button class="btn" onclick="checkCity()">CEK</button></div>
 </div>
 <div id="cityResult"></div>
+<div class="footer-brand">Powered by IC</div>
 </section>
 
 <section id="nomor" class="page">
 <div class="panel"><h1>🔎 Cek Nomor</h1><input id="number" class="search" style="margin-top:12px" placeholder="08xxxxxxxxxx" inputmode="numeric"><button class="btn full" onclick="checkNumber()">CEK</button><div id="numberResult" class="result"></div></div>
+<div class="footer-brand">Powered by IC</div>
 </section>
 
 <section id="info" class="page">
 <div class="panel"><h1>ℹ️ Informasi</h1><div class="muted">Halaman informasi layanan dan pemesanan reseller.</div></div>
+<div class="footer-brand">Powered by IC</div>
 </section>
 </main>
 
 <script>
 let products = [];
 let activeVersion = "ALL";
+let initialStockMap = {}; // Menyimpan stok awal untuk melacak penurunan (terjual)
 
 function go(id,btn){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
@@ -144,11 +149,18 @@ async function fetchProducts() {
           }
         });
 
+        const currentStock = item.stock !== undefined ? Number(item.stock) : 0;
+        
+        // Catat stok awal saat pertama kali fetch untuk acuan hitung terjual (berkurangnya stok)
+        if (initialStockMap[code] === undefined) {
+          initialStockMap[code] = currentStock;
+        }
+
         return {
           v: v,
           code: item.code,
           name: item.name,
-          stock: item.stock !== undefined ? Number(item.stock) : 0,
+          stock: currentStock,
           areas: areas
         };
       }).filter(p => p.v !== "OTHER");
@@ -188,7 +200,7 @@ function toggleCard(elem) {
 }
 
 function updateStats(){
-  // Total stok dihitung dari total stok produk biasa, khusus PDA (V5) jika open dihitung 1
+  // Total stok
   const total = products.reduce((a, p) => {
     if (p.v === "V5") {
       return a + (p.stock > 0 ? 1 : 0);
@@ -196,15 +208,22 @@ function updateStats(){
     return a + p.stock;
   }, 0);
   
+  // Produk Ready
   const ready = products.filter(p => p.stock > 0).length;
-  const empty = products.filter(p => {
-    if(p.v === "V5") return p.stock <= 0;
-    return p.stock === 0;
-  }).length;
+
+  // Produk Terjual: dihitung dari selisih berkurangnya stok dari awal (initialStockMap - stock saat ini)
+  let soldCount = 0;
+  products.forEach(p => {
+    const init = initialStockMap[p.code] !== undefined ? initialStockMap[p.code] : p.stock;
+    const diff = init - p.stock;
+    if (diff > 0) {
+      soldCount += diff;
+    }
+  });
   
   if(document.getElementById("homeTotal")) document.getElementById("homeTotal").textContent = total.toLocaleString("id-ID");
   if(document.getElementById("homeReady")) document.getElementById("homeReady").textContent = ready;
-  if(document.getElementById("homeEmpty")) document.getElementById("homeEmpty").textContent = empty;
+  if(document.getElementById("homeEmpty")) document.getElementById("homeEmpty").textContent = soldCount;
 }
 
 function renderStock(){
@@ -265,7 +284,6 @@ function checkCity(){
   document.getElementById("cityResult").innerHTML = `<div class="panel">Hasil deteksi area aktif dan siap dipesan.</div>`;
 }
 
-// Inisialisasi & Realtime Auto-refresh setiap 10 detik
 fetchProducts();
 setInterval(fetchProducts, 10000);
 
