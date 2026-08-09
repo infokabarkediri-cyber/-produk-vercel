@@ -3,76 +3,58 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC - Informasi Produk</title>
+<title>IC Store - Cek Produk</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}
-.top{background:#fff;border-bottom:1px solid #e5e7eb;padding:15px 16px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1400px;margin:auto}.title{font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px}.subtitle{font-size:11px;color:#6b7280}
-.nav{background:#fff;border-bottom:1px solid #e5e7eb;display:flex;overflow:auto;padding:0 10px;position:sticky;top:0;z-index:4}.nav button{border:0;background:none;color:#6b7280;padding:14px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.nav button.active{color:#111827;border-bottom:2px solid #111827}
-.wrap{padding:18px 15px 75px}.page{display:none}.page.active{display:block}
-.panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;margin-bottom:13px}.panel h1,.panel h2{margin:0 0 5px}.panel h1{font-size:20px}.panel h2{font-size:16px}.muted{font-size:12px;color:#6b7280;line-height:1.6}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:13px 0}.stat{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px}.stat b{display:block;font-size:18px}.stat small{font-size:10px;color:#6b7280}
-.btn{border:0;background:#111827;color:#fff;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.btn.full{width:100%;margin-top:10px}
-.btn-refresh{background:#0284c7;color:#fff;border:0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
-.btn-refresh:hover{background:#0369a1}
-.search{width:100%;border:1px solid #dfe3e8;border-radius:10px;padding:12px;outline:none;background:#fff}.filters{display:flex;gap:7px;overflow:auto;margin-top:10px}.filter{border:0;background:#e5e7eb;border-radius:9px;padding:9px 12px;font-weight:800;white-space:nowrap;cursor:pointer}.filter.on{background:#111827;color:white}
-.head{text-align:center;padding:14px 15px}.head b{font-size:18px}.head small{color:#9ca3af;display:block;margin-top:2px}
+*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
+.top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
+.nav{background:#fff;border-bottom:1px solid #e2e8f0;display:flex;overflow:auto;padding:0 12px;position:sticky;top:0;z-index:4}.nav button{border:0;background:none;color:#64748b;padding:14px 14px;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer}.nav button.active{color:#0f172a;border-bottom:2px solid #0f172a}
+.wrap{padding:20px 15px 80px}.page{display:none}.page.active{display:block}
+.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}.panel h1{font-size:17px;margin:0 0 6px;color:#0f172a}.muted{font-size:13px;color:#64748b;line-height:1.5}
+.search{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;outline:none;background:#fff;font-size:13px}.filters{display:flex;gap:6px;overflow:auto;margin-top:10px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
+.head{text-align:center;padding:16px 10px 8px}.head b{font-size:16px;color:#0f172a}.head small{color:#94a3b8;display:block;margin-top:2px;font-size:11px}
 
-.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important;padding:2px !important}
-.card{border:1px solid #e5e7eb;border-radius:12px;padding:10px;cursor:pointer;background:#fff;position:relative;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
-.card:hover{box-shadow:0 5px 16px rgba(0,0,0,0.06)}
+.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important}
+.card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
+.card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
 .card-top{display:flex;justify-content:space-between;align-items:flex-start}
-.name{font-weight:900;font-size:13px;color:#111827}
-.badge-habis{font-size:8px;font-weight:900;border-radius:99px;padding:2px 6px;background:#fee2e2;color:#b91c1c}
-.badge-ready{font-size:8px;font-weight:900;border-radius:99px;padding:2px 6px;background:#dcfce7;color:#15803d}
-.slot-label{font-size:8px;color:#6b7280;font-weight:700;margin-top:6px;text-transform:uppercase}
-.slot-val{font-size:16px;font-weight:900;color:#111827;margin-bottom:4px}
-.area-list{border-top:1px solid #f3f4f6;padding-top:4px;margin-top:4px;display:none}
+.name{font-weight:800;font-size:13px;color:#0f172a}
+.badge-habis{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ffeeee;color:#dc2626}
+.badge-ready{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ecfdf5;color:#059669}
+.slot-label{font-size:9px;color:#64748b;font-weight:700;margin-top:8px;text-transform:uppercase}
+.slot-val{font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
-.area-row{display:flex;justify-content:space-between;font-size:10px;color:#4b5563;padding:2px 0}
-.area-row b{color:#111827}
-.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#b91c1c;border-top:1px solid #f3f4f6;padding-top:4px;margin-top:4px}
-.toggle-detail.ready-text{color:#15803d}
-.result{background:#f8fafc;border-radius:12px;padding:13px;margin-top:12px;font-size:13px;line-height:1.8;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
-.footer-brand{text-align:center;font-size:11px;color:#9ca3af;margin-top:20px;font-weight:700}
+.area-row{display:flex;justify-content:space-between;font-size:11px;color:#475569;padding:2px 0}
+.area-row b{color:#0f172a}
+.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
+.toggle-detail.ready-text{color:#059669}
+.result{background:#f8fafc;border-radius:10px;padding:14px;margin-top:12px;font-size:13px;line-height:1.6;display:none}.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{border:0;background:#0f172a;color:#fff;border-radius:10px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;width:100%}
+.footer-brand{text-align:center;font-size:11px;color:#94a3b8;margin-top:30px;font-weight:600}
 
-@media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:8px}.name{font-size:11px}.slot-val{font-size:14px}}
+@media(max-width:640px){.grid{grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}.card{padding:10px}.name{font-size:11px}.slot-val{font-size:13px}}
 </style>
 </head>
 <body>
 <header class="top">
-  <div class="title"><span style="color:#0284c7">IC</span> Store</div>
+  <div class="title">✨ Katalog Layanan</div>
   <div class="subtitle" id="updateTime">-</div>
 </header>
 <nav class="nav">
-<button class="active" onclick="go('home',this)">Beranda</button>
+<button class="active" onclick="go('home',this)">📦 Katalog Produk</button>
 <button onclick="go('area',this)">📍 Cek Area</button>
 <button onclick="go('nomor',this)">🔎 Cek Nomor</button>
-<button onclick="go('info',this)">ℹ️ Info</button>
+<button onclick="go('info',this)">ℹ️ Informasi</button>
 </nav>
 
 <main class="wrap">
 <section id="home" class="page active">
-<div class="panel"><h1>Informasi Produk</h1><div class="muted">Silakan tekan tombol Lihat Stok di bawah atau tombol Refresh API untuk memperbarui data secara real-time.</div></div>
-<div class="stats">
-  <div class="stat"><b id="homeTotal">0</b><small>TOTAL STOK</small></div>
-  <div class="stat"><b id="homeReady">0</b><small>READY</small></div>
-  <div class="stat"><b id="homeEmpty">0</b><small>TERJUAL</small></div>
-  <div class="stat">
-    <b>API</b>
-    <small><button class="btn-refresh" onclick="manualRefresh()">🔄 Refresh</button></small>
-  </div>
-</div>
-<div class="panel"><h2>📦 Ketersediaan Produk</h2><button class="btn full" onclick="go('stok', null)">LIHAT STOK</button></div>
-<div class="footer-brand">Powered by IC</div>
-</section>
-
-<section id="stok" class="page">
 <div class="panel">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-    <button class="btn" style="padding:6px 12px;font-size:12px;" onclick="go('home', document.querySelectorAll('.nav button')[0])">← Kembali</button>
-    <button class="btn-refresh" onclick="manualRefresh()">🔄 Refresh Realtime</button>
-  </div>
-  <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk...">
+  <h1>Silakan Pilih Produk</h1>
+  <div class="muted">Informasi ketersediaan produk, kuota area, dan status layanan diperbarui secara otomatis setiap detik untuk kenyamanan transaksi Anda.</div>
+</div>
+<div class="panel" style="padding:12px 16px;">
+  <input id="stockSearch" class="search" placeholder="🔎 Cari produk atau kode cepat...">
   <div class="filters">
     <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
     <button class="filter" data-v="V1" onclick="setFilter('V1', this)">Akrab V1</button>
@@ -83,34 +65,42 @@
   </div>
 </div>
 <div id="stockList"></div>
-<div class="footer-brand">Powered by IC</div>
+<div class="footer-brand">Copyright © IC™ 2026</div>
 </section>
 
 <section id="area" class="page">
 <div class="panel">
-<h1>📍 Cek Area Produk</h1>
-<div class="muted">Masukkan nama kota untuk rekomendasi area.</div>
-<div class="row" style="margin-top:12px"><input id="cityInput" class="search" placeholder="Contoh: Semarang, Solo"><button class="btn" onclick="checkCity()">CEK</button></div>
+  <h1>📍 Cek Area Produk</h1>
+  <div class="muted">Masukkan nama kota untuk melihat ketersediaan wilayah jangkauan.</div>
+  <div class="row" style="margin-top:12px"><input id="cityInput" class="search" placeholder="Contoh: Semarang, Solo"><button class="btn" style="width:auto;padding:0 20px" onclick="checkCity()">Cek</button></div>
 </div>
 <div id="cityResult"></div>
-<div class="footer-brand">Powered by IC</div>
+<div class="footer-brand">Copyright © IC™ 2026</div>
 </section>
 
 <section id="nomor" class="page">
-<div class="panel"><h1>🔎 Cek Nomor</h1><input id="number" class="search" style="margin-top:12px" placeholder="08xxxxxxxxxx" inputmode="numeric"><button class="btn full" onclick="checkNumber()">CEK</button><div id="numberResult" class="result"></div></div>
-<div class="footer-brand">Powered by IC</div>
+<div class="panel">
+  <h1>🔎 Cek Nomor Pelanggan</h1>
+  <div class="muted">Pastikan nomor tujuan aktif dan sesuai format.</div>
+  <input id="number" class="search" style="margin-top:12px" placeholder="08xxxxxxxxxx" inputmode="numeric">
+  <button class="btn" style="margin-top:10px" onclick="checkNumber()">Periksa Nomor</button>
+  <div id="numberResult" class="result"></div>
+</div>
+<div class="footer-brand">Copyright © IC™ 2026</div>
 </section>
 
 <section id="info" class="page">
-<div class="panel"><h1>ℹ️ Informasi</h1><div class="muted">Halaman informasi layanan dan pemesanan reseller.</div></div>
-<div class="footer-brand">Powered by IC</div>
+<div class="panel">
+  <h1>ℹ️ Informasi Layanan</h1>
+  <div class="muted">Gunakan katalog di atas untuk memantau produk secara real-time. Hubungi admin utama jika ada kendala transaksi.</div>
+</div>
+<div class="footer-brand">Copyright © IC™ 2026</div>
 </section>
 </main>
 
 <script>
 let products = [];
 let activeVersion = "ALL";
-let initialStockMap = {}; // Menyimpan stok awal untuk melacak penurunan (terjual)
 
 function go(id,btn){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
@@ -149,37 +139,21 @@ async function fetchProducts() {
           }
         });
 
-        const currentStock = item.stock !== undefined ? Number(item.stock) : 0;
-        
-        // Catat stok awal saat pertama kali fetch untuk acuan hitung terjual (berkurangnya stok)
-        if (initialStockMap[code] === undefined) {
-          initialStockMap[code] = currentStock;
-        }
-
         return {
           v: v,
           code: item.code,
           name: item.name,
-          stock: currentStock,
+          stock: item.stock !== undefined ? Number(item.stock) : 0,
           areas: areas
         };
       }).filter(p => p.v !== "OTHER");
       
-      updateStats();
       renderStock();
       
       const now = new Date();
       document.getElementById("updateTime").textContent = now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
     }
   } catch (err) { console.error(err); }
-}
-
-function manualRefresh() {
-  const btns = document.querySelectorAll(".btn-refresh");
-  btns.forEach(b => b.textContent = "⏳ Memuat...");
-  fetchProducts().then(() => {
-    btns.forEach(b => b.textContent = "🔄 Refresh");
-  });
 }
 
 function setFilter(v, btn) {
@@ -199,33 +173,6 @@ function toggleCard(elem) {
   }
 }
 
-function updateStats(){
-  // Total stok
-  const total = products.reduce((a, p) => {
-    if (p.v === "V5") {
-      return a + (p.stock > 0 ? 1 : 0);
-    }
-    return a + p.stock;
-  }, 0);
-  
-  // Produk Ready
-  const ready = products.filter(p => p.stock > 0).length;
-
-  // Produk Terjual: dihitung dari selisih berkurangnya stok dari awal (initialStockMap - stock saat ini)
-  let soldCount = 0;
-  products.forEach(p => {
-    const init = initialStockMap[p.code] !== undefined ? initialStockMap[p.code] : p.stock;
-    const diff = init - p.stock;
-    if (diff > 0) {
-      soldCount += diff;
-    }
-  });
-  
-  if(document.getElementById("homeTotal")) document.getElementById("homeTotal").textContent = total.toLocaleString("id-ID");
-  if(document.getElementById("homeReady")) document.getElementById("homeReady").textContent = ready;
-  if(document.getElementById("homeEmpty")) document.getElementById("homeEmpty").textContent = soldCount;
-}
-
 function renderStock(){
   const q = (document.getElementById("stockSearch").value || "").toLowerCase();
   const arr = products.filter(p => (activeVersion === "ALL" || p.v === activeVersion) && `${p.name} ${p.code}`.toLowerCase().includes(q));
@@ -243,7 +190,7 @@ function renderStock(){
 
   let out = "";
   for(const [v, items] of Object.entries(groups)){
-    out += `<div class="head"><b>Produk ${nameMap[v] || v}</b><small>${items.length} item</small></div><div class="grid">`;
+    out += `<div class="head"><b>${nameMap[v] || v}</b><small>${items.length} pilihan tersedia</small></div><div class="grid">`;
     items.forEach(p => {
       const isPDA = p.v === "V5";
       const isReady = p.stock > 0;
@@ -254,7 +201,7 @@ function renderStock(){
           <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
         </div>
         <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-        <div class="slot-val" style="font-size:${isPDA ? '14px' : '16px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
+        <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}">${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : p.stock}</div>
         
         <div class="area-list">
           <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
@@ -270,18 +217,18 @@ function renderStock(){
     });
     out += "</div>";
   }
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#9ca3af">Tidak ada produk ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;">Produk tidak ditemukan.</div>';
 }
 
 function checkNumber(){
   const n = document.getElementById("number").value.trim();
   const r = document.getElementById("numberResult");
   r.style.display = "block";
-  r.innerHTML = /^08\d{8,11}$/.test(n) ? `Nomor: <b>${n}</b><br>Status: <b style="color:#15803d">🟢 Valid & Bisa Diproses</b>` : `❌ Nomor tidak valid.`;
+  r.innerHTML = /^08\d{8,11}$/.test(n) ? `Nomor: <b>${n}</b><br>Status: <b style="color:#059669">🟢 Valid & Siap Diproses</b>` : `❌ Format nomor tidak valid.`;
 }
 
 function checkCity(){
-  document.getElementById("cityResult").innerHTML = `<div class="panel">Hasil deteksi area aktif dan siap dipesan.</div>`;
+  document.getElementById("cityResult").innerHTML = `<div class="panel">Hasil pencarian area wilayah aktif dan siap dipesan.</div>`;
 }
 
 fetchProducts();
