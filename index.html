@@ -82,122 +82,156 @@
 
 <script>
 let products = [];
+
+function go(id,btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  const target = document.getElementById(id);
+  if(target) target.classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  window.scrollTo(0,0);
+}
+
 async function fetchProductsFromAPI() {
   try {
     const response = await fetch('/api/products');
     const result = await response.json();
     
-    // Menyesuaikan properti dari format JSON API ICS Store Anda
-    products = result.map(item => ({
-      v: "V1",
-      code: item.code || "CODE",
-      name: item.name || "Produk",
-      type: item.type || "Regular",
-      quota: item.quota || "-", // Mengambil dari description yang sudah di-mapping di serverless
-      stock: Number(item.stock) || 0,
-      area: "Semua Area"
-    }));
+    if (Array.isArray(result)) {
+      products = result.map(item => ({
+        v: "V1",
+        code: item.code || "CODE",
+        name: item.name || "Produk",
+        type: item.type || "Regular",
+        quota: item.quota || "-",
+        stock: Number(item.stock) || 0,
+        area: "Semua Area"
+      }));
+    }
 
     updateStats();
     renderStock();
     renderProducts();
-    document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
+    const timeEl = document.getElementById("updateTime");
+    if(timeEl) timeEl.textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
   } catch (err) {
     console.error("Gagal memuat produk:", err);
-    document.getElementById("updateTime").textContent = "Gagal memuat data API";
+    const timeEl = document.getElementById("updateTime");
+    if(timeEl) timeEl.textContent = "Gagal memuat data API";
   }
 }
-
-
-
-    updateStats();
-    renderStock();
-    renderProducts();
-    document.getElementById("updateTime").textContent = "Update: " + new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+" WIB";
-  } catch (err) {
-    console.error("Gagal memuat produk:", err);
-    document.getElementById("updateTime").textContent = "Gagal memuat data API";
-  }
-}
-
-function go(id,btn){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));if(btn)btn.classList.add("active");window.scrollTo(0,0)}
 
 function renderStock(){
-  const q=(document.getElementById("stockSearch").value||"").toLowerCase();
-  const arr=products.filter(p=>`${p.name} ${p.code} ${p.quota}`.toLowerCase().includes(q));
-  let out="";
+  const searchEl = document.getElementById("stockSearch");
+  const q = searchEl ? searchEl.value.toLowerCase() : "";
+  const arr = products.filter(p => `${p.name} ${p.code} ${p.quota}`.toLowerCase().includes(q));
+  const listEl = document.getElementById("stockList");
+  if(!listEl) return;
+
   if(arr.length === 0) {
-    document.getElementById("stockList").innerHTML='<div class="section empty">Tidak ada produk ditemukan.</div>';
+    listEl.innerHTML = '<div class="section empty">Tidak ada produk ditemukan.</div>';
     return;
   }
-  out+=`<section class="section"><div class="head"><b>Daftar Stok</b><small>${arr.length} produk</small></div><div class="grid">`;
-  arr.forEach(p=>out+=`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">📦 ${p.quota}<br>📍 ${p.area}</div><div class="bottom"><span class="stock">${p.stock}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`);
-  out+="</div></section>";
-  document.getElementById("stockList").innerHTML=out;
+  let out = `<section class="section"><div class="head"><b>Daftar Stok</b><small>${arr.length} produk</small></div><div class="grid">`;
+  arr.forEach(p => {
+    out += `<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">📦 ${p.quota}<br>📍 ${p.area}</div><div class="bottom"><span class="stock">${p.stock}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`;
+  });
+  out += "</div></section>";
+  listEl.innerHTML = out;
 }
 
 function renderProducts(){
-  const q=(document.getElementById("productSearch").value||"").toLowerCase();
-  const arr=products.filter(p=>`${p.name} ${p.code} ${p.quota} ${p.type}`.toLowerCase().includes(q));
-  document.getElementById("productList").innerHTML=`<section class="section"><div class="head"><b>Semua Produk</b><small>${arr.length} produk</small></div><div class="grid">${arr.map(p=>`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">${p.type} • ${p.quota}</div><div class="bottom"><span>${p.area}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`).join("")}</div></section>`;
+  const searchEl = document.getElementById("productSearch");
+  const q = searchEl ? searchEl.value.toLowerCase() : "";
+  const arr = products.filter(p => `${p.name} ${p.code} ${p.quota} ${p.type}`.toLowerCase().includes(q));
+  const listEl = document.getElementById("productList");
+  if(!listEl) return;
+
+  listEl.innerHTML = `<section class="section"><div class="head"><b>Semua Produk</b><small>${arr.length} produk</small></div><div class="grid">${arr.map(p=>`<article class="card" onclick="showProduct('${p.code}')"><div class="name">${p.name}</div><div class="code">${p.code}</div><div class="meta">${p.type} • ${p.quota}</div><div class="bottom"><span>${p.area}</span><span class="${p.stock>0?'ready':'sold'}">${p.stock>0?'READY':'HABIS'}</span></div></article>`).join("")}</div></section>`;
 }
 
 function updateStats(){
-  const total=products.reduce((a,p)=>a+p.stock,0), ready=products.filter(p=>p.stock>0).length, empty=products.filter(p=>p.stock===0).length;
-  document.getElementById("total").textContent=total.toLocaleString("id-ID");
-  document.getElementById("ready").textContent=ready;
-  document.getElementById("empty").textContent=empty;
-  document.getElementById("homeTotal").textContent=total.toLocaleString("id-ID");
-  document.getElementById("homeReady").textContent=ready;
-  document.getElementById("homeEmpty").textContent=empty;
+  const total = products.reduce((a,p)=>a+p.stock,0);
+  const ready = products.filter(p=>p.stock>0).length;
+  const empty = products.filter(p=>p.stock===0).length;
+  
+  if(document.getElementById("total")) document.getElementById("total").textContent = total.toLocaleString("id-ID");
+  if(document.getElementById("ready")) document.getElementById("ready").textContent = ready;
+  if(document.getElementById("empty")) document.getElementById("empty").textContent = empty;
+  if(document.getElementById("homeTotal")) document.getElementById("homeTotal").textContent = total.toLocaleString("id-ID");
+  if(document.getElementById("homeReady")) document.getElementById("homeReady").textContent = ready;
+  if(document.getElementById("homeEmpty")) document.getElementById("homeEmpty").textContent = empty;
 }
 
 function showProduct(code){
-  const p=products.find(x=>x.code===code);
+  const p = products.find(x => x.code === code);
   if(!p) return;
-  document.getElementById("modalContent").innerHTML=`<div class="big">${p.name}</div><div class="detail">
+  document.getElementById("modalContent").innerHTML = `<div class="big">${p.name}</div><div class="detail">
   Kode: <b>${p.code}</b><br>Jenis: <b>${p.type}</b><br>Kuota: <b>${p.quota}</b><br>Area: <b>${p.area}</b><br>Stok: <b>${p.stock}</b><br>Status: <b>${p.stock>0?'🟢 READY':'🔴 HABIS'}</b><br><br>Harga mengikuti ketentuan reseller.
   </div><button class="btn full" onclick="closeModal()">TUTUP</button>`;
   document.getElementById("modal").classList.add("show");
 }
 
-const cityAreas={
+const cityAreas = {
   "semarang":["Area 2"],"salatiga":["Area 3"],"solo":["Area 2"],"surakarta":["Area 2"],"yogyakarta":["Area 1"],"jakarta":["Area 2"],"bandung":["Area 1"],"surabaya":["Area 2"]
 };
 
-function setCity(city){document.getElementById("cityInput").value=city;checkCity()}
+function setCity(city){
+  const input = document.getElementById("cityInput");
+  if(input) input.value = city;
+  checkCity();
+}
 
 function checkCity(){
-  const input=document.getElementById("cityInput").value.trim();
-  const key=input.toLowerCase().replace(/[^a-z0-9\s]/g,"").replace(/\s+/g," ");
-  const result=document.getElementById("cityResult");
+  const inputEl = document.getElementById("cityInput");
+  const input = inputEl ? inputEl.value.trim() : "";
+  const key = input.toLowerCase().replace(/[^a-z0-9\s]/g,"").replace(/\s+/g," ");
+  const result = document.getElementById("cityResult");
+  if(!result) return;
+
   if(!key){
-    result.innerHTML='<div class="panel"><div class="notice">Masukkan nama kota terlebih dahulu.</div></div>';
+    result.innerHTML = '<div class="panel"><div class="notice">Masukkan nama kota terlebih dahulu.</div></div>';
     return;
   }
   const areas = cityAreas[key] || ["Area Umum"];
-  let out='<div class="panel"><h2>📍 '+input+'</h2><div class="muted">Hasil deteksi wilayah: <b>'+areas.join(", ")+'</b></div></div>';
+  let out = '<div class="panel"><h2>📍 '+input+'</h2><div class="muted">Hasil deteksi wilayah: <b>'+areas.join(", ")+'</b></div></div>';
   
-  out+='<section class="section"><div class="head"><b>Produk yang Cocok</b><small>Berdasarkan stok sistem</small></div><div class="grid">';
+  out += '<section class="section"><div class="head"><b>Produk yang Cocok</b><small>Berdasarkan stok sistem</small></div><div class="grid">';
   products.slice(0, 4).forEach(p => {
-    out+='<article class="card" onclick="showProduct(\''+p.code+'\')"><div class="name">'+p.name+'</div><div class="code">'+p.code+'</div><div class="meta">📦 '+p.quota+'<br>📍 '+p.area+'</div><div class="bottom"><span class="stock">'+p.stock+'</span><span class="'+(p.stock>0?'ready':'sold')+'">'+(p.stock>0?'READY':'HABIS')+'</span></div></article>';
+    out += '<article class="card" onclick="showProduct(\''+p.code+'\')"><div class="name">'+p.name+'</div><div class="code">'+p.code+'</div><div class="meta">📦 '+p.quota+'<br>📍 '+p.area+'</div><div class="bottom"><span class="stock">'+p.stock+'</span><span class="'+(p.stock>0?'ready':'sold')+'">'+(p.stock>0?'READY':'HABIS')+'</span></div></article>';
   });
-  out+='</div></section>';
-  result.innerHTML=out;
+  out += '</div></section>';
+  result.innerHTML = out;
 }
 
 function checkNumber(){
-  const n=document.getElementById("number").value.trim(),r=document.getElementById("numberResult");r.style.display="block";
-  if(!/^08\d{8,11}$/.test(n)){r.innerHTML="❌ Nomor tidak valid. Contoh: <b>081234567890</b>";return}
-  r.innerHTML=`Nomor: <b>${n}</b><br>Provider: <b>Seluler</b><br>Status: <b style="color:#15803d">🟢 Dapat diproses</b>`
+  const numEl = document.getElementById("number");
+  const r = document.getElementById("numberResult");
+  if(!numEl || !r) return;
+  const n = numEl.value.trim();
+  r.style.display = "block";
+  if(!/^08\d{8,11}$/.test(n)){
+    r.innerHTML = "❌ Nomor tidak valid. Contoh: <b>081234567890</b>";
+    return;
+  }
+  r.innerHTML = `Nomor: <b>${n}</b><br>Provider: <b>Seluler</b><br>Status: <b style="color:#15803d">🟢 Dapat diproses</b>`;
 }
 
-function closeModal(){document.getElementById("modal").classList.remove("show")}
+function closeModal(){
+  const modal = document.getElementById("modal");
+  if(modal) modal.classList.remove("show");
+}
 
-document.getElementById("stockSearch").oninput=renderStock;
-document.getElementById("productSearch").oninput=renderProducts;
-document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};
+const stockSearchEl = document.getElementById("stockSearch");
+if(stockSearchEl) stockSearchEl.oninput = renderStock;
 
+const productSearchEl = document.getElementById("productSearch");
+if(productSearchEl) productSearchEl.oninput = renderProducts;
+
+const modalEl = document.getElementById("modal");
+if(modalEl) modalEl.onclick = e => { if(e.target.id === "modal") closeModal(); };
+
+// Jalankan pengambilan data secara aman
 fetchProductsFromAPI();
 </script>
 </body>
