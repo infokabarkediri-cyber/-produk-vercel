@@ -2,19 +2,34 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<title>Cek Stok Langsung</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Informasi Produk Supplier</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#111827;font-family:sans-serif}
+.wrap{max-width:800px;margin:auto;padding:20px}
+.panel{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:15px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.name{font-weight:bold;font-size:14px;margin-bottom:5px}
+.desc{font-size:11px;color:#6b7280;margin-bottom:10px}
+.price{font-weight:bold;color:#15803d;font-size:15px}
+.stock{font-size:12px;font-weight:bold;color:#111827}
+</style>
 </head>
 <body>
-<div id="status" style="padding:20px; font-family:sans-serif;">Memulai koneksi langsung ke supplier...</div>
-<div id="container" style="padding:20px;"></div>
+<div class="wrap">
+  <div class="panel">
+    <h2>Daftar Produk</h2>
+    <div id="status">Memuat data...</div>
+  </div>
+  <div id="container" class="grid"></div>
+</div>
 
 <script>
 async function ambilData() {
+  const container = document.getElementById("container");
   const status = document.getElementById("status");
   try {
-    status.textContent = "Menghubungkan ke API Supplier...";
-    
-    // Kita panggil langsung ke supplier
     const response = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
       headers: {
@@ -23,12 +38,25 @@ async function ambilData() {
       }
     });
 
-    const data = await response.json();
-    status.textContent = "Data berhasil diambil!";
-    document.getElementById("container").innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+    const result = await response.json();
+    status.textContent = "Data berhasil dimuat (" + result.total + " produk)";
+    
+    let html = "";
+    result.data.forEach(p => {
+      html += `
+        <div class="card">
+          <div class="name">${p.name}</div>
+          <div class="desc">${p.description}</div>
+          <div style="display:flex; justify-content:space-between;">
+            <div class="price">Rp ${p.price.toLocaleString()}</div>
+            <div class="stock">Stok: ${p.stock}</div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
   } catch (err) {
-    status.textContent = "Gagal total: " + err.message;
-    console.error(err);
+    status.textContent = "Gagal memuat data.";
   }
 }
 ambilData();
