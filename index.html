@@ -3,14 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title></title>
+<title>Dashboard Performa & Stok</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}
 .brand-container{display:flex;align-items:center;gap:10px}
 .brand-badge{font-size:12px;font-weight:800;padding:5px 10px;border-radius:6px;letter-spacing:0.5px}
-/* Ganti warna atau style logo provider di bawah ini */
 .brand-primary{background:#003d79;color:#fff}
 .brand-secondary{background:#8a2be2;color:#fff}
 .subtitle{font-size:11px;color:#64748b}
@@ -86,10 +85,14 @@
 .badge-ready{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ecfdf5;color:#059669}
 .slot-label{font-size:9px;color:#64748b;font-weight:700;margin-top:8px;text-transform:uppercase}
 .slot-val{font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px}
-.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
+
+/* Area list yang rapi & bersih */
+.area-list{border-top:1px solid #f1f5f9;padding-top:8px;margin-top:8px;display:none}
 .card.expanded .area-list{display:block}
-.area-row{display:flex;justify-content:space-between;font-size:11px;color:#475569;padding:2px 0}
-.area-row b{color:#0f172a}
+.area-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#475569;padding:3px 0;border-bottom:1px dashed #f8fafc}
+.area-row:last-child{border-bottom:0}
+.area-row b{color:#0f172a;background:#f8fafc;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0}
+
 .toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
 .toggle-detail.ready-text{color:#059669}
 .footer-brand{text-align:center;font-size:11px;color:#94a3b8;margin-top:30px;font-weight:600}
@@ -100,7 +103,6 @@
 </head>
 <body>
 <header class="top">
-  <!-- TEMPAT LOGO PROVIDER: Ubah teks/tag di bawah sesuai kebutuhan provider lain -->
   <div class="brand-container" id="providerLogoContainer">
     <span class="brand-badge brand-primary">PROV 1</span>
     <span class="brand-badge brand-secondary">PROV 2</span>
