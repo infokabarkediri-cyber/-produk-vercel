@@ -10,12 +10,13 @@
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
 .wrap{padding:20px 15px 80px}
 
-/* DASHBOARD STATISTIK UTAMA (5 KOLOM) */
-.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+/* DASHBOARD STATISTIK (6 KOLOM) */
+.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
 .stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01);position:relative;overflow:hidden}
 .stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
 .stat-card.ready::before{background:#059669}
 .stat-card.sold::before{background:#3b82f6}
+.stat-card.day::before{background:#e11d48}
 .stat-card.sec::before{background:#ec4899}
 .stat-card.rate::before{background:#8b5cf6}
 .stat-card.speed::before{background:#f59e0b}
@@ -23,7 +24,7 @@
 .stat-val{font-size:16px;font-weight:800;color:#0f172a;margin-top:4px}
 .stat-sub{font-size:9px;color:#94a3b8;margin-top:2px}
 
-/* PANEL MONITORING PRODUK (TERTINGGI & TERENDAH) */
+/* PANEL MONITORING PRODUK */
 .insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
 .insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
 .insight-title{font-size:13px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px}
@@ -34,13 +35,16 @@
 .badge-top{background:#ecfdf5;color:#059669}
 .badge-low{background:#fff1f2;color:#e11d48}
 
-/* KOTAK GRAFIK ANALITIK */
+/* GRAFIK & FILTER TANGGAL */
 .chart-container{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
-.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px}
 .chart-header b{font-size:14px;color:#0f172a}
-.chart-header span{font-size:11px;color:#64748b}
+.chart-header span{font-size:11px;color:#64748b;display:block}
+.date-filter-box{display:flex;gap:6px;align-items:center}
+.date-filter-box input{border:1px solid #cbd5e1;border-radius:8px;padding:5px 8px;font-size:11px;outline:none;background:#f8fafc}
+.date-filter-box button{background:#0f172a;color:#fff;border:0;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer}
 
-/* PANEL FITUR KEREN TAMBAHAN */
+/* PANEL KENDALI */
 .features-panel{background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 .feature-info b{font-size:13px;display:block;margin-bottom:2px}
 .feature-info span{font-size:11px;color:#94a3b8}
@@ -55,7 +59,7 @@
 .head b{font-size:15px;color:#0f172a}
 .head small{color:#64748b;font-size:11px;font-weight:600}
 
-/* GRID 3 KOLOM RAPI */
+/* GRID KARTU PRODUK */
 .grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important}
 .card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 2px rgba(0,0,0,0.02);transition:all 0.2s ease}
 .card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
@@ -86,36 +90,41 @@
 </header>
 
 <main class="wrap">
-  <!-- DASHBOARD STATISTIK UTAMA (MURNI ANGKA BULAT / KELIPATAN TRANSAKSI) -->
+  <!-- DASHBOARD STATISTIK UTAMA -->
   <div class="stats-grid">
     <div class="stat-card ready">
-      <div class="stat-label">Stok Tersedia</div>
+      <div class="stat-label">Tersedia</div>
       <div class="stat-val" id="statReady">0</div>
-      <div class="stat-sub" id="statReadyVariant">0 varian aktif</div>
+      <div class="stat-sub" id="statReadyVariant">0 varian</div>
     </div>
     <div class="stat-card sold">
-      <div class="stat-label">Total Terjual</div>
+      <div class="stat-label">Total</div>
       <div class="stat-val" id="statSold">0</div>
-      <div class="stat-sub">Akumulasi V1-V4</div>
+      <div class="stat-sub">Akumulasi</div>
+    </div>
+    <div class="stat-card day">
+      <div class="stat-label">Hari Ini</div>
+      <div class="stat-val" id="statDay">0</div>
+      <div class="stat-sub">Unit terjual</div>
     </div>
     <div class="stat-card sec">
-      <div class="stat-label">Unit / Detik Ini</div>
+      <div class="stat-label">Detik Ini</div>
       <div class="stat-val" id="statSec">0</div>
-      <div class="stat-sub">Jumlah unit masuk</div>
+      <div class="stat-sub">Unit masuk</div>
     </div>
     <div class="stat-card rate">
-      <div class="stat-label">Unit / Menit Ini</div>
+      <div class="stat-label">Menit Ini</div>
       <div class="stat-val" id="statMin">0</div>
-      <div class="stat-sub">Jumlah unit masuk</div>
+      <div class="stat-sub">Unit masuk</div>
     </div>
     <div class="stat-card speed">
-      <div class="stat-label">Unit / Jam Ini</div>
+      <div class="stat-label">Jam Ini</div>
       <div class="stat-val" id="statHour">0</div>
-      <div class="stat-sub">Jumlah unit masuk</div>
+      <div class="stat-sub">Unit masuk</div>
     </div>
   </div>
 
-  <!-- PANEL MONITORING PRODUK TERJUAL TERTINGGI & TERENDAH -->
+  <!-- PANEL MONITORING PRODUK TERTINGGI & TERENDAH -->
   <div class="insight-grid">
     <div class="insight-card">
       <div class="insight-title">🔥 Top 3 Produk Terjual Terbanyak</div>
@@ -127,20 +136,27 @@
     </div>
   </div>
 
-  <!-- PANEL GRAFIK ANALITIK PENJUALAN REAL-TIME -->
+  <!-- PANEL GRAFIK ANALITIK DENGAN FILTER TANGGAL & RATA-RATA HARIAN -->
   <div class="chart-container">
     <div class="chart-header">
       <div>
-        <b>📈 Grafik Tren Penjualan Real-Time</b>
-        <span>Pemantauan kecepatan transaksi berdasarkan kategori versi</span>
+        <b>📈 Grafik Rata-Rata Penjualan Per Hari</b>
+        <span>Analisis tren harian dan filter rentang tanggal</span>
+      </div>
+      <div class="date-filter-box">
+        <input type="date" id="startDateFilter">
+        <span style="font-size:11px;color:#64748b">s/d</span>
+        <input type="date" id="endDateFilter">
+        <button onclick="applyDateFilter()">Filter</button>
+        <button onclick="resetDateFilter()" style="background:#64748b">Reset</button>
       </div>
     </div>
-    <div style="position: relative; height: 240px; width: 100%;">
+    <div style="position: relative; height: 260px; width: 100%;">
       <canvas id="salesChart"></canvas>
     </div>
   </div>
 
-  <!-- PANEL FITUR KEREN TAMBAHAN -->
+  <!-- PANEL KENDALI -->
   <div class="features-panel">
     <div class="feature-info">
       <b>🚀 Panel Kendali & Ekspor Data</b>
@@ -178,6 +194,12 @@ let soldPerHour = 0;
 let productSoldMap = {}; 
 let totalSoldUnits = 0;   
 let activeVersion = "ALL";
+let totalSoldAtStartOfDay = 0; 
+let lastDate = new Date().getDate();
+
+// Riwayat harian untuk grafik rata-rata & filter tanggal
+let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
+let lastRecordedDateStr = "";
 
 let salesChart;
 function initChart() {
@@ -187,10 +209,10 @@ function initChart() {
     data: {
       labels: [],
       datasets: [
-        { label: 'V1 (XLA)', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V2 (XDA)', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V3 (KDA)', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V4 (XLF)', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
+        { label: 'Rata-Rata V1 (XLA)', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'Rata-Rata V2 (XDA)', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'Rata-Rata V3 (KDA)', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'Rata-Rata V4 (XLF)', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
       ]
     },
     options: {
@@ -200,6 +222,7 @@ function initChart() {
       scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }
     }
   });
+  renderChartFiltered();
 }
 
 const CREDENTIALS = {
@@ -275,7 +298,6 @@ async function fetchProducts() {
         };
       }).filter(p => p.v !== "OTHER");
       
-      // Deteksi mutlak unit baru masuk (tanpa rumus pembagian waktu)
       let newlySold = currentSoldDiff - previousTotalSold;
       if (newlySold > 0) {
         soldPerSecond += newlySold;
@@ -288,8 +310,10 @@ async function fetchProducts() {
       updateStatistics();
       updateProductInsights();
       renderStock();
-      updateChartData(vSoldCounts);
       
+      // Catat data harian otomatis untuk grafik rata-rata
+      recordDailyData(vSoldCounts);
+
       const now = new Date();
       document.getElementById("updateTime").textContent = "Sinkron: " + now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
     }
@@ -299,22 +323,17 @@ async function fetchProducts() {
   }
 }
 
-// Reset penghitung per detik secara berkala
-setInterval(() => {
-  soldPerSecond = 0;
-}, 1000);
-
-// Reset penghitung per menit secara berkala
-setInterval(() => {
-  soldPerMinute = 0;
-}, 60000);
-
-// Reset penghitung per jam secara berkala
-setInterval(() => {
-  soldPerHour = 0;
-}, 3600000);
+setInterval(() => { soldPerSecond = 0; }, 1000);
+setInterval(() => { soldPerMinute = 0; }, 60000);
+setInterval(() => { soldPerHour = 0; }, 3600000);
 
 function updateStatistics() {
+  let today = new Date().getDate();
+  if (today !== lastDate) {
+    totalSoldAtStartOfDay = totalSoldUnits; 
+    lastDate = today;
+  }
+
   let totalReadyUnits = 0;
   let readyVariantCount = 0;
 
@@ -327,9 +346,12 @@ function updateStatistics() {
     }
   });
 
+  let soldToday = totalSoldUnits - totalSoldAtStartOfDay;
+
   document.getElementById("statReady").textContent = totalReadyUnits.toLocaleString("id-ID");
   document.getElementById("statReadyVariant").textContent = `${readyVariantCount} varian aktif`;
   document.getElementById("statSold").textContent = totalSoldUnits.toLocaleString("id-ID");
+  document.getElementById("statDay").textContent = soldToday.toLocaleString("id-ID");
   document.getElementById("statSec").textContent = soldPerSecond;
   document.getElementById("statMin").textContent = soldPerMinute;
   document.getElementById("statHour").textContent = soldPerHour;
@@ -367,20 +389,80 @@ function updateProductInsights() {
   document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data penjualan.</div>';
 }
 
-function updateChartData(vSoldCounts) {
-  const timeLabel = new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+// Fungsi mencatat histori harian dan menghitung rata-rata
+function recordDailyData(vSoldCounts) {
+  const todayStr = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
   
-  salesChart.data.labels.push(timeLabel);
-  salesChart.data.datasets[0].data.push(vSoldCounts.V1);
-  salesChart.data.datasets[1].data.push(vSoldCounts.V2);
-  salesChart.data.datasets[2].data.push(vSoldCounts.V3);
-  salesChart.data.datasets[3].data.push(vSoldCounts.V4);
-
-  if (salesChart.data.labels.length > 10) {
-    salesChart.data.labels.shift();
-    salesChart.data.datasets.forEach(ds => ds.data.shift());
+  let existingIndex = dailyHistoryRecords.findIndex(r => r.date === todayStr);
+  if (existingIndex >= 0) {
+    // Update data hari ini dengan nilai tertinggi/terkini akumulasi sesi
+    dailyHistoryRecords[existingIndex].v1 = Math.max(dailyHistoryRecords[existingIndex].v1, vSoldCounts.V1);
+    dailyHistoryRecords[existingIndex].v2 = Math.max(dailyHistoryRecords[existingIndex].v2, vSoldCounts.V2);
+    dailyHistoryRecords[existingIndex].v3 = Math.max(dailyHistoryRecords[existingIndex].v3, vSoldCounts.V3);
+    dailyHistoryRecords[existingIndex].v4 = Math.max(dailyHistoryRecords[existingIndex].v4, vSoldCounts.V4);
+  } else {
+    dailyHistoryRecords.push({
+      date: todayStr,
+      v1: vSoldCounts.V1,
+      v2: vSoldCounts.V2,
+      v3: vSoldCounts.V3,
+      v4: vSoldCounts.V4
+    });
   }
+  localStorage.setItem("ic_daily_history", JSON.stringify(dailyHistoryRecords));
+  renderChartFiltered();
+}
+
+function renderChartFiltered(startDate = "", endDate = "") {
+  let filtered = dailyHistoryRecords;
+  if (startDate && endDate) {
+    filtered = dailyHistoryRecords.filter(r => r.date >= startDate && r.date <= endDate);
+  }
+
+  // Urutkan berdasarkan tanggal
+  filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  let labels = filtered.map(r => r.date);
+  let dataV1 = filtered.map(r => r.v1);
+  let dataV2 = filtered.map(r => r.v2);
+  let dataV3 = filtered.map(r => r.v3);
+  let dataV4 = filtered.map(r => r.v4);
+
+  // Hitung rata-rata keseluruhan dari data yang terfilter
+  if (filtered.length > 0) {
+    let avgV1 = Math.round(dataV1.reduce((a,b)=>a+b,0) / filtered.length);
+    let avgV2 = Math.round(dataV2.reduce((a,b)=>a+b,0) / filtered.length);
+    let avgV3 = Math.round(dataV3.reduce((a,b)=>a+b,0) / filtered.length);
+    let avgV4 = Math.round(dataV4.reduce((a,b)=>a+b,0) / filtered.length);
+
+    salesChart.data.datasets[0].label = `Rata-Rata V1 (XLA): ${avgV1} unit/hari`;
+    salesChart.data.datasets[1].label = `Rata-Rata V2 (XDA): ${avgV2} unit/hari`;
+    salesChart.data.datasets[2].label = `Rata-Rata V3 (KDA): ${avgV3} unit/hari`;
+    salesChart.data.datasets[3].label = `Rata-Rata V4 (XLF): ${avgV4} unit/hari`;
+  }
+
+  salesChart.data.labels = labels;
+  salesChart.data.datasets[0].data = dataV1;
+  salesChart.data.datasets[1].data = dataV2;
+  salesChart.data.datasets[2].data = dataV3;
+  salesChart.data.datasets[3].data = dataV4;
   salesChart.update();
+}
+
+function applyDateFilter() {
+  const start = document.getElementById("startDateFilter").value;
+  const end = document.getElementById("endDateFilter").value;
+  if (!start || !end) {
+    alert("Silakan pilih tanggal awal dan tanggal akhir terlebih dahulu!");
+    return;
+  }
+  renderChartFiltered(start, end);
+}
+
+function resetDateFilter() {
+  document.getElementById("startDateFilter").value = "";
+  document.getElementById("endDateFilter").value = "";
+  renderChartFiltered();
 }
 
 function resetSalesTracker() {
@@ -391,11 +473,14 @@ function resetSalesTracker() {
   soldPerSecond = 0;
   soldPerMinute = 0;
   soldPerHour = 0;
+  totalSoldAtStartOfDay = 0;
+  dailyHistoryRecords = [];
+  localStorage.removeItem("ic_daily_history");
   salesChart.data.labels = [];
   salesChart.data.datasets.forEach(ds => ds.data = []);
   salesChart.update();
   fetchProducts();
-  alert("Sesi analitik penjualan berhasil direset!");
+  alert("Sesi analitik dan histori grafik berhasil direset!");
 }
 
 function exportDataCSV() {
@@ -444,7 +529,7 @@ function renderCardsHtml(items) {
       </div>
       <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
       <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}; color:${isReady ? '#0f172a' : '#dc2626'}">
-        ${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : (isReady ? p.stock : 'Habis (0)')}
+        ${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : (isReady ? p.stock.toLocaleString("id-ID") : 'Habis (0)')}
       </div>
       <div style="font-size:10px; color:#3b82f6; font-weight:700; margin-top:2px;">Terjual: ${p.sold} unit</div>
       
@@ -473,8 +558,10 @@ function renderStock(){
   
   let out = "";
   for(const [v, items] of Object.entries(groups)){
-    const readyInGroup = items.filter(i => i.stock > 0).length;
-    out += `<div class="head"><b>Kategori ${v}</b><small>${readyInGroup} Ready dari ${items.length} Total</small></div>`;
+    let totalStockInGroup = items.reduce((acc, curr) => acc + (curr.stock > 0 ? curr.stock : 0), 0);
+    let readyVariantCount = items.filter(i => i.stock > 0).length;
+    
+    out += `<div class="head"><b>Kategori ${v}</b><small>${readyVariantCount} varian aktif (Total Stok: ${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
     out += renderCardsHtml(items);
   }
   document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">Produk tidak ditemukan.</div>';
