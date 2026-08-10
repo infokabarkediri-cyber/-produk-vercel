@@ -19,17 +19,15 @@
         .tab-axis { background: #6b21a8; color: #fff; }
         .tab-inactive { background: #e2e8f0; color: #64748b; }
 
-        /* Grid Statistik ala Gambar */
+        /* Grid Statistik */
         .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         .stat-card { background: #fff; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; position: relative; }
         .stat-card.blue-border { border-left: 4px solid #0060af; }
-        .stat-card.purple-border { border-left: 4px solid #6b21a8; }
         .stat-card.red-border { border-left: 4px solid #e11d48; }
         .stat-card.orange-border { border-left: 4px solid #f59e0b; }
         .stat-title { font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
         .stat-value { font-size: 20px; font-weight: 800; color: #0f172a; }
         .stat-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
-        .badge-count { position: absolute; top: 12px; right: 12px; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; color: #0f172a; }
 
         .list-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 600; }
         .list-row:last-child { border-bottom: none; }
@@ -39,14 +37,14 @@
 </head>
 <body>
 
-    <!-- 1. HALAMAN LOGIN AGEN (Validasi Kode & Gmail) -->
+    <!-- 1. HALAMAN LOGIN ADMIN (Hanya untuk Anda, Customer tidak akan melihat ini jika lewat link share) -->
     <div id="loginSection" class="card" style="max-width: 380px; margin: 40px auto; text-align: center;">
-        <h3>🔒 Login Akses Agen</h3>
-        <p style="font-size: 12px; color: #64748b;">Masukkan kode agen dan Gmail terdaftar Anda:</p>
-        <input type="text" id="kodeInput" class="input-field" placeholder="Masukkan Kode Agen..." style="text-align:center; font-weight:bold;">
-        <input type="email" id="emailInput" class="input-field" placeholder="Masukkan Gmail Terdaftar..." style="text-align:center;">
-        <button class="btn" style="width:100%;" onclick="checkLogin()">Masuk Dashboard</button>
-        <p id="errorMsg" style="color:red; font-size:11px; margin-top:8px; display:none;">❌ Kode Agen atau Gmail Tidak Sesuai!</p>
+        <h3>🔒 Login Panel Admin</h3>
+        <p style="font-size: 12px; color: #64748b;">Masukkan kode admin & Gmail terdaftar:</p>
+        <input type="text" id="kodeInput" class="input-field" value="ICS-ADMIN" placeholder="Kode Admin..." style="text-align:center; font-weight:bold;">
+        <input type="email" id="emailInput" class="input-field" value="infokabarkediri@gmail.com" placeholder="Gmail..." style="text-align:center;">
+        <button class="btn" style="width:100%;" onclick="checkLogin()">Masuk Panel</button>
+        <p id="errorMsg" style="color:red; font-size:11px; margin-top:8px; display:none;">❌ Kode atau Gmail Salah!</p>
     </div>
 
     <!-- 2. DASHBOARD UTAMA (Tampilan Sesuai Gambar Asli) -->
@@ -61,23 +59,22 @@
             <div style="font-size: 11px; color: #64748b; font-weight: 500;" id="textSinkron">Sinkron: 18.20.56</div>
         </div>
 
-        <!-- PANEL KHUSUS AGEN: Tambahan Fitur Ganti Nomor WA & Link Share -->
-        <div id="panelAgenKhusus" class="card" style="background: #eff6ff; border-color: #bfdbfe; display: none;">
-            <h4 style="margin: 0 0 6px 0; color: #1e40af; font-size: 12px;">🛠️ Panel Agen: <span id="namaAgenLogin">-</span></h4>
+        <!-- PANEL KONTROL ADMIN (Opsional muncul saat Anda login untuk salin link & ganti No WA) -->
+        <div id="panelAdminKhusus" class="card" style="background: #eff6ff; border-color: #bfdbfe; display: none;">
+            <h4 style="margin: 0 0 6px 0; color: #1e40af; font-size: 12px;">🛠️ Kontrol Admin: <span id="namaAdminLogin">-</span></h4>
             
-            <p style="font-size: 10px; color: #3b82f6; margin-bottom: 3px;">Link Share Khusus Customer Anda:</p>
+            <p style="font-size: 10px; color: #3b82f6; margin-bottom: 3px;">Link Share untuk Customer:</p>
             <input type="text" id="shareLink" class="input-field" readonly style="background:#fff; font-size:10px; font-weight:bold; color:#2563eb; margin-bottom:6px;">
             
-            <!-- Fitur Ganti Nomor HP / WhatsApp -->
             <div style="background: #e0f2fe; padding: 6px; border-radius: 6px; margin-bottom: 6px;">
-                <label style="font-size: 10px; font-weight: bold; color: #0369a1; display: block; margin-bottom: 2px;">📱 Ganti Nomor WhatsApp Tujuan Pesanan:</label>
+                <label style="font-size: 10px; font-weight: bold; color: #0369a1; display: block; margin-bottom: 2px;">📱 Ubah Nomor WhatsApp Tujuan:</label>
                 <div style="display: flex; gap: 4px;">
                     <input type="text" id="inputGantiWa" class="input-field" placeholder="Contoh: 628123456789" style="margin:0; font-size:10px; padding:6px;">
                     <button class="btn" style="width: 90px; padding: 4px; font-size: 10px;" onclick="updateNomorWa()">Simpan</button>
                 </div>
             </div>
 
-            <button class="btn" style="background:#dc2626; padding:4px 8px; font-size:10px; width:100%;" onclick="logout()">Keluar Portal 🔒</button>
+            <button class="btn" style="background:#dc2626; padding:4px 8px; font-size:10px; width:100%;" onclick="logout()">Keluar Login 🔒</button>
         </div>
 
         <!-- Status Real-Time Bar -->
@@ -103,7 +100,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-title">Hari Ini</div>
-                <div class="stat-value" id="valHariIni">162</div>
+                <div class="stat-value">162</div>
                 <div class="stat-desc">Terjual</div>
             </div>
             <div class="stat-card red-border">
@@ -174,31 +171,27 @@
     </div>
 
 <script>
-// ==========================================
-// DATABASE AGEN (Kode, Gmail, Nama, & WA)
-// ==========================================
-let databaseAgen = [
-    { kode: "ICS-MASTER-01", email: "admin@gmail.com", nama: "Pusat Konter Utama", wa: "628123456789" },
-    { kode: "AGEN-BUDI", email: "budi@gmail.com", nama: "Budi Cell Salatiga", wa: "628987654321" }
+// Database Admin
+let databaseAdmin = [
+    { kode: "ICS-ADMIN", email: "infokabarkediri@gmail.com", nama: "Info Kab Kediri", wa: "628123456789" }
 ];
 
-// Menangkap parameter URL jika diakses oleh customer dari link agen
 const urlParams = new URLSearchParams(window.location.search);
 const paramToko = urlParams.get('toko');
 const paramWa = urlParams.get('wa');
 
 window.onload = function() {
+    // Jika customer membuka web lewat link share, langsung tampilkan dashboard bersih tanpa login
     if (paramToko && paramWa) {
-        // Mode Customer: Tampilan dashboard bersih tanpa panel generator agen
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('dashboardSection').style.display = 'block';
-        document.getElementById('panelAgenKhusus').style.display = 'none';
+        document.getElementById('panelAdminKhusus').style.display = 'none';
     } 
-    else if (sessionStorage.getItem("agenLogin") === "true") {
-        bukaDashboardAgen(
-            sessionStorage.getItem("agenNama"), 
-            sessionStorage.getItem("agenWa"),
-            sessionStorage.getItem("agenEmail")
+    else if (sessionStorage.getItem("adminLogin") === "true") {
+        bukaDashboardAdmin(
+            sessionStorage.getItem("adminNama"), 
+            sessionStorage.getItem("adminWa"),
+            sessionStorage.getItem("adminEmail")
         );
     } 
     else {
@@ -211,28 +204,27 @@ function checkLogin() {
     const kode = document.getElementById('kodeInput').value.trim();
     const email = document.getElementById('emailInput').value.trim().toLowerCase();
     
-    // Validasi pencocokan Kode Agen dan Gmail
-    const agenDitemukan = databaseAgen.find(a => a.kode === kode && a.email.toLowerCase() === email);
+    const adminDitemukan = databaseAdmin.find(a => a.kode === kode && a.email.toLowerCase() === email);
 
-    if (agenDitemukan) {
-        sessionStorage.setItem("agenLogin", "true");
-        sessionStorage.setItem("agenKode", agenDitemukan.kode);
-        sessionStorage.setItem("agenNama", agenDitemukan.nama);
-        sessionStorage.setItem("agenWa", agenDitemukan.wa);
-        sessionStorage.setItem("agenEmail", agenDitemukan.email);
+    if (adminDitemukan) {
+        sessionStorage.setItem("adminLogin", "true");
+        sessionStorage.setItem("adminKode", adminDitemukan.kode);
+        sessionStorage.setItem("adminNama", adminDitemukan.nama);
+        sessionStorage.setItem("adminWa", adminDitemukan.wa);
+        sessionStorage.setItem("adminEmail", adminDitemukan.email);
         
-        bukaDashboardAgen(agenDitemukan.nama, agenDitemukan.wa, agenDitemukan.email);
+        bukaDashboardAdmin(adminDitemukan.nama, adminDitemukan.wa, adminDitemukan.email);
     } else {
         document.getElementById('errorMsg').style.display = 'block';
     }
 }
 
-function bukaDashboardAgen(nama, wa, email) {
+function bukaDashboardAdmin(nama, wa, email) {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('dashboardSection').style.display = 'block';
-    document.getElementById('panelAgenKhusus').style.display = 'block';
+    document.getElementById('panelAdminKhusus').style.display = 'block';
     
-    document.getElementById('namaAgenLogin').textContent = nama;
+    document.getElementById('namaAdminLogin').textContent = nama;
     document.getElementById('inputGantiWa').value = wa;
 
     updateLinkShare(nama, wa);
@@ -244,25 +236,24 @@ function updateLinkShare(nama, wa) {
     document.getElementById('shareLink').value = linkUnik;
 }
 
-// Fitur Ganti Nomor HP / WhatsApp
 function updateNomorWa() {
     const nomorBaru = document.getElementById('inputGantiWa').value.trim();
-    const currentKode = sessionStorage.getItem("agenKode");
+    const currentKode = sessionStorage.getItem("adminKode");
 
     if (!nomorBaru) {
         alert("Nomor WhatsApp tidak boleh kosong!");
         return;
     }
 
-    sessionStorage.setItem("agenWa", nomorBaru);
+    sessionStorage.setItem("adminWa", nomorBaru);
     
-    const agen = databaseAgen.find(a => a.kode === currentKode);
-    if(agen) {
-        agen.wa = nomorBaru;
+    const adm = databaseAdmin.find(a => a.kode === currentKode);
+    if(adm) {
+        adm.wa = nomorBaru;
     }
 
-    updateLinkShare(sessionStorage.getItem("agenNama"), nomorBaru);
-    alert("✅ Nomor WhatsApp pesanan berhasil diperbarui!");
+    updateLinkShare(sessionStorage.getItem("adminNama"), nomorBaru);
+    alert("✅ Nomor WhatsApp berhasil diperbarui!");
 }
 
 function logout() {
@@ -270,7 +261,6 @@ function logout() {
     location.href = window.location.pathname;
 }
 
-// Interaksi tombol provider XL / AXIS
 function switchProvider(provider) {
     const btnXl = document.getElementById('btnXl');
     const btnAxis = document.getElementById('btnAxis');
@@ -288,10 +278,10 @@ function switchProvider(provider) {
     }
 }
 
-// Aksi tombol cek nomor HP
 function cekNomorHp() {
     const noHp = document.getElementById('inputNomorHp').value.trim();
-    const tujuanWa = paramWa ? decodeURIComponent(paramWa) : sessionStorage.getItem("agenWa");
+    // Mengambil nomor WhatsApp tujuan (dari parameter link jika dibuka customer, atau dari session admin)
+    const tujuanWa = paramWa ? decodeURIComponent(paramWa) : sessionStorage.getItem("adminWa");
 
     if (!noHp) {
         alert("Masukkan nomor HP terlebih dahulu!");
@@ -299,7 +289,7 @@ function cekNomorHp() {
     }
 
     if (!tujuanWa) {
-        alert("Nomor tujuan WhatsApp belum diatur.");
+        alert("Nomor WhatsApp tujuan belum diatur.");
         return;
     }
 
