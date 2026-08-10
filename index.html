@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Portal Dashboard & Cek Paket</title>
+    <title>Portal Dashboard, Cek Area & Stok</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: #f8fafc; margin: 0; padding: 16px; color: #1e293b; }
@@ -11,6 +11,8 @@
         .input-field { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px; font-size: 13px; outline: none; }
         .btn { background: #0f172a; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn:hover { background: #334155; }
+        .btn-wa { background: #22c55e; }
+        .btn-wa:hover { background: #16a34a; }
         
         /* Desain Tab Provider XL / AXIS */
         .provider-tabs { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; justify-content: space-between; }
@@ -33,11 +35,16 @@
         .list-row:last-child { border-bottom: none; }
         .badge-num { background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 6px; font-size: 11px; }
         .badge-zero { background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 6px; font-size: 11px; }
+
+        /* Produk Stok List */
+        .product-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding: 10px 0; }
+        .product-info b { font-size: 13px; color: #0f172a; display: block; }
+        .product-info span { font-size: 11px; color: #64748b; }
     </style>
 </head>
 <body>
 
-    <!-- 1. HALAMAN LOGIN ADMIN (Hanya untuk Anda, Customer tidak akan melihat ini jika lewat link share) -->
+    <!-- 1. HALAMAN LOGIN ADMIN (Hanya untuk Anda, Customer langsung lewat link share) -->
     <div id="loginSection" class="card" style="max-width: 380px; margin: 40px auto; text-align: center;">
         <h3>🔒 Login Panel Admin</h3>
         <p style="font-size: 12px; color: #64748b;">Masukkan kode admin & Gmail terdaftar:</p>
@@ -47,7 +54,7 @@
         <p id="errorMsg" style="color:red; font-size:11px; margin-top:8px; display:none;">❌ Kode atau Gmail Salah!</p>
     </div>
 
-    <!-- 2. DASHBOARD UTAMA (Tampilan Sesuai Gambar Asli) -->
+    <!-- 2. DASHBOARD UTAMA -->
     <div id="dashboardSection" style="display:none; max-width: 500px; margin: auto;">
         
         <!-- Header Provider & Sinkronisasi -->
@@ -59,7 +66,7 @@
             <div style="font-size: 11px; color: #64748b; font-weight: 500;" id="textSinkron">Sinkron: 18.20.56</div>
         </div>
 
-        <!-- PANEL KONTROL ADMIN (Opsional muncul saat Anda login untuk salin link & ganti No WA) -->
+        <!-- PANEL KONTROL ADMIN (Opsional muncul saat Anda login) -->
         <div id="panelAdminKhusus" class="card" style="background: #eff6ff; border-color: #bfdbfe; display: none;">
             <h4 style="margin: 0 0 6px 0; color: #1e40af; font-size: 12px;">🛠️ Kontrol Admin: <span id="namaAdminLogin">-</span></h4>
             
@@ -134,6 +141,49 @@
             </div>
         </div>
 
+        <!-- Cek Ketersediaan Berdasarkan Area & 3 Produk -->
+        <div class="card">
+            <h4 style="margin: 0 0 8px 0; font-size: 13px;">🏙️ Cek Ketersediaan Berdasarkan Area</h4>
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <input type="text" id="inputKota" class="input-field" placeholder="Ketik Kota (Contoh: Salatiga, Semarang)..." style="margin:0;">
+                <button class="btn" style="width: 120px;" onclick="cekAreaStok()">Cek Area</button>
+            </div>
+
+            <!-- Hasil Display Stok Global (3 Produk) -->
+            <div id="hasilStokSection" style="display:none; margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                <div style="font-size: 12px; font-weight: bold; color: #0f172a; margin-bottom: 6px;">
+                    📦 Stok di <span id="textLabelArea" style="color: #2563eb;">-</span> (<span id="textKotaTerpilih" style="color: #2563eb;">-</span>)
+                </div>
+                
+                <div id="listProdukStok">
+                    <!-- Produk 1 -->
+                    <div class="product-item">
+                        <div class="product-info">
+                            <b>PDA13 (10 GB)</b>
+                            <span>Stok: <strong id="stokPda13" style="color: #059669;">-</strong> Unit</span>
+                        </div>
+                        <button class="btn btn-wa" style="width: auto; padding: 5px 10px; font-size: 11px;" onclick="orderProduk('PDA13 (10 GB)')">Order (WA)</button>
+                    </div>
+                    <!-- Produk 2 -->
+                    <div class="product-item">
+                        <div class="product-info">
+                            <b>PDA20 (20 GB)</b>
+                            <span>Stok: <strong id="stokPda20" style="color: #059669;">-</strong> Unit</span>
+                        </div>
+                        <button class="btn btn-wa" style="width: auto; padding: 5px 10px; font-size: 11px;" onclick="orderProduk('PDA20 (20 GB)')">Order (WA)</button>
+                    </div>
+                    <!-- Produk 3 -->
+                    <div class="product-item" style="border-bottom: none;">
+                        <div class="product-info">
+                            <b>PDA30 (30 GB)</b>
+                            <span>Stok: <strong id="stokPda30" style="color: #059669;">-</strong> Unit</span>
+                        </div>
+                        <button class="btn btn-wa" style="width: auto; padding: 5px 10px; font-size: 11px;" onclick="orderProduk('PDA30 (30 GB)')">Order (WA)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Top 3 Terjual Terbanyak -->
         <div class="card">
             <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">🔥 Top 3 Terjual Terbanyak</div>
@@ -176,12 +226,19 @@ let databaseAdmin = [
     { kode: "ICS-ADMIN", email: "infokabarkediri@gmail.com", nama: "Info Kab Kediri", wa: "628123456789" }
 ];
 
+// Data Stok Global (Salatiga otomatis masuk Area 3 sesuai database)
+const stokGlobalData = {
+    "area1": { namaKota: "Semarang", pda13: "1.420", pda20: "600", pda30: "250" },
+    "area2": { namaKota: "Solo", pda13: "430", pda20: "210", pda30: "95" },
+    "salatiga": { namaKota: "Salatiga (Area 3)", pda13: "150", pda20: "85", pda30: "40" },
+    "area4": { namaKota: "Jakarta", pda13: "2.500", pda20: "1.100", pda30: "500" }
+};
+
 const urlParams = new URLSearchParams(window.location.search);
 const paramToko = urlParams.get('toko');
 const paramWa = urlParams.get('wa');
 
 window.onload = function() {
-    // Jika customer membuka web lewat link share, langsung tampilkan dashboard bersih tanpa login
     if (paramToko && paramWa) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('dashboardSection').style.display = 'block';
@@ -278,9 +335,46 @@ function switchProvider(provider) {
     }
 }
 
+let areaAktif = "";
+function cekAreaStok() {
+    const input = document.getElementById('inputKota').value.trim().toLowerCase();
+    
+    if (!input) {
+        alert("Silakan ketik nama kota terlebih dahulu!");
+        return;
+    }
+
+    if (stokGlobalData[input]) {
+        areaAktif = stokGlobalData[input].namaKota;
+        document.getElementById('textLabelArea').textContent = "Area 3";
+        document.getElementById('textKotaTerpilih').textContent = areaAktif;
+        
+        document.getElementById('stokPda13').textContent = stokGlobalData[input].pda13;
+        document.getElementById('stokPda20').textContent = stokGlobalData[input].pda20;
+        document.getElementById('stokPda30').textContent = stokGlobalData[input].pda30;
+        
+        document.getElementById('hasilStokSection').style.display = 'block';
+    } else {
+        alert("Maaf, area/kota '" + input + "' belum tersedia atau stok kosong.");
+        document.getElementById('hasilStokSection').style.display = 'none';
+    }
+}
+
+function orderProduk(namaProduk) {
+    const tujuanWa = paramWa ? decodeURIComponent(paramWa) : sessionStorage.getItem("adminWa");
+
+    if (!tujuanWa) {
+        alert("Nomor WhatsApp tujuan belum diatur.");
+        return;
+    }
+
+    const pesan = `Halo, saya mau order:\n\n* Produk: ${namaProduk}\n* Area Tujuan: ${areaAktif}\n\nMohon diproses ya Kak!`;
+    const linkWa = `https://wa.me/${tujuanWa}?text=${encodeURIComponent(pesan)}`;
+    window.open(linkWa, '_blank');
+}
+
 function cekNomorHp() {
     const noHp = document.getElementById('inputNomorHp').value.trim();
-    // Mengambil nomor WhatsApp tujuan (dari parameter link jika dibuka customer, atau dari session admin)
     const tujuanWa = paramWa ? decodeURIComponent(paramWa) : sessionStorage.getItem("adminWa");
 
     if (!noHp) {
