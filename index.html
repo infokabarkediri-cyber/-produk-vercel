@@ -160,7 +160,7 @@
   <div class="features-panel">
     <div class="feature-info">
       <b>🚀 Panel Kendali & Ekspor Data</b>
-      <span>Sinkronisasi otomatis real-time tiap 10 detik tanpa reload halaman.</span>
+      <span>Sinkronisasi otomatis real-time tiap 1 detik tanpa reload halaman.</span>
     </div>
     <div class="action-btns">
       <button class="btn-action" onclick="exportDataCSV()">📥 Export CSV</button>
@@ -188,20 +188,18 @@
 let products = [];
 let initialStockMap = {}; 
 let previousTotalSold = 0;
-let soldPerSecond = 0;
-let soldPerMinute = 0;
-let soldPerHour = 0;
 let productSoldMap = {}; 
 let totalSoldUnits = 0;   
 let activeVersion = "ALL";
 let totalSoldAtStartOfDay = 0; 
 let lastDate = new Date().getDate();
 
-// Riwayat harian untuk grafik rata-rata & filter tanggal
-let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
-let lastRecordedDateStr = "";
+// Log transaksi berbasis waktu (timestamp) agar pergerakan detik, menit, jam, dan harian akurat
+let transactionLogs = [];
 
+let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
 let salesChart;
+
 function initChart() {
   const ctx = document.getElementById('salesChart').getContext('2d');
   salesChart = new Chart(ctx, {
@@ -300,9 +298,8 @@ async function fetchProducts() {
       
       let newlySold = currentSoldDiff - previousTotalSold;
       if (newlySold > 0) {
-        soldPerSecond += newlySold;
-        soldPerMinute += newlySold;
-        soldPerHour += newlySold;
+        // Catat ke dalam log waktu transaksi real-time
+        transactionLogs.push({ time: Date.now(), count: newlySold });
       }
       previousTotalSold = currentSoldDiff;
       totalSoldUnits = currentSoldDiff;
@@ -310,8 +307,6 @@ async function fetchProducts() {
       updateStatistics();
       updateProductInsights();
       renderStock();
-      
-      // Catat data harian otomatis untuk grafik rata-rata
       recordDailyData(vSoldCounts);
 
       const now = new Date();
@@ -323,16 +318,22 @@ async function fetchProducts() {
   }
 }
 
-setInterval(() => { soldPerSecond = 0; }, 1000);
-setInterval(() => { soldPerMinute = 0; }, 60000);
-setInterval(() => { soldPerHour = 0; }, 3600000);
-
+// Fungsi update statistik bergerak setiap detik berdasarkan jendela waktu (windowed log)
 function updateStatistics() {
   let today = new Date().getDate();
   if (today !== lastDate) {
     totalSoldAtStartOfDay = totalSoldUnits; 
     lastDate = today;
   }
+
+  const now = Date.now();
+  // Filter transaksi berdasarkan rentang waktu aktual
+  const lastSecond = transactionLogs.filter(t => now - t.time <= 1000).reduce((a, b) => a + b.count, 0);
+  const lastMinute = transactionLogs.filter(t => now - t.time <= 60000).reduce((a, b) => a + b.count, 0);
+  const lastHour   = transactionLogs.filter(t => now - t.time <= 3600000).reduce((a, b) => a + b.count, 0);
+
+  // Bersihkan log yang lebih lama dari 1 jam agar memori ringan
+  transactionLogs = transactionLogs.filter(t => now - t.time <= 3600000);
 
   let totalReadyUnits = 0;
   let readyVariantCount = 0;
@@ -352,19 +353,20 @@ function updateStatistics() {
   document.getElementById("statReadyVariant").textContent = `${readyVariantCount} varian aktif`;
   document.getElementById("statSold").textContent = totalSoldUnits.toLocaleString("id-ID");
   document.getElementById("statDay").textContent = soldToday.toLocaleString("id-ID");
-  document.getElementById("statSec").textContent = soldPerSecond;
-  document.getElementById("statMin").textContent = soldPerMinute;
-  document.getElementById("statHour").textContent = soldPerHour;
+  document.getElementById("statSec").textContent = lastSecond;
+  document.getElementById("statMin").textContent = lastMinute;
+  document.getElementById("statHour").textContent = lastHour;
 }
+
+// Jalankan pembaruan statistik UI setiap 1 detik agar angka bergerak mulus
+setInterval(updateStatistics, 1000);
 
 function updateProductInsights() {
   let validProducts = products.filter(p => p.v !== "V5");
   
   let sortedDesc = [...validProducts].sort((a, b) => b.sold - a.sold);
   let sortedAsc = [...validProducts].sort((a, b) => {
-    if (a.sold !== b.sold) {
-      return a.sold - b.sold;
-    }
+    if (a.sold !== b.sold) return a.sold - b.sold;
     return a.code.localeCompare(b.code);
   });
 
@@ -389,13 +391,10 @@ function updateProductInsights() {
   document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data penjualan.</div>';
 }
 
-// Fungsi mencatat histori harian dan menghitung rata-rata
 function recordDailyData(vSoldCounts) {
-  const todayStr = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
-  
+  const todayStr = new Date().toISOString().split('T')[0];
   let existingIndex = dailyHistoryRecords.findIndex(r => r.date === todayStr);
   if (existingIndex >= 0) {
-    // Update data hari ini dengan nilai tertinggi/terkini akumulasi sesi
     dailyHistoryRecords[existingIndex].v1 = Math.max(dailyHistoryRecords[existingIndex].v1, vSoldCounts.V1);
     dailyHistoryRecords[existingIndex].v2 = Math.max(dailyHistoryRecords[existingIndex].v2, vSoldCounts.V2);
     dailyHistoryRecords[existingIndex].v3 = Math.max(dailyHistoryRecords[existingIndex].v3, vSoldCounts.V3);
@@ -418,8 +417,6 @@ function renderChartFiltered(startDate = "", endDate = "") {
   if (startDate && endDate) {
     filtered = dailyHistoryRecords.filter(r => r.date >= startDate && r.date <= endDate);
   }
-
-  // Urutkan berdasarkan tanggal
   filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   let labels = filtered.map(r => r.date);
@@ -428,7 +425,6 @@ function renderChartFiltered(startDate = "", endDate = "") {
   let dataV3 = filtered.map(r => r.v3);
   let dataV4 = filtered.map(r => r.v4);
 
-  // Hitung rata-rata keseluruhan dari data yang terfilter
   if (filtered.length > 0) {
     let avgV1 = Math.round(dataV1.reduce((a,b)=>a+b,0) / filtered.length);
     let avgV2 = Math.round(dataV2.reduce((a,b)=>a+b,0) / filtered.length);
@@ -470,9 +466,7 @@ function resetSalesTracker() {
   productSoldMap = {};
   totalSoldUnits = 0;
   previousTotalSold = 0;
-  soldPerSecond = 0;
-  soldPerMinute = 0;
-  soldPerHour = 0;
+  transactionLogs = [];
   totalSoldAtStartOfDay = 0;
   dailyHistoryRecords = [];
   localStorage.removeItem("ic_daily_history");
@@ -569,7 +563,9 @@ function renderStock(){
 
 initChart();
 fetchProducts();
-setInterval(fetchProducts, 10000);
+
+// Auto refresh API dipercepat menjadi setiap 1 detik sekali agar data terpantau real-time per detik
+setInterval(fetchProducts, 1000);
 
 document.getElementById("stockSearch").addEventListener("input", renderStock);
 </script>
