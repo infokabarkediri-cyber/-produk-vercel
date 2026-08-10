@@ -4,8 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Portal Cek Area & Stok</title>
-    <!-- Library untuk membaca Google Sheets secara otomatis -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: #f8fafc; margin: 0; padding: 16px; color: #1e293b; }
@@ -26,7 +24,7 @@
 <div id="loginSection" class="card" style="max-width: 380px; margin: 40px auto; text-align: center;">
     <h3>🔒 Login Akses Agen</h3>
     <p style="font-size: 12px; color: #64748b;">Masukkan kode agen Anda untuk masuk ke portal:</p>
-    <input type="password" id="kodeInput" class="input-field" placeholder="Kode Agen..." style="text-align:center; letter-spacing:1px; font-weight:bold;">
+    <input type="password" id="kodeInput" class="input-field" placeholder="Masukkan Kode Agen..." style="text-align:center; letter-spacing:1px; font-weight:bold;">
     <button class="btn" onclick="checkLogin()">Masuk Portal</button>
     <p id="errorMsg" style="color:red; font-size:11px; margin-top:8px; display:none;">❌ Kode Agen Tidak Terdaftar!</p>
 </div>
@@ -89,28 +87,20 @@
 
 <script>
 // ==========================================
-// PENGATURAN DATA (GANTI URL GOOGLE SHEETS ANDA DI SINI)
+// DATA BASE AGEN (KODE AGEN ANDA)
 // ==========================================
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ABC-123-GANTI-DENGAN-LINK-ANDA/gviz/tq?tqx=out:csv&sheet=Sheet1'; 
+const databaseAgen = [
+    { kode: "ICS-MASTER-01", nama: "Pusat Konter Utama", wa: "628123456789" },
+    { kode: "AGEN-BUDI", nama: "Budi Cell Salatiga", wa: "628987654321" }
+];
 
-// Database Stok Global (Pusat mengatur jumlah stok per kota)
+// DATA STOK GLOBAL (Pusat mengatur jumlah stok per kota)
 const stokGlobalData = {
     "salatiga": { pda13: "150", pda20: "85" },
     "semarang": { pda13: "1.420", pda20: "600" },
     "solo": { pda13: "430", pda20: "210" },
     "jakarta": { pda13: "2.500", pda20: "1.100" }
 };
-
-let databaseAgen = [];
-
-// Load data agen dari Google Sheets otomatis saat halaman dibuka
-Papa.parse(SHEET_URL, { 
-    download: true, 
-    header: true, 
-    complete: (res) => { 
-        databaseAgen = res.data; 
-    } 
-});
 
 // Menangkap parameter dari URL (jika customer membuka link share dari agen)
 const urlParams = new URLSearchParams(window.location.search);
@@ -137,12 +127,9 @@ window.onload = function() {
 
 function checkLogin() {
     const kode = document.getElementById('kodeInput').value.trim();
-    
-    // Mencocokkan input kode dengan data kolom 'kode' di Google Sheets
-    const agenDitemukan = databaseAgen.find(a => a.kode && a.kode.trim() === kode);
+    const agenDitemukan = databaseAgen.find(a => a.kode === kode);
 
     if (agenDitemukan) {
-        // Simpan sesi login agen
         sessionStorage.setItem("agenLogin", "true");
         sessionStorage.setItem("agenNama", agenDitemukan.nama);
         sessionStorage.setItem("agenWa", agenDitemukan.wa);
@@ -159,7 +146,6 @@ function bukaDashboardAgen(nama, wa) {
     document.getElementById('displayNamaToko').textContent = nama;
     document.getElementById('statusMode').textContent = "Panel Utama Agen";
 
-    // Generate link unik khusus agen tersebut
     const baseUrl = window.location.origin + window.location.pathname;
     const linkUnik = `${baseUrl}?toko=${encodeURIComponent(nama)}&wa=${encodeURIComponent(wa)}`;
     document.getElementById('shareLink').value = linkUnik;
@@ -170,7 +156,6 @@ function logout() {
     location.href = window.location.pathname;
 }
 
-// Fungsi Cek Area & Menampilkan Stok Global
 let kotaAktif = "";
 function cekAreaStok() {
     const input = document.getElementById('inputKota').value.trim().toLowerCase();
@@ -184,7 +169,6 @@ function cekAreaStok() {
         kotaAktif = input.charAt(0).toUpperCase() + input.slice(1);
         document.getElementById('textKotaTerpilih').textContent = kotaAktif;
         
-        // Menampilkan stok sesuai data global pusat
         document.getElementById('stokPda13').textContent = stokGlobalData[input].pda13 + " Unit";
         document.getElementById('stokPda20').textContent = stokGlobalData[input].pda20 + " Unit";
         
@@ -195,7 +179,6 @@ function cekAreaStok() {
     }
 }
 
-// Fungsi Order WhatsApp langsung ke Agen yang membagikan link
 function orderProduk(namaProduk) {
     const tujuanWa = paramWa ? decodeURIComponent(paramWa) : sessionStorage.getItem("agenWa");
     const namaMitra = paramToko ? decodeURIComponent(paramToko) : sessionStorage.getItem("agenNama");
