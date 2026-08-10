@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC Store - Analitik & Performa Produk Terjual</title>
+<title>IC Store - Analitik Performa & Stok Pro</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
@@ -99,19 +99,19 @@
       <div class="stat-sub">Akumulasi V1-V4</div>
     </div>
     <div class="stat-card sec">
-      <div class="stat-label">Rata2 / Detik</div>
-      <div class="stat-val" id="statSec">0.000</div>
-      <div class="stat-sub">Unit per detik</div>
+      <div class="stat-label">Penjualan / Detik</div>
+      <div class="stat-val" id="statSec">0</div>
+      <div class="stat-sub">Unit di detik ini</div>
     </div>
     <div class="stat-card rate">
-      <div class="stat-label">Rata2 / Menit</div>
-      <div class="stat-val" id="statMin">0.00</div>
-      <div class="stat-sub">Unit per menit</div>
+      <div class="stat-label">Penjualan / Menit</div>
+      <div class="stat-val" id="statMin">0</div>
+      <div class="stat-sub">Unit di menit ini</div>
     </div>
     <div class="stat-card speed">
-      <div class="stat-label">Rata2 / Jam</div>
-      <div class="stat-val" id="statHour">0.0</div>
-      <div class="stat-sub">Unit per jam</div>
+      <div class="stat-label">Penjualan / Jam</div>
+      <div class="stat-val" id="statHour">0</div>
+      <div class="stat-sub">Unit di jam ini</div>
     </div>
   </div>
 
@@ -140,7 +140,7 @@
     </div>
   </div>
 
-  <!-- FITUR KEREN TAMBAHAN -->
+  <!-- PANEL FITUR KEREN TAMBAHAN -->
   <div class="features-panel">
     <div class="feature-info">
       <b>🚀 Panel Kendali & Ekspor Data</b>
@@ -171,10 +171,13 @@
 <script>
 let products = [];
 let initialStockMap = {}; 
-let productSoldMap = {}; // Menyimpan jumlah terjual per kode produk
+let previousTotalSold = 0;
+let soldPerSecond = 0;
+let soldPerMinute = 0;
+let soldPerHour = 0;
+let productSoldMap = {}; 
 let totalSoldUnits = 0;   
 let activeVersion = "ALL";
-let startTime = Date.now(); 
 
 let salesChart;
 function initChart() {
@@ -235,6 +238,7 @@ async function fetchProducts() {
         let soldQty = 0;
 
         if (v !== "V5") {
+          // Pastikan semua varian tercatat stock awalnya secara real-time
           if (!(code in initialStockMap)) {
             initialStockMap[code] = currentStock;
             productSoldMap[code] = 0;
@@ -272,6 +276,13 @@ async function fetchProducts() {
         };
       }).filter(p => p.v !== "OTHER");
       
+      let newlySold = currentSoldDiff - previousTotalSold;
+      if (newlySold > 0) {
+        soldPerSecond += newlySold;
+        soldPerMinute += newlySold;
+        soldPerHour += newlySold;
+      }
+      previousTotalSold = currentSoldDiff;
       totalSoldUnits = currentSoldDiff;
 
       updateStatistics();
@@ -288,13 +299,45 @@ async function fetchProducts() {
   }
 }
 
-// Analisis Produk Terjual Terbanyak & Terendah
+setInterval(() => { soldPerSecond = 0; }, 1000);
+setInterval(() => { soldPerMinute = 0; }, 60000);
+setInterval(() => { soldPerHour = 0; }, 3600000);
+
+function updateStatistics() {
+  let totalReadyUnits = 0;
+  let readyVariantCount = 0;
+
+  products.forEach(p => {
+    if (p.stock > 0 && p.v !== "V5") {
+      totalReadyUnits += p.stock;
+    }
+    if (p.stock > 0) {
+      readyVariantCount++;
+    }
+  });
+
+  document.getElementById("statReady").textContent = totalReadyUnits.toLocaleString("id-ID");
+  document.getElementById("statReadyVariant").textContent = `${readyVariantCount} varian aktif`;
+  document.getElementById("statSold").textContent = totalSoldUnits.toLocaleString("id-ID");
+  document.getElementById("statSec").textContent = soldPerSecond;
+  document.getElementById("statMin").textContent = soldPerMinute;
+  document.getElementById("statHour").textContent = soldPerHour;
+}
+
 function updateProductInsights() {
   let validProducts = products.filter(p => p.v !== "V5");
-  // Urutkan berdasarkan jumlah terjual terbanyak
+  
+  // Urutkan terbanyak (Descending)
   let sortedDesc = [...validProducts].sort((a, b) => b.sold - a.sold);
-  // Urutkan berdasarkan jumlah terjual terendah (tetap mengambil produk valid)
-  let sortedAsc = [...validProducts].sort((a, b) => a.sold - b.sold);
+  
+  // Urutkan terendah (Ascending) dengan prioritas varian yang terdeteksi valid agar tidak tertahan di angka 0 statis
+  let sortedAsc = [...validProducts].sort((a, b) => {
+    if (a.sold !== b.sold) {
+      return a.sold - b.sold;
+    }
+    // Jika jumlah terjual sama (misal sama-sama 0), urutkan berdasarkan kode produk agar dinamis
+    return a.code.localeCompare(b.code);
+  });
 
   let topHtml = "";
   for (let i = 0; i < Math.min(3, sortedDesc.length); i++) {
@@ -333,47 +376,14 @@ function updateChartData(vSoldCounts) {
   salesChart.update();
 }
 
-function updateStatistics() {
-  let totalReadyUnits = 0;
-  let readyVariantCount = 0;
-
-  products.forEach(p => {
-    if (p.stock > 0 && p.v !== "V5") {
-      totalReadyUnits += p.stock;
-    }
-    if (p.stock > 0) {
-      readyVariantCount++;
-    }
-  });
-
-  let elapsedSeconds = (Date.now() - startTime) / 1000;
-  if (elapsedSeconds < 1) elapsedSeconds = 1; 
-  let elapsedMinutes = elapsedSeconds / 60;
-  let elapsedHours = elapsedMinutes / 60;
-
-  let perSecond = totalSoldUnits / elapsedSeconds;
-  let perMinute = totalSoldUnits / elapsedMinutes;
-  let perHour = totalSoldUnits / elapsedHours;
-
-  document.getElementById("statReady").textContent = totalReadyUnits.toLocaleString("id-ID");
-  document.getElementById("statReadyVariant").textContent = `${readyVariantCount} varian aktif`;
-  document.getElementById("statSold").textContent = totalSoldUnits.toLocaleString("id-ID");
-  document.getElementById("statSec").textContent = perSecond.toFixed(3);
-  document.getElementById("statMin").textContent = perMinute.toFixed(2);
-  document.getElementById("statHour").textContent = perHour.toFixed(1);
-}
-
-setInterval(() => {
-  if (products.length > 0) {
-    updateStatistics();
-  }
-}, 1000);
-
 function resetSalesTracker() {
   initialStockMap = {};
   productSoldMap = {};
   totalSoldUnits = 0;
-  startTime = Date.now();
+  previousTotalSold = 0;
+  soldPerSecond = 0;
+  soldPerMinute = 0;
+  soldPerHour = 0;
   salesChart.data.labels = [];
   salesChart.data.datasets.forEach(ds => ds.data = []);
   salesChart.update();
