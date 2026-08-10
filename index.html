@@ -14,7 +14,6 @@
 .subtitle{font-size:11px;color:#64748b}
 .wrap{padding:16px 12px 80px}
 
-/* Animasi Bola/Loader Berputar di Atas */
 .sync-indicator-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
 .sync-left{display:flex;align-items:center;gap:10px}
 .spinner-ball{width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:#0f172a;border-radius:50%;animation:spin 0.8s linear infinite}
@@ -119,7 +118,6 @@
 </header>
 
 <main class="wrap">
-  <!-- Indikator Bola Berputar & Hitung Mundur Waktu Sinkronisasi di Atas -->
   <div class="sync-indicator-container">
     <div class="sync-left">
       <div class="spinner-ball"></div>
@@ -207,7 +205,7 @@
   </div>
 
   <div class="panel" style="padding:10px 12px;">
-    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Masukkan kata kunci...">
+    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten (Contoh: Bandung, Surabaya)...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -223,6 +221,97 @@
 </main>
 
 <script>
+// Database Area Lokal Mandiri
+const areaDatabase = [
+  {
+    area: "Area 2",
+    provinces: [
+      { name: "Banten", cities: ["Kota Tangerang Selatan", "Kota Tangerang", "Kab. Tangerang", "Kab. Pandeglang", "Kab. Lebak", "Kab. Serang", "Kota Serang", "Kota Cilegon"] },
+      { name: "DKI Jakarta", cities: ["Kota Jakarta Pusat", "Kota Jakarta Selatan", "Kota Jakarta Barat", "Kota Jakarta Timur", "Kota Jakarta Utara"] },
+      { name: "Jawa Barat", cities: ["Kab. Bandung Barat", "Kota Cimahi", "Kab. Cirebon", "Kota Cirebon", "Kab. Indramayu", "Kab. Subang"] },
+      { name: "Jawa Tengah", cities: ["Kab. Tegal", "Kota Surakarta", "Kota Tegal", "Kab. Brebes", "Kab. Kebumen", "Kab. Pemalang", "Kota Semarang"] },
+      { name: "Jawa Timur", cities: ["Kota Probolinggo", "Kab. Bangkalan", "Kab. Sidoarjo", "Kab. Banyuwangi", "Kota Surabaya", "Kab. Sampang", "Kab. Pamekasan", "Kab. Sumenep", "Kab. Pacitan"] },
+      { name: "Kepulauan Bangka Belitung", cities: ["Kab. Bangka Selatan", "Kota Pangkal Pinang", "Kab. Belitung", "Kab. Belitung Timur"] },
+      { name: "Kepulauan Riau", cities: ["Kota Batam"] },
+      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Barat Daya", "Kab. Aceh Besar", "Kota Sabang", "Kab. Gayo Lues"] },
+      { name: "Riau", cities: ["Kota Pekanbaru"] },
+      { name: "Sumatera Barat", cities: ["Kab. Kepulauan Mentawai"] },
+      { name: "Sumatera Utara", cities: ["Kab. Karo", "Kota Medan", "Kab. Dairi"] },
+      { name: "Kalimantan Selatan", cities: ["Kab. Hulu Sungai Tengah", "Kab. Tapin", "Kab. Hulu Sungai Utara", "Kab. Tabalong", "Kota Banjarmasin", "Kab. Banjar", "Kab. Tanah Bumbu", "Kota Banjarbaru", "Kab. Hulu Sungai Selatan"] },
+      { name: "Sulawesi Barat", cities: ["Kab. Majene", "Kab. Polewali Mandar", "Kab. Mamuju Utara"] },
+      { name: "Sulawesi Selatan", cities: ["Kab. Barru", "Kota Pare Pare", "Kab. Pinrang"] },
+      { name: "Sulawesi Tenggara", cities: ["Kota Bau Bau", "Kab. Muna", "Kab. Buton Selatan", "Kab. Buton Tengah", "Kab. Muna Barat"] },
+      { name: "Bali", cities: ["Kab. Badung", "Kab. Karangasem", "Kab. Tabanan", "Kab. Bangli", "Kab. Gianyar", "Kab. Klungkung", "Kota Denpasar"] },
+      { name: "Nusa Tenggara Barat", cities: ["Kab. Lombok Barat", "Kab. Lombok Timur", "Kota Mataram", "Kab. Lombok Tengah", "Kab. Lombok Utara", "Kab. Sumbawa Barat", "Kab. Sumbawa", "Kota Bima", "Kab. Dompu"] }
+    ]
+  },
+  {
+    area: "Area 1",
+    provinces: [
+      { name: "DI Yogyakarta", cities: ["Kab. Kulon Progo", "Kota Yogyakarta", "Kab. Sleman", "Kab. Bantul", "Kab. Gunungkidul"] },
+      { name: "Jawa Barat", cities: ["Kab. Bandung", "Kab. Kuningan", "Kab. Purwakarta", "Kota Bandung"] },
+      { name: "Bali", cities: ["Kab. Jembrana", "Kab. Buleleng"] },
+      { name: "Maluku Utara", cities: ["Kab. Halmahera Barat", "Kab. Halmahera Utara", "Kab. Kepulauan Sula", "Kab. Halmahera Timur", "Kab. Pulau Taliabu", "Kab. Halmahera Selatan", "Kota Tidore Kepulauan", "Kota Ternate", "Kab. Halmahera Tengah", "Kab. Pulau Morotai"] },
+      { name: "Papua", cities: ["Kab. Asmat", "Kab. Jayapura", "Kab. Mimika", "Kab. Keerom", "Kab. Biak Numfor", "Kota Jayapura", "Kab. Kepulauan Yapen", "Kab. Boven Digoel", "Kab. Merauke", "Kab. Deiyai", "Kab. Dogiyai", "Kab. Intan Jaya", "Kab. Jayawijaya", "Kab. Lanny Jaya", "Kab. Mamberamo Raya", "Kab. Mamberamo Tengah", "Kab. Mappi", "Kab. Nabire", "Kab. Nduga", "Kab. Paniai", "Kab. Pegunungan Bintang", "Kab. Puncak", "Kab. Puncak Jaya", "Kab. Sarmi", "Kab. Supiori", "Kab. Tolikara", "Kab. Waropen", "Kab. Yahukimo", "Kab. Yalimo"] },
+      { name: "Papua Barat", cities: ["Kab. Teluk Bintuni", "Kab. Sorong Selatan", "Kab. Sorong", "Kab. Teluk Wondama", "Kota Sorong", "Kab. Manokwari", "Kab. Fak Fak", "Kab. Kaimana", "Kab. Manokwari Selatan", "Kab. Maybrat", "Kab. Pegunungan Arfak", "Kab. Raja Ampat", "Kab. Tambrauw"] }
+    ]
+  },
+  {
+    area: "Area 3",
+    provinces: [
+      { name: "DKI Jakarta", cities: ["Kab. Kepulauan Seribu"] },
+      { name: "Jawa Barat", cities: ["Kab. Bogor", "Kota Bogor", "Kota Depok", "Kota Bekasi", "Kota Banjar", "Kab. Ciamis", "Kota Tasikmalaya", "Kab. Majalengka", "Kab. Sumedang", "Kab. Bekasi", "Kab. Tasikmalaya", "Kab. Garut"] },
+      { name: "Jawa Tengah", cities: ["Kab. Boyolali", "Kota Salatiga", "Kab. Semarang", "Kab. Cilacap", "Kab. Grobogan", "Kab. Kendal", "Kab. Rembang"] },
+      { name: "Jawa Timur", cities: ["Kab. Lumajang", "Kab. Probolinggo"] },
+      { name: "Bengkulu", cities: ["Kab. Seluma"] },
+      { name: "Jambi", cities: ["Kab. Batanghari", "Kota Jambi", "Kab. Tanjung Jabung Barat", "Kab. Muaro Jambi", "Kab. Sarolangun"] },
+      { name: "Kepulauan Bangka Belitung", cities: ["Kab. Bangka", "Kab. Bangka Tengah", "Kab. Bangka Barat"] },
+      { name: "Kepulauan Riau", cities: ["Kab. Karimun", "Kab. Bintan", "Kota Tanjung Pinang"] },
+      { name: "Lampung", cities: ["Kab. Lampung Tengah", "Kab. Pringsewu", "Kota Metro", "Kab. Pesawaran", "Kab. Lampung Selatan", "Kota Bandar Lampung"] },
+      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Jaya", "Kab. Aceh Selatan", "Kab. Aceh Tenggara", "Kab. Nagan Raya", "Kota Banda Aceh"] },
+      { name: "Riau", cities: ["Kab. Kuantan Singingi", "Kab. Pelalawan", "Kab. Kampar", "Kab. Siak", "Kota Dumai", "Kab. Rokan Hilir", "Kab. Indragiri Hulu", "Kab. Kepulauan Meranti", "Kab. Bengkalis"] },
+      { name: "Sumatera Barat", cities: ["Kota Payakumbuh", "Kota Padang Panjang", "Kab. Sijunjung", "Kab. Padang Pariaman", "Kota Padang", "Kab. Solok Selatan"] },
+      { name: "Sumatera Selatan", cities: ["Kab. Ogan Komering Ilir", "Kab. Penukal Abab Lematang Ilir", "Kab. Banyuasin", "Kota Palembang", "Kab. Ogan Ilir"] },
+      { name: "Sumatera Utara", cities: ["Kota Binjai", "Kota Tebing Tinggi", "Kab. Serdang Bedagai", "Kab. Langkat", "Kab. Deli Serdang", "Kab. Batu Bara", "Kota Tanjung Balai", "Kab. Asahan", "Kota Gunungsitoli", "Kab. Nias Barat", "Kab. Nias Selatan", "Kab. Nias Utara"] },
+      { name: "Kalimantan Selatan", cities: ["Kab. Balangan", "Kab. Barito Kuala", "Kab. Tanah Laut", "Kab. Kotabaru"] },
+      { name: "Kalimantan Tengah", cities: ["Kab. Kapuas", "Kab. Pulang Pisau", "Kota Palangkaraya"] },
+      { name: "Sulawesi Barat", cities: ["Kab. Mamuju", "Kab. Mamasa"] },
+      { name: "Sulawesi Selatan", cities: ["Kab. Kepulauan Selayar", "Kab. Takalar", "Kab. Jeneponto", "Kab. Bulukumba", "Kab. Pangkajene Kepulauan", "Kota Makassar", "Kab. Gowa", "Kab. Maros", "Kab. Bone", "Kab. Wajo", "Kab. Luwu", "Kab. Luwu Utara", "Kota Palopo", "Kab. Toraja Utara"] },
+      { name: "Sulawesi Tengah", cities: ["Kab. Banggai", "Kab. Parigi Moutong", "Kab. Donggala", "Kab. Sigi", "Kab. Poso", "Kab. Buol"] },
+      { name: "Sulawesi Tenggara", cities: ["Kab. Kolaka", "Kab. Kolaka Utara", "Kab. Konawe", "Kab. Konawe Selatan", "Kota Kendari", "Kab. Kolaka Timur", "Kab. Buton", "Kab. Bombana"] }
+    ]
+  },
+  {
+    area: "Area 4",
+    provinces: [
+      { name: "Jawa Barat", cities: ["Kab. Cianjur", "Kab. Pangandaran", "Kab. Karawang", "Kota Sukabumi", "Kab. Sukabumi"] },
+      { name: "Jawa Tengah", cities: ["Kab. Tegal", "Kota Surakarta", "Kota Tegal", "Kab. Brebes", "Kab. Kebumen", "Kab. Pemalang", "Kota Semarang", "Kota Pekalongan", "Kab. Pekalongan", "Kab. Batang", "Kab. Purbalingga", "Kab. Kudus", "Kab. Sukoharjo", "Kab. Klaten", "Kota Magelang", "Kab. Banyumas", "Kab. Magelang", "Kab. Temanggung", "Kab. Sragen", "Kab. Banjarnegara", "Kab. Karanganyar", "Kab. Wonosobo", "Kab. Jepara", "Kab. Demak", "Kab. Purworejo", "Kab. Blora", "Kab. Wonogiri", "Kab. Pati"] },
+      { name: "Jawa Timur", cities: ["Kab. Jombang", "Kota Blitar", "Kab. Blitar", "Kota Kediri", "Kab. Lamongan", "Kab. Kediri", "Kab. Ngawi", "Kab. Mojokerto", "Kota Mojokerto", "Kab. Magetan", "Kab. Gresik", "Kab. Tulungagung", "Kab. Nganjuk", "Kab. Pasuruan", "Kota Pasuruan", "Kab. Bojonegoro", "Kab. Madiun", "Kab. Bondowoso", "Kab. Tuban", "Kota Madiun", "Kab. Situbondo", "Kab. Jember", "Kota Malang", "Kab. Malang", "Kab. Ponorogo", "Kota Batu", "Kab. Trenggalek"] },
+      { name: "Bengkulu", cities: ["Kab. Bengkulu Selatan", "Kab. Kaur", "Kab. Lebong", "Kab. Rejang Lebong", "Kab. Bengkulu Tengah", "Kota Bengkulu", "Kab. Bengkulu Utara", "Kab. Kepahiang", "Kab. Muko Muko"] },
+      { name: "Jambi", cities: ["Kab. Tanjung Jabung Timur", "Kab. Kerinci", "Kab. Bungo", "Kab. Tebo", "Kab. Merangin", "Kota Sungai Penuh"] },
+      { name: "Kepulauan Riau", cities: ["Kab. Lingga", "Kab. Kepulauan Anambas", "Kab. Natuna"] },
+      { name: "Lampung", cities: ["Kab. Lampung Barat", "Kab. Lampung Timur", "Kab. Tulang Bawang Barat", "Kab. Way Kanan", "Kab. Tulang Bawang", "Kab. Tanggamus", "Kab. Pesisir Barat", "Kab. Lampung Utara", "Kab. Mesuji"] },
+      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Barat", "Kab. Aceh Singkil", "Kab. Aceh Tamiang", "Kab. Aceh Tengah", "Kota Subulussalam", "Kab. Bener Meriah", "Kab. Aceh Utara", "Kota Lhokseumawe", "Kab. Pidie", "Kab. Aceh Timur", "Kab. Simeulue", "Kota Langsa", "Kab. Bireuen", "Kab. Pidie Jaya"] },
+      { name: "Riau", cities: ["Kab. Rokan Hulu", "Kab. Indragiri Hilir"] },
+      { name: "Sumatera Barat", cities: ["Kab. Pasaman Barat", "Kab. Pasaman", "Kab. Lima Puluh Kota", "Kab. Tanah Datar", "Kab. Dharmasraya", "Kota Solok", "Kab. Agam", "Kab. Solok", "Kota Bukittinggi", "Kota Pariaman", "Kota Sawahlunto", "Kab. Pesisir Selatan"] },
+      { name: "Sumatera Selatan", cities: ["Kab. Ogan Komering Ulu Timur", "Kab. Ogan Komering Ulu Selatan", "Kab. Ogan Komering Ulu", "Kab. Musi Rawas", "Kab. Musi Rawas Utara", "Kab. Empat Lawang", "Kota Pagar Alam", "Kota Lubuk Linggau", "Kab. Musi Banyuasin", "Kab. Muara Enim", "Kab. Lahat", "Kota Prabumulih"] },
+      { name: "Sumatera Utara", cities: ["Kab. Pakpak Bharat", "Kab. Mandailing Natal", "Kab. Padang Lawas", "Kab. Labuhanbatu Utara", "Kota Padangsidimpuan", "Kab. Tapanuli Selatan", "Kab. Labuhanbatu Selatan", "Kab. Labuhanbatu", "Kab. Tapanuli Utara", "Kab. Padang Lawas Utara", "Kab. Humbang Hasundutan", "Kab. Simalungun", "Kab. Toba Samosir", "Kota Pematangsiantar", "Kab. Tapanuli Tengah", "Kab. Samosir", "Kota Sibolga", "Kab. Nias"] },
+      { name: "Kalimantan Barat", cities: ["Kab. Sekadau", "Kab. Kapuas Hulu", "Kab. Sintang", "Kab. Bengkayang", "Kab. Melawi", "Kab. Sambas", "Kab. Sanggau", "Kab. Kubu Raya", "Kota Pontianak", "Kab. Kayong Utara", "Kab. Landak", "Kab. Mempawah", "Kota Singkawang", "Kab. Ketapang"] },
+      { name: "Kalimantan Tengah", cities: ["Kab. Seruyan", "Kab. Kotawaringin Barat", "Kab. Katingan", "Kab. Kotawaringin Timur", "Kab. Sukamara", "Kab. Lamandau", "Kab. Murung Raya", "Kab. Barito Timur", "Kab. Barito Utara", "Kab. Barito Selatan", "Kab. Gunung Mas"] },
+      { name: "Kalimantan Timur", cities: ["Kab. Penajam Paser Utara", "Kota Balikpapan", "Kab. Paser", "Kab. Kutai Kartanegara", "Kota Samarinda", "Kota Bontang", "Kab. Berau", "Kab. Kutai Timur", "Kab. Kutai Barat", "Kab. Mahakam Ulu"] },
+      { name: "Kalimantan Utara", cities: ["Kab. Tana Tidung", "Kab. Malinau", "Kab. Bulungan", "Kota Tarakan", "Kab. Nunukan"] },
+      { name: "Gorontalo", cities: ["Kab. Pahuwato", "Kab. Boalemo", "Kab. Gorontalo", "Kota Gorontalo", "Kab. Gorontalo Utara", "Kab. Bone Bolango"] },
+      { name: "Sulawesi Barat", cities: ["Kab. Mamuju Tengah"] },
+      { name: "Sulawesi Selatan", cities: ["Kab. Sinjai", "Kab. Enrekang", "Kab. Sidenreng Rappang", "Kab. Luwu Timur", "Kab. Soppeng", "Kab. Tana Toraja"] },
+      { name: "Sulawesi Tengah", cities: ["Kab. Banggai Kepulauan", "Kab. Banggai Laut", "Kota Palu", "Kab. Toli Toli", "Kab. Tojo Una Una", "Kab. Morowali", "Kab. Morowali Utara"] },
+      { name: "Sulawesi Tenggara", cities: ["Kab. Konawe Kepulauan", "Kab. Konawe Utara", "Kab. Buton Utara", "Kab. Wakatobi"] },
+      { name: "Sulawesi Utara", cities: ["Kab. Bolaang Mongondow", "Kab. Bolaang Mongondow Selatan", "Kota Kotamobagu", "Kab. Minahasa Selatan", "Kab. Bolaang Mongondow Timur", "Kab. Minahasa Tenggara", "Kab. Bolaang Mongondow Utara", "Kota Tomohon", "Kab. Minahasa", "Kota Manado", "Kab. Minahasa Utara", "Kota Bitung", "Kab. Kepulauan Sangihe", "Kab. Kepulauan Talaud", "Kab. Siau Tagulandang Biaro"] },
+      { name: "Nusa Tenggara Timur", cities: ["Kab. Alor", "Kota Kupang", "Kab. Kupang", "Kab. Malaka", "Kab. Manggarai Barat", "Kab. Timor Tengah Selatan", "Kab. Belu", "Kab. Sikka", "Kab. Timor Tengah Utara", "Kab. Lembata", "Kab. Manggarai Timur", "Kab. Ende", "Kab. Sumba Barat Daya", "Kab. Rote Ndao", "Kab. Nagekeo", "Kab. Flores Timur", "Kab. Ngada", "Kab. Sumba Tengah", "Kab. Manggarai", "Kab. Sumba Barat", "Kab. Sumba Timur", "Kab. Sabu Raijua"] },
+      { name: "Maluku", cities: ["Kab. Maluku Tenggara Barat", "Kab. Kepulauan Aru", "Kota Tual", "Kab. Seram Bagian Barat", "Kab. Maluku Tengah", "Kab. Seram Bagian Timur", "Kota Ambon", "Kab. Maluku Tenggara", "Kab. Maluku Barat Daya", "Kab. Buru Selatan", "Kab. Buru"] }
+    ]
+  }
+];
+
 let products = [];
 let initialStockMap = JSON.parse(localStorage.getItem("ic_initial_stock")) || {}; 
 let previousTotalSold = 0;
@@ -663,11 +752,40 @@ function renderCardsHtml(items) {
   return out;
 }
 
+// Fungsi Pencarian Cerdas berbasis Database Kota -> Area
 function renderStock(){
-  const q = (document.getElementById("stockSearch").value || "").toLowerCase().trim();
+  const rawQ = (document.getElementById("stockSearch").value || "").trim();
+  const q = rawQ.toLowerCase();
+
+  // Cek apakah input mencocokkan kota di database lokal
+  let matchedAreaName = "";
+  if (q.length > 2) {
+    for (let group of areaDatabase) {
+      for (let prov of group.provinces) {
+        for (let city of prov.cities) {
+          if (city.toLowerCase().includes(q)) {
+            matchedAreaName = group.area.toLowerCase(); // contoh: "area 2"
+            break;
+          }
+        }
+        if (matchedAreaName) break;
+      }
+      if (matchedAreaName) break;
+    }
+  }
+
   const arr = products.filter(p => {
     const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
-    const matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
+    
+    let matchesArea = false;
+    if (matchedAreaName) {
+      // Jika kota ditemukan di database, filter produk yang area-nya cocok
+      matchesArea = p.areasText.includes(matchedAreaName);
+    } else {
+      // Jika tidak ditemukan di database kota, gunakan pencarian teks bebas biasa
+      matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
+    }
+
     return matchesCategory && matchesArea;
   });
   
@@ -679,10 +797,10 @@ function renderStock(){
     let totalStockInGroup = items.reduce((acc, curr) => acc + (curr.stock > 0 ? curr.stock : 0), 0);
     let readyVariantCount = items.filter(i => i.stock > 0).length;
     
-    out += `<div class="head"><b>Kategori ${v}</b><small>${readyVariantCount} aktif (${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
+    out += `<div class="head"><b>Kategori ${v}</b> ${matchedAreaName ? `<small style="color:#059669; font-weight:800;">(Rekomendasi untuk ${rawQ} -> ${matchedAreaName.toUpperCase()})</small>` : ''}<small>${readyVariantCount} aktif (${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
     out += renderCardsHtml(items);
   }
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data tidak ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data area atau paket tidak ditemukan.</div>';
 }
 
 initChart();
