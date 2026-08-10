@@ -257,7 +257,7 @@ function initChart() {
 
 async function fetchProducts() {
   try {
-    const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
+    const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
       headers: { 
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
