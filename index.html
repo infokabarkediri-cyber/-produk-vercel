@@ -283,7 +283,7 @@ function cleanAreaValue(rawLine) {
 }
 
 async function fetchProducts() {
-  countdownTimer = 1; // Reset timer hitung mundur saat fetch baru dijalankan
+  countdownTimer = 1; 
   try {
     const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
@@ -411,7 +411,6 @@ function updateStatistics() {
   document.getElementById("statMin").textContent = lastMinute;
   document.getElementById("statHour").textContent = lastHour;
 
-  // Update counter badge hitung mundur bola berputar
   const timerBadge = document.getElementById("syncTimerBadge");
   if (timerBadge) {
     timerBadge.textContent = `${countdownTimer}s`;
