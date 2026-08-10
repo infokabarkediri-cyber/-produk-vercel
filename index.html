@@ -7,14 +7,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
-.top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}
-.brand-container{display:flex;align-items:center;gap:12px}
-.brand-logo{height:24px;object-fit:contain}
+.top{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}
+.brand-container{display:flex;align-items:center;gap:10px}
+.brand-logo-svg{height:22px;display:flex;align-items:center}
 .subtitle{font-size:11px;color:#64748b}
-.wrap{padding:20px 15px 80px}
+.wrap{padding:16px 12px 80px}
 
-.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
-.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01);position:relative;overflow:hidden}
+.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;position:relative;overflow:hidden}
 .stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
 .stat-card.ready::before{background:#059669}
 .stat-card.sold::before{background:#3b82f6}
@@ -22,88 +22,98 @@
 .stat-card.sec::before{background:#ec4899}
 .stat-card.rate::before{background:#8b5cf6}
 .stat-card.speed::before{background:#f59e0b}
-.stat-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
-.stat-val{font-size:16px;font-weight:800;color:#0f172a;margin-top:4px}
-.stat-sub{font-size:9px;color:#94a3b8;margin-top:2px}
+.stat-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
+.stat-val{font-size:15px;font-weight:800;color:#0f172a;margin-top:2px}
+.stat-sub{font-size:9px;color:#94a3b8}
 
-.checker-panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
-.checker-header{font-size:14px;font-weight:800;color:#0f172a;margin-bottom:4px}
-.checker-sub{font-size:11px;color:#64748b;margin-bottom:12px}
-.checker-form{display:flex;gap:8px;flex-wrap:wrap}
-.checker-input{flex:1;min-width:200px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 14px;outline:none;background:#f8fafc;font-size:13px}
-.checker-btn{background:#0f172a;color:#fff;border:0;border-radius:10px;padding:10px 18px;font-size:12px;font-weight:700;cursor:pointer}
-.checker-btn:hover{background:#1e293b}
-.checker-result{margin-top:14px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;display:none}
+.checker-panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
+.checker-header{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
+.checker-sub{font-size:11px;color:#64748b;margin-bottom:10px}
+.checker-form{display:flex;gap:6px;flex-wrap:wrap}
+.checker-input{flex:1;min-width:180px;border:1px solid #cbd5e1;border-radius:8px;padding:8px 12px;outline:none;background:#f8fafc;font-size:12px}
+.checker-btn{background:#0f172a;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer}
+.checker-result{margin-top:10px;padding:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;display:none}
 .checker-result.active{display:block}
-.checker-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
-.checker-item{background:#fff;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px}
-.checker-item span{display:block;font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase}
-.checker-item b{font-size:13px;color:#0f172a}
+.checker-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
+.checker-item{background:#fff;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px}
+.checker-item span{display:block;font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
+.checker-item b{font-size:12px;color:#0f172a}
 
-.insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
-.insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
-.insight-title{font-size:13px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.insight-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px}
+.insight-title{font-size:12px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.insight-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:11px}
 .insight-item:last-child{border-bottom:0}
 .insight-item b{color:#0f172a}
-.badge-count{background:#f1f5f9;padding:3px 8px;border-radius:6px;font-weight:800;font-size:11px}
+.badge-count{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-weight:800;font-size:10px}
 .badge-top{background:#ecfdf5;color:#059669}
 .badge-low{background:#fff1f2;color:#e11d48}
 
-.chart-container{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
-.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px}
-.chart-header b{font-size:14px;color:#0f172a}
-.chart-header span{font-size:11px;color:#64748b;display:block}
-.date-filter-box{display:flex;gap:6px;align-items:center}
-.date-filter-box input{border:1px solid #cbd5e1;border-radius:8px;padding:5px 8px;font-size:11px;outline:none;background:#f8fafc}
-.date-filter-box button{background:#0f172a;color:#fff;border:0;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer}
+.chart-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.chart-header b{font-size:13px;color:#0f172a}
+.chart-header span{font-size:10px;color:#64748b;display:block}
+.date-filter-box{display:flex;gap:4px;align-items:center}
+.date-filter-box input{border:1px solid #cbd5e1;border-radius:6px;padding:4px 6px;font-size:10px;outline:none;background:#f8fafc}
+.date-filter-box button{background:#0f172a;color:#fff;border:0;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:700;cursor:pointer}
 
-.features-panel{background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.feature-info b{font-size:13px;display:block;margin-bottom:2px}
-.feature-info span{font-size:11px;color:#94a3b8}
-.action-btns{display:flex;gap:8px}
-.btn-action{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s}
-.btn-action:hover{background:rgba(255,255,255,0.2)}
+.features-panel{background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.feature-info b{font-size:12px;display:block;margin-bottom:1px}
+.feature-info span{font-size:10px;color:#94a3b8}
+.action-btns{display:flex;gap:6px}
+.btn-action{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:6px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer}
 
-.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
-.search{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;outline:none;background:#fff;font-size:13px}
-.filters{display:flex;gap:6px;overflow:auto;margin-top:10px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
-.head{display:flex;justify-content:space-between;align-items:baseline;padding:16px 10px 8px;border-bottom:1px solid #e2e8f0;margin-bottom:10px}
-.head b{font-size:15px;color:#0f172a}
-.head small{color:#64748b;font-size:11px;font-weight:600}
+.panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.search{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;outline:none;background:#fff;font-size:12px}
+.filters{display:flex;gap:4px;overflow:auto;margin-top:8px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:6px;padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
+.head{display:flex;justify-content:space-between;align-items:baseline;padding:12px 6px 6px;border-bottom:1px solid #e2e8f0;margin-bottom:8px}
+.head b{font-size:14px;color:#0f172a}
+.head small{color:#64748b;font-size:10px;font-weight:600}
 
-.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important}
-.card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 2px rgba(0,0,0,0.02);transition:all 0.2s ease}
-.card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
+.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}
+.card{border:1px solid #e2e8f0;border-radius:10px;padding:8px;cursor:pointer;background:#fff;position:relative;transition:all 0.2s ease}
+.card:hover{border-color:#cbd5e1}
 .card.habis{background:#fafafa;opacity:0.85}
 
 .card-top{display:flex;justify-content:space-between;align-items:flex-start}
-.name{font-weight:800;font-size:13px;color:#0f172a}
-.badge-habis{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ffeeee;color:#dc2626}
-.badge-ready{font-size:8px;font-weight:800;border-radius:99px;padding:3px 7px;background:#ecfdf5;color:#059669}
-.slot-label{font-size:9px;color:#64748b;font-weight:700;margin-top:8px;text-transform:uppercase}
-.slot-val{font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.name{font-weight:800;font-size:11px;color:#0f172a}
+.badge-habis{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ffeeee;color:#dc2626}
+.badge-ready{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ecfdf5;color:#059669}
+.slot-label{font-size:8px;color:#64748b;font-weight:700;margin-top:4px;text-transform:uppercase}
+.slot-val{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
 
-/* Area list yang konsisten, rapi & bersih */
-.area-list{border-top:1px solid #f1f5f9;padding-top:8px;margin-top:8px;display:none}
+.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
-.area-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#475569;padding:3px 0;border-bottom:1px dashed #f8fafc}
+.area-row{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#475569;padding:2px 0;border-bottom:1px dashed #f8fafc}
 .area-row:last-child{border-bottom:0}
-.area-row b{color:#0f172a;background:#f8fafc;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0}
+.area-row b{color:#0f172a;background:#f8fafc;padding:1px 4px;border-radius:3px;border:1px solid #e2e8f0;font-size:9px}
 
-.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
+.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:4px;margin-top:4px}
 .toggle-detail.ready-text{color:#059669}
-.footer-brand{text-align:center;font-size:11px;color:#94a3b8;margin-top:30px;font-weight:600}
+.footer-brand{text-align:center;font-size:10px;color:#94a3b8;margin-top:20px;font-weight:600}
 
 @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(3,1fr)}.insight-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}.card{padding:10px}.name{font-size:11px}.slot-val{font-size:13px}}
+@media(max-width:640px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:6px}.name{font-size:10px}.slot-val{font-size:11px}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="brand-container" id="providerLogoContainer">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/XL_Axiata_2016.svg" alt="XL Logo" class="brand-logo">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/3/37/AXIS_Logo_2015.svg" alt="AXIS Logo" class="brand-logo" style="height: 22px;">
+    <!-- Logo XL (Inline SVG) -->
+    <div class="brand-logo-svg">
+      <svg viewBox="0 0 100 35" height="22">
+        <path d="M5 28L25 5H18L2 24V5H0V28H5ZM30 5H32V28H30V5ZM42 5H44V28H42V5Z" fill="#003781"/>
+        <text x="35" y="25" font-weight="900" font-size="24" fill="#001489" font-family="Arial">XL</text>
+      </svg>
+    </div>
+    <span style="color:#cbd5e1;font-weight:300;">|</span>
+    <!-- Logo AXIS (Inline SVG Badge) -->
+    <div class="brand-logo-svg">
+      <svg viewBox="0 0 90 28" height="22">
+        <rect width="90" height="28" rx="14" fill="#6c2d91"/>
+        <text x="45" y="19" font-weight="800" font-size="14" fill="#ffffff" text-anchor="middle" font-family="Arial">AXIS</text>
+      </svg>
+    </div>
   </div>
   <div class="subtitle" id="updateTime">Menghubungkan...</div>
 </header>
@@ -123,22 +133,22 @@
     <div class="stat-card day">
       <div class="stat-label">Hari Ini</div>
       <div class="stat-val" id="statDay">0</div>
-      <div class="stat-sub">Unit terjual</div>
+      <div class="stat-sub">Terjual</div>
     </div>
     <div class="stat-card sec">
       <div class="stat-label">Detik Ini</div>
       <div class="stat-val" id="statSec">0</div>
-      <div class="stat-sub">Unit masuk</div>
+      <div class="stat-sub">Masuk</div>
     </div>
     <div class="stat-card rate">
       <div class="stat-label">Menit Ini</div>
       <div class="stat-val" id="statMin">0</div>
-      <div class="stat-sub">Unit masuk</div>
+      <div class="stat-sub">Masuk</div>
     </div>
     <div class="stat-card speed">
       <div class="stat-label">Jam Ini</div>
       <div class="stat-val" id="statHour">0</div>
-      <div class="stat-sub">Unit masuk</div>
+      <div class="stat-sub">Masuk</div>
     </div>
   </div>
 
@@ -156,12 +166,12 @@
 
   <div class="insight-grid">
     <div class="insight-card">
-      <div class="insight-title">🔥 Top 3 Produk Terjual Terbanyak</div>
-      <div id="topSoldList"><div style="font-size:11px;color:#94a3b8">Memuat data...</div></div>
+      <div class="insight-title">🔥 Top 3 Terjual Terbanyak</div>
+      <div id="topSoldList"><div style="font-size:10px;color:#94a3b8">Memuat data...</div></div>
     </div>
     <div class="insight-card">
-      <div class="insight-title">🧊 Top 3 Produk Terjual Terendah</div>
-      <div id="lowSoldList"><div style="font-size:11px;color:#94a3b8">Memuat data...</div></div>
+      <div class="insight-title">🧊 Top 3 Terjual Terendah</div>
+      <div id="lowSoldList"><div style="font-size:10px;color:#94a3b8">Memuat data...</div></div>
     </div>
   </div>
 
@@ -169,17 +179,17 @@
     <div class="chart-header">
       <div>
         <b>📈 Grafik Rata-Rata Penjualan Per Hari</b>
-        <span>Analisis tren harian dan filter rentang tanggal</span>
+        <span>Analisis tren harian & filter rentang tanggal</span>
       </div>
       <div class="date-filter-box">
         <input type="date" id="startDateFilter">
-        <span style="font-size:11px;color:#64748b">s/d</span>
+        <span style="font-size:10px;color:#64748b">s/d</span>
         <input type="date" id="endDateFilter">
         <button onclick="applyDateFilter()">Filter</button>
         <button onclick="resetDateFilter()" style="background:#64748b">Reset</button>
       </div>
     </div>
-    <div style="position: relative; height: 260px; width: 100%;">
+    <div style="position: relative; height: 220px; width: 100%;">
       <canvas id="salesChart"></canvas>
     </div>
   </div>
@@ -187,16 +197,16 @@
   <div class="features-panel">
     <div class="feature-info">
       <b>🚀 Panel Kendali & Ekspor Data</b>
-      <span>Sinkronisasi otomatis real-time tiap 1 detik tanpa reload halaman.</span>
+      <span>Sinkronisasi otomatis real-time tiap 1 detik.</span>
     </div>
     <div class="action-btns">
-      <button class="btn-action" onclick="exportDataCSV()">📥 Export CSV</button>
-      <button class="btn-action" onclick="resetSalesTracker()">🔄 Reset Sesi</button>
+      <button class="btn-action" onclick="exportDataCSV()">📥 CSV</button>
+      <button class="btn-action" onclick="resetSalesTracker()">🔄 Reset</button>
     </div>
   </div>
 
-  <div class="panel" style="padding:12px 16px;">
-    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Masukkan kata kunci pencarian...">
+  <div class="panel" style="padding:10px 12px;">
+    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Masukkan kata kunci...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -232,16 +242,16 @@ function initChart() {
     data: {
       labels: [],
       datasets: [
-        { label: 'Rata-Rata V1', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'Rata-Rata V2', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'Rata-Rata V3', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'Rata-Rata V4', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
+        { label: 'V1', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V2', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V3', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V4', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
       scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }
     }
   });
@@ -351,7 +361,7 @@ async function fetchProducts() {
       recordDailyData(vSoldCounts);
 
       const now = new Date();
-      document.getElementById("updateTime").textContent = "Sinkron: " + now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " WIB";
+      document.getElementById("updateTime").textContent = "Sinkron: " + now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'});
     }
   } catch (err) { 
     console.error(err); 
@@ -409,7 +419,7 @@ async function cekInfoDompul() {
   }
 
   resultBox.classList.add("active");
-  contentBox.innerHTML = "Sedang memproses pengecekan nomor...";
+  contentBox.innerHTML = "Memproses...";
 
   try {
     const response = await fetch('/api/check', {
@@ -428,43 +438,42 @@ async function cekInfoDompul() {
 
       let paketHtml = "";
       paketList.forEach(pkt => {
-        let namaPkt = (pkt.nama_paket && pkt.nama_paket !== "undefined" && pkt.nama_paket.trim() !== "") ? pkt.nama_paket : "Paket Utama / Kuota";
-        let expirePkt = pkt.tanggal_expire ? `Expire: ${pkt.tanggal_expire}` : "";
+        let namaPkt = (pkt.nama_paket && pkt.nama_paket !== "undefined" && pkt.nama_paket.trim() !== "") ? pkt.nama_paket : "Paket Utama";
+        let expirePkt = pkt.tanggal_expire ? `Exp: ${pkt.tanggal_expire}` : "";
         
         let kuotaHtml = "";
         (pkt.kuota || []).forEach(k => {
-          kuotaHtml += `<div style="display:flex;justify-content:space-between;font-size:11px;color:#475569;margin-top:4px;border-bottom:1px dashed #f1f5f9;padding-bottom:3px;">
+          kuotaHtml += `<div style="display:flex;justify-content:space-between;font-size:10px;color:#475569;margin-top:3px;border-bottom:1px dashed #f1f5f9;padding-bottom:2px;">
             <span>• ${k.name || k.nama}</span>
-            <b>${k.sisa} / ${k.total} (${k.persen}%)</b>
+            <b>${k.sisa} / ${k.total}</b>
           </div>`;
         });
 
-        paketHtml += `<div style="margin-top:8px;padding:10px;background:#fff;border-radius:8px;border:1px solid #e2e8f0;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <b style="font-size:12px;color:#0f172a;">📦 ${namaPkt}</b>
-            <span style="font-size:10px;color:#64748b;background:#f8fafc;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">${expirePkt}</span>
+        paketHtml += `<div style="margin-top:6px;padding:8px;background:#fff;border-radius:6px;border:1px solid #e2e8f0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <b style="font-size:11px;color:#0f172a;">📦 ${namaPkt}</b>
+            <span style="font-size:9px;color:#64748b;">${expirePkt}</span>
           </div>
-          ${kuotaHtml || '<div style="font-size:11px;color:#94a3b8;">Tidak ada rincian kuota spesifik.</div>'}
+          ${kuotaHtml || '<div style="font-size:10px;color:#94a3b8;">Tidak ada rincian kuota.</div>'}
         </div>`;
       });
 
       contentBox.innerHTML = `
-        <div style="font-weight:800;color:#059669;margin-bottom:8px;font-size:13px;">✅ ${resJson.keterangan || "Berhasil Cek"}</div>
+        <div style="font-weight:800;color:#059669;margin-bottom:6px;font-size:12px;">✅ ${resJson.keterangan || "Berhasil"}</div>
         <div class="checker-grid">
-          <div class="checker-item"><span>Nomor (MSISDN)</span><b>${info.msisdn || nomor}</b></div>
+          <div class="checker-item"><span>Nomor</span><b>${info.msisdn || nomor}</b></div>
           <div class="checker-item"><span>Operator</span><b>${info.operator || "-"}</b></div>
           <div class="checker-item"><span>Masa Aktif</span><b>${info.masa_aktif || "-"}</b></div>
-          <div class="checker-item"><span>Masa Tenggang</span><b>${info.masa_tenggang || "-"}</b></div>
-          <div class="checker-item" style="grid-column: span 2"><span>Tenure</span><b>${tenureDisplay}</b></div>
+          <div class="checker-item"><span>Tenggang</span><b>${info.masa_tenggang || "-"}</b></div>
         </div>
-        <div style="margin-top:12px;font-weight:800;font-size:12px;color:#0f172a;">Informasi Paket Aktif:</div>
-        ${paketHtml || '<div style="font-size:11px;color:#94a3b8;margin-top:4px;padding:8px;background:#fff;border-radius:6px;border:1px solid #e2e8f0;">Tidak ada paket aktif.</div>'}
+        <div style="margin-top:8px;font-weight:800;font-size:11px;color:#0f172a;">Paket Aktif:</div>
+        ${paketHtml || '<div style="font-size:10px;color:#94a3b8;margin-top:3px;">Tidak ada paket aktif.</div>'}
       `;
     } else {
-      contentBox.innerHTML = `<span style="color:#dc2626;font-size:12px;">Gagal: ${resJson.keterangan || resJson.message || "Data tidak valid."}</span>`;
+      contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Gagal: ${resJson.keterangan || resJson.message || "Data tidak valid."}</span>`;
     }
   } catch (e) {
-    contentBox.innerHTML = `<span style="color:#dc2626;font-size:12px;">Terjadi kesalahan koneksi: ${e.message}</span>`;
+    contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Koneksi error: ${e.message}</span>`;
   }
 }
 
@@ -480,21 +489,21 @@ function updateProductInsights() {
   for (let i = 0; i < Math.min(3, sortedDesc.length); i++) {
     let p = sortedDesc[i];
     topHtml += `<div class="insight-item">
-      <div><b>${p.code}</b> <span style="font-size:10px;color:#64748b">(${p.name})</span></div>
-      <span class="badge-count badge-top">+${p.sold} unit</span>
+      <div><b>${p.code}</b></div>
+      <span class="badge-count badge-top">+${p.sold}</span>
     </div>`;
   }
-  document.getElementById("topSoldList").innerHTML = topHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data.</div>';
+  document.getElementById("topSoldList").innerHTML = topHtml || '<div style="font-size:10px;color:#94a3b8">Belum ada data.</div>';
 
   let lowHtml = "";
   for (let i = 0; i < Math.min(3, sortedAsc.length); i++) {
     let p = sortedAsc[i];
     lowHtml += `<div class="insight-item">
-      <div><b>${p.code}</b> <span style="font-size:10px;color:#64748b">(${p.name})</span></div>
-      <span class="badge-count badge-low">${p.sold} unit</span>
+      <div><b>${p.code}</b></div>
+      <span class="badge-count badge-low">${p.sold}</span>
     </div>`;
   }
-  document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data.</div>';
+  document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:10px;color:#94a3b8">Belum ada data.</div>';
 }
 
 function recordDailyData(vSoldCounts) {
@@ -531,18 +540,6 @@ function renderChartFiltered(startDate = "", endDate = "") {
   let dataV3 = filtered.map(r => r.v3);
   let dataV4 = filtered.map(r => r.v4);
 
-  if (filtered.length > 0) {
-    let avgV1 = Math.round(dataV1.reduce((a,b)=>a+b,0) / filtered.length);
-    let avgV2 = Math.round(dataV2.reduce((a,b)=>a+b,0) / filtered.length);
-    let avgV3 = Math.round(dataV3.reduce((a,b)=>a+b,0) / filtered.length);
-    let avgV4 = Math.round(dataV4.reduce((a,b)=>a+b,0) / filtered.length);
-
-    salesChart.data.datasets[0].label = `Rata-Rata V1: ${avgV1} unit/hari`;
-    salesChart.data.datasets[1].label = `Rata-Rata V2: ${avgV2} unit/hari`;
-    salesChart.data.datasets[2].label = `Rata-Rata V3: ${avgV3} unit/hari`;
-    salesChart.data.datasets[3].label = `Rata-Rata V4: ${avgV4} unit/hari`;
-  }
-
   salesChart.data.labels = labels;
   salesChart.data.datasets[0].data = dataV1;
   salesChart.data.datasets[1].data = dataV2;
@@ -555,7 +552,7 @@ function applyDateFilter() {
   const start = document.getElementById("startDateFilter").value;
   const end = document.getElementById("endDateFilter").value;
   if (!start || !end) {
-    alert("Silakan pilih tanggal awal dan akhir!");
+    alert("Pilih tanggal awal & akhir!");
     return;
   }
   renderChartFiltered(start, end);
@@ -580,7 +577,7 @@ function resetSalesTracker() {
   salesChart.data.datasets.forEach(ds => ds.data = []);
   salesChart.update();
   fetchProducts();
-  alert("Sesi analitik direset!");
+  alert("Sesi direset!");
 }
 
 function exportDataCSV() {
@@ -636,10 +633,10 @@ function renderCardsHtml(items) {
         <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
       </div>
       <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-      <div class="slot-val" style="font-size:${isPDA ? '14px' : '15px'}; color:${isReady ? '#0f172a' : '#dc2626'}">
-        ${isPDA ? (isReady ? '🟢 OPEN' : '🔴 CLOSE') : (isReady ? p.stock.toLocaleString("id-ID") : 'Habis (0)')}
+      <div class="slot-val" style="color:${isReady ? '#0f172a' : '#dc2626'}">
+        ${isPDA ? (isReady ? 'OPEN' : 'CLOSE') : (isReady ? p.stock.toLocaleString("id-ID") : 'Habis')}
       </div>
-      <div style="font-size:10px; color:#3b82f6; font-weight:700; margin-top:2px;">Terjual: ${p.sold} unit</div>
+      <div style="font-size:9px; color:#3b82f6; font-weight:700; margin-top:1px;">Terjual: ${p.sold}</div>
       
       <div class="area-list">
         <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
@@ -673,10 +670,10 @@ function renderStock(){
     let totalStockInGroup = items.reduce((acc, curr) => acc + (curr.stock > 0 ? curr.stock : 0), 0);
     let readyVariantCount = items.filter(i => i.stock > 0).length;
     
-    out += `<div class="head"><b>Kategori ${v}</b><small>${readyVariantCount} varian aktif (Total Stok: ${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
+    out += `<div class="head"><b>Kategori ${v}</b><small>${readyVariantCount} aktif (${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
     out += renderCardsHtml(items);
   }
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">Data tidak ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data tidak ditemukan.</div>';
 }
 
 initChart();
