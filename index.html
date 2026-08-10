@@ -3,14 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title></title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}
 .brand-container{display:flex;align-items:center;gap:10px}
 .brand-badge{font-size:12px;font-weight:800;padding:5px 10px;border-radius:6px;letter-spacing:0.5px}
-.brand-xl{background:#003d79;color:#fff}
-.brand-axis{background:#8a2be2;color:#fff}
+/* Ganti warna atau style logo provider di bawah ini */
+.brand-primary{background:#003d79;color:#fff}
+.brand-secondary{background:#8a2be2;color:#fff}
 .subtitle{font-size:11px;color:#64748b}
 .wrap{padding:20px 15px 80px}
 
@@ -98,9 +100,10 @@
 </head>
 <body>
 <header class="top">
-  <div class="brand-container">
-    <span class="brand-badge brand-xl">XL</span>
-    <span class="brand-badge brand-axis">AXIS</span>
+  <!-- TEMPAT LOGO PROVIDER: Ubah teks/tag di bawah sesuai kebutuhan provider lain -->
+  <div class="brand-container" id="providerLogoContainer">
+    <span class="brand-badge brand-primary">PROV 1</span>
+    <span class="brand-badge brand-secondary">PROV 2</span>
   </div>
   <div class="subtitle" id="updateTime">Menghubungkan...</div>
 </header>
@@ -140,10 +143,10 @@
   </div>
 
   <div class="checker-panel">
-    <div class="checker-header">🔍 Cek Info Dompul & Paket (Mayugoro)</div>
-    <div class="checker-sub">Mengecek info detail nomor HP menggunakan API Mayugoro via Vercel Serverless</div>
+    <div class="checker-header">🔍 Cek Info Nomor & Paket</div>
+    <div class="checker-sub">Mengecek info detail nomor HP menggunakan API Serverless</div>
     <div class="checker-form">
-      <input type="text" id="checkNomorInput" class="checker-input" placeholder="Masukkan nomor HP (misal: 081912345678)...">
+      <input type="text" id="checkNomorInput" class="checker-input" placeholder="Masukkan nomor HP (misal: 0819...)...">
       <button class="checker-btn" onclick="cekInfoDompul()">Cek Nomor</button>
     </div>
     <div id="checkerResult" class="checker-result">
@@ -193,7 +196,7 @@
   </div>
 
   <div class="panel" style="padding:12px 16px;">
-    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area (Kecocokan Kuota Area 1-4): Masukkan nama kota / wilayah...">
+    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Masukkan kata kunci pencarian...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -205,7 +208,7 @@
   </div>
 
   <div id="stockList"></div>
-  <div class="footer-brand">Copyright © IC™ 2026</div>
+  <div class="footer-brand">System Dashboard © 2026</div>
 </main>
 
 <script>
@@ -229,10 +232,10 @@ function initChart() {
     data: {
       labels: [],
       datasets: [
-        { label: 'Rata-Rata V1 (XLA)', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'Rata-Rata V2 (XDA)', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'Rata-Rata V3 (KDA)', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'Rata-Rata V4 (XLF)', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
+        { label: 'Rata-Rata V1', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'Rata-Rata V2', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'Rata-Rata V3', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'Rata-Rata V4', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
       ]
     },
     options: {
@@ -259,7 +262,7 @@ function formatAreaMinText(lineText) {
   const matchRange = lineText.match(/(\d+)\s*-\s*(\d+)\s*(?:gb|g)/i);
   if (matchRange) {
     const minVal = matchRange[1];
-    formatted = lineText.replace(matchRange[0], `${minVal} GB`);
+    formatted = `${minVal} GB`;
   }
   return formatted;
 }
@@ -310,9 +313,11 @@ async function fetchProducts() {
         const lines = desc.split("\n");
         let idx = 1;
         lines.forEach(l => {
-          let match = l.match(/(\d+\s*GB)/i);
+          let cleanLine = l.replace(/^area\s*\d*\s*[:\-]?\s*/i, "").trim();
+          let match = cleanLine.match(/(\d+\s*GB)/i) || l.match(/(\d+\s*GB)/i);
           if (match && idx <= 4) {
-            areas['a' + idx] = formatAreaMinText(l.trim());
+            let val = cleanLine.length > 0 ? formatAreaMinText(cleanLine) : formatAreaMinText(l.trim());
+            areas['a' + idx] = val;
             idx++;
           }
         });
@@ -404,14 +409,12 @@ async function cekInfoDompul() {
   }
 
   resultBox.classList.add("active");
-  contentBox.innerHTML = "Sedang memproses pengecekan nomor via server Mayugoro...";
+  contentBox.innerHTML = "Sedang memproses pengecekan nomor...";
 
   try {
     const response = await fetch('/api/check', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nomer: nomor })
     });
 
@@ -421,41 +424,52 @@ async function cekInfoDompul() {
       const info = resJson.data.info_kartu;
       const paketList = resJson.data.info_paket || [];
       
+      let tenureDisplay = (info.tenure && info.tenure !== "undefined") ? info.tenure : "-";
+
       let paketHtml = "";
       paketList.forEach(pkt => {
+        let namaPkt = (pkt.nama_paket && pkt.nama_paket !== "undefined" && pkt.nama_paket.trim() !== "") ? pkt.nama_paket : "Paket Utama / Kuota";
+        let expirePkt = pkt.tanggal_expire ? `Expire: ${pkt.tanggal_expire}` : "";
+        
         let kuotaHtml = "";
         (pkt.kuota || []).forEach(k => {
-          kuotaHtml += `<div style="font-size:11px;color:#475569;margin-top:2px;">• ${k.nama}: <b>${k.sisa}</b> dari ${k.total} (${k.persen}%)</div>`;
+          kuotaHtml += `<div style="display:flex;justify-content:space-between;font-size:11px;color:#475569;margin-top:4px;border-bottom:1px dashed #f1f5f9;padding-bottom:3px;">
+            <span>• ${k.name || k.nama}</span>
+            <b>${k.sisa} / ${k.total} (${k.persen}%)</b>
+          </div>`;
         });
-        paketHtml += `<div style="margin-top:6px;padding:6px;background:#fff;border-radius:6px;border:1px solid #e2e8f0;">
-          <b>${pkt.nama_paket}</b> (Expire: ${pkt.tanggal_expire})
-          ${kuotaHtml}
+
+        paketHtml += `<div style="margin-top:8px;padding:10px;background:#fff;border-radius:8px;border:1px solid #e2e8f0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <b style="font-size:12px;color:#0f172a;">📦 ${namaPkt}</b>
+            <span style="font-size:10px;color:#64748b;background:#f8fafc;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">${expirePkt}</span>
+          </div>
+          ${kuotaHtml || '<div style="font-size:11px;color:#94a3b8;">Tidak ada rincian kuota spesifik.</div>'}
         </div>`;
       });
 
       contentBox.innerHTML = `
-        <div style="font-weight:800;color:#059669;margin-bottom:6px;">✅ ${resJson.keterangan || "Berhasil"}</div>
+        <div style="font-weight:800;color:#059669;margin-bottom:8px;font-size:13px;">✅ ${resJson.keterangan || "Berhasil Cek"}</div>
         <div class="checker-grid">
-          <div class="checker-item"><span>Nomor (MSISDN)</span><b>${info.msisdn}</b></div>
-          <div class="checker-item"><span>Operator</span><b>${info.operator}</b></div>
-          <div class="checker-item"><span>Masa Aktif</span><b>${info.masa_aktif}</b></div>
-          <div class="checker-item"><span>Masa Tenggang</span><b>${info.masa_tenggang}</b></div>
-          <div class="checker-item" style="grid-column: span 2"><span>Tenure</span><b>${info.tenure}</b></div>
+          <div class="checker-item"><span>Nomor (MSISDN)</span><b>${info.msisdn || nomor}</b></div>
+          <div class="checker-item"><span>Operator</span><b>${info.operator || "-"}</b></div>
+          <div class="checker-item"><span>Masa Aktif</span><b>${info.masa_aktif || "-"}</b></div>
+          <div class="checker-item"><span>Masa Tenggang</span><b>${info.masa_tenggang || "-"}</b></div>
+          <div class="checker-item" style="grid-column: span 2"><span>Tenure</span><b>${tenureDisplay}</b></div>
         </div>
-        <div style="margin-top:10px;font-weight:800;font-size:12px;color:#0f172a;">Informasi Paket Aktif:</div>
-        ${paketHtml || '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">Tidak ada paket aktif.</div>'}
+        <div style="margin-top:12px;font-weight:800;font-size:12px;color:#0f172a;">Informasi Paket Aktif:</div>
+        ${paketHtml || '<div style="font-size:11px;color:#94a3b8;margin-top:4px;padding:8px;background:#fff;border-radius:6px;border:1px solid #e2e8f0;">Tidak ada paket aktif.</div>'}
       `;
     } else {
-      contentBox.innerHTML = `<span style="color:#dc2626;">Gagal: ${resJson.keterangan || resJson.message || "Nomor atau kredensial tidak valid."}</span>`;
+      contentBox.innerHTML = `<span style="color:#dc2626;font-size:12px;">Gagal: ${resJson.keterangan || resJson.message || "Data tidak valid."}</span>`;
     }
   } catch (e) {
-    contentBox.innerHTML = `<span style="color:#dc2626;">Terjadi kesalahan koneksi ke server Vercel: ${e.message}</span>`;
+    contentBox.innerHTML = `<span style="color:#dc2626;font-size:12px;">Terjadi kesalahan koneksi: ${e.message}</span>`;
   }
 }
 
 function updateProductInsights() {
   let validProducts = products.filter(p => p.v !== "V5");
-  
   let sortedDesc = [...validProducts].sort((a, b) => b.sold - a.sold);
   let sortedAsc = [...validProducts].sort((a, b) => {
     if (a.sold !== b.sold) return a.sold - b.sold;
@@ -470,7 +484,7 @@ function updateProductInsights() {
       <span class="badge-count badge-top">+${p.sold} unit</span>
     </div>`;
   }
-  document.getElementById("topSoldList").innerHTML = topHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data penjualan.</div>';
+  document.getElementById("topSoldList").innerHTML = topHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data.</div>';
 
   let lowHtml = "";
   for (let i = 0; i < Math.min(3, sortedAsc.length); i++) {
@@ -480,7 +494,7 @@ function updateProductInsights() {
       <span class="badge-count badge-low">${p.sold} unit</span>
     </div>`;
   }
-  document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data penjualan.</div>';
+  document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:11px;color:#94a3b8">Belum ada data.</div>';
 }
 
 function recordDailyData(vSoldCounts) {
@@ -523,10 +537,10 @@ function renderChartFiltered(startDate = "", endDate = "") {
     let avgV3 = Math.round(dataV3.reduce((a,b)=>a+b,0) / filtered.length);
     let avgV4 = Math.round(dataV4.reduce((a,b)=>a+b,0) / filtered.length);
 
-    salesChart.data.datasets[0].label = `Rata-Rata V1 (XLA): ${avgV1} unit/hari`;
-    salesChart.data.datasets[1].label = `Rata-Rata V2 (XDA): ${avgV2} unit/hari`;
-    salesChart.data.datasets[2].label = `Rata-Rata V3 (KDA): ${avgV3} unit/hari`;
-    salesChart.data.datasets[3].label = `Rata-Rata V4 (XLF): ${avgV4} unit/hari`;
+    salesChart.data.datasets[0].label = `Rata-Rata V1: ${avgV1} unit/hari`;
+    salesChart.data.datasets[1].label = `Rata-Rata V2: ${avgV2} unit/hari`;
+    salesChart.data.datasets[2].label = `Rata-Rata V3: ${avgV3} unit/hari`;
+    salesChart.data.datasets[3].label = `Rata-Rata V4: ${avgV4} unit/hari`;
   }
 
   salesChart.data.labels = labels;
@@ -541,7 +555,7 @@ function applyDateFilter() {
   const start = document.getElementById("startDateFilter").value;
   const end = document.getElementById("endDateFilter").value;
   if (!start || !end) {
-    alert("Silakan pilih tanggal awal dan tanggal akhir terlebih dahulu!");
+    alert("Silakan pilih tanggal awal dan akhir!");
     return;
   }
   renderChartFiltered(start, end);
@@ -566,19 +580,19 @@ function resetSalesTracker() {
   salesChart.data.datasets.forEach(ds => ds.data = []);
   salesChart.update();
   fetchProducts();
-  alert("Sesi analitik dan histori grafik berhasil direset!");
+  alert("Sesi analitik direset!");
 }
 
 function exportDataCSV() {
   let csvContent = "data:text/csv;charset=utf-8,Kode,Nama,Kategori,Stok,Terjual,Area 1,Area 2,Area 3,Area 4\n";
   products.forEach(p => {
-    let row = [p.code, `"${p.name}"`, p.v, p.stock, p.sold, `"${p.areas.a1}"`, `"${p.areas.a2}"`, `"${p.areas.a3}"`, `"${p.areas.a4}"`].join(",");
+    let row = [p.code, `\"${p.name}\"`, p.v, p.stock, p.sold, `\"${p.areas.a1}\"`, `\"${p.areas.a2}\"`, `\"${p.areas.a3}\"`, `\"${p.areas.a4}\"`].join(",");
     csvContent += row + "\n";
   });
   let encodedUri = encodeURI(csvContent);
   let link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "analitik_penjualan_ic_store.csv");
+  link.setAttribute("download", "analitik_penjualan.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -605,12 +619,8 @@ function renderCardsHtml(items) {
   items.sort((a, b) => {
     let aReady = a.stock > 0 ? 1 : 0;
     let bReady = b.stock > 0 ? 1 : 0;
-    if (aReady !== bReady) {
-      return bReady - aReady;
-    }
-    if (a.minGb !== b.minGb) {
-      return a.minGb - b.minGb;
-    }
+    if (aReady !== bReady) return bReady - aReady;
+    if (a.minGb !== b.minGb) return a.minGb - b.minGb;
     return b.sold - a.sold;
   });
 
@@ -649,7 +659,6 @@ function renderCardsHtml(items) {
 
 function renderStock(){
   const q = (document.getElementById("stockSearch").value || "").toLowerCase().trim();
-  
   const arr = products.filter(p => {
     const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
     const matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
@@ -667,7 +676,7 @@ function renderStock(){
     out += `<div class="head"><b>Kategori ${v}</b><small>${readyVariantCount} varian aktif (Total Stok: ${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
     out += renderCardsHtml(items);
   }
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">Area atau produk tidak ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">Data tidak ditemukan.</div>';
 }
 
 initChart();
