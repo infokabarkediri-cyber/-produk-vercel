@@ -186,7 +186,7 @@
   </div>
 
   <div class="panel" style="padding:12px 16px;">
-    <input id="stockSearch" class="search" placeholder="🔎 Cari kode produk (misal: XLA14, XLA32)...">
+    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area (Kecocokan Kuota Area 1-4): Masukkan nama kota / wilayah...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -238,6 +238,16 @@ function initChart() {
   renderChartFiltered();
 }
 
+// Fungsi helper untuk mendeteksi angka GB terkecil dari teks (misal: "13 - 15 GB" -> mengambil 13)
+function getMinGbFromText(text) {
+  const matches = [...text.matchAll(/(\d+)\s*(?:gb|g)/gi)];
+  if (matches.length > 0) {
+    const numbers = matches.map(m => parseInt(m[1]));
+    return Math.min(...numbers);
+  }
+  return 999999; // Default nilai tinggi jika tidak ditemukan angka GB
+}
+
 async function fetchProducts() {
   try {
     const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
@@ -286,10 +296,16 @@ async function fetchProducts() {
         lines.forEach(l => {
           let match = l.match(/(\d+\s*GB)/i);
           if (match && idx <= 4) {
-            areas['a' + idx] = match[0];
+            areas['a' + idx] = l.trim();
             idx++;
           }
         });
+
+        // Gabungkan teks khusus area 1-4 untuk pemeriksaan kota/area yang akurat
+        const combinedAreasText = `${areas.a1} ${areas.a2} ${areas.a3} ${areas.a4}`.toLowerCase();
+        
+        // Ambil nilai GB terkecil dari deskripsi / area untuk acuan pembanding
+        const minGb = getMinGbFromText(desc);
 
         return {
           v: v,
@@ -298,6 +314,8 @@ async function fetchProducts() {
           stock: currentStock,
           sold: soldQty,
           descText: desc.toLowerCase(),
+          areasText: combinedAreasText,
+          minGb: minGb,
           areas: areas
         };
       }).filter(p => p.v !== "OTHER");
@@ -571,6 +589,21 @@ function toggleCard(elem) {
 }
 
 function renderCardsHtml(items) {
+  // Aturan Urutan:
+  // 1. Stok > 0 (Ready / Open) di atas, stok 0 di bawah.
+  // 2. Berdasarkan nilai GB terkecil (misal 13 GB lebih diprioritaskan naik jika urutan kategori/ukuran).
+  items.sort((a, b) => {
+    let aReady = a.stock > 0 ? 1 : 0;
+    let bReady = b.stock > 0 ? 1 : 0;
+    if (aReady !== bReady) {
+      return bReady - aReady; // Ready di atas
+    }
+    if (a.minGb !== b.minGb) {
+      return a.minGb - b.minGb; // GB terkecil di atas (misal 13 sebelum 15)
+    }
+    return b.sold - a.sold;
+  });
+
   let out = `<div class="grid">`;
   items.forEach(p => {
     const isPDA = p.v === "V5";
@@ -605,8 +638,14 @@ function renderCardsHtml(items) {
 }
 
 function renderStock(){
-  const q = (document.getElementById("stockSearch").value || "").toLowerCase();
-  const arr = products.filter(p => (activeVersion === "ALL" || p.v === activeVersion) && `${p.name} ${p.code}`.toLowerCase().includes(q));
+  const q = (document.getElementById("stockSearch").value || "").toLowerCase().trim();
+  
+  // Pencarian Cek Area sekarang mendeteksi kecocokan kota/kata pada teks Area 1-4 atau deskripsi kuota
+  const arr = products.filter(p => {
+    const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
+    const matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
+    return matchesCategory && matchesArea;
+  });
   
   const groups = {};
   arr.forEach(p => (groups[p.v] ??=[]).push(p));
@@ -619,7 +658,7 @@ function renderStock(){
     out += `<div class="head"><b>Kategori ${v}</b><small>${readyVariantCount} varian aktif (Total Stok: ${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
     out += renderCardsHtml(items);
   }
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">Produk tidak ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;">Area atau produk tidak ditemukan.</div>';
 }
 
 initChart();
