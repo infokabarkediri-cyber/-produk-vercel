@@ -10,7 +10,6 @@
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}.title{font-size:16px;font-weight:800;color:#0f172a}.subtitle{font-size:11px;color:#64748b}
 .wrap{padding:20px 15px 80px}
 
-/* DASHBOARD STATISTIK (6 KOLOM) */
 .stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
 .stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01);position:relative;overflow:hidden}
 .stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
@@ -24,7 +23,6 @@
 .stat-val{font-size:16px;font-weight:800;color:#0f172a;margin-top:4px}
 .stat-sub{font-size:9px;color:#94a3b8;margin-top:2px}
 
-/* PANEL CEK NOMOR / DOMPUL */
 .checker-panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
 .checker-header{font-size:14px;font-weight:800;color:#0f172a;margin-bottom:4px}
 .checker-sub{font-size:11px;color:#64748b;margin-bottom:12px}
@@ -39,7 +37,6 @@
 .checker-item span{display:block;font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase}
 .checker-item b{font-size:13px;color:#0f172a}
 
-/* PANEL MONITORING PRODUK */
 .insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
 .insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
 .insight-title{font-size:13px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px}
@@ -50,7 +47,6 @@
 .badge-top{background:#ecfdf5;color:#059669}
 .badge-low{background:#fff1f2;color:#e11d48}
 
-/* GRAFIK & FILTER TANGGAL */
 .chart-container{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.01)}
 .chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px}
 .chart-header b{font-size:14px;color:#0f172a}
@@ -59,7 +55,6 @@
 .date-filter-box input{border:1px solid #cbd5e1;border-radius:8px;padding:5px 8px;font-size:11px;outline:none;background:#f8fafc}
 .date-filter-box button{background:#0f172a;color:#fff;border:0;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer}
 
-/* PANEL KENDALI */
 .features-panel{background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 .feature-info b{font-size:13px;display:block;margin-bottom:2px}
 .feature-info span{font-size:11px;color:#94a3b8}
@@ -74,7 +69,6 @@
 .head b{font-size:15px;color:#0f172a}
 .head small{color:#64748b;font-size:11px;font-weight:600}
 
-/* GRID KARTU PRODUK */
 .grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:10px !important}
 .card{border:1px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:#fff;position:relative;box-shadow:0 1px 2px rgba(0,0,0,0.02);transition:all 0.2s ease}
 .card:hover{border-color:#cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
@@ -105,7 +99,6 @@
 </header>
 
 <main class="wrap">
-  <!-- DASHBOARD STATISTIK UTAMA -->
   <div class="stats-grid">
     <div class="stat-card ready">
       <div class="stat-label">Tersedia</div>
@@ -139,10 +132,10 @@
     </div>
   </div>
 
-  <!-- PANEL CEK INFO DOMPUL & PAKET -->
+  <!-- PANEL CEK NOMOR / DOMPUL (MAYUGORO) -->
   <div class="checker-panel">
-    <div class="checker-header">🔍 Cek Info Dompul & Paket Multi Provider</div>
-    <div class="checker-sub">Mengecek info detail nomor HP (wajib format 08xxx)</div>
+    <div class="checker-header">🔍 Cek Info Dompul & Paket (Mayugoro)</div>
+    <div class="checker-sub">Mengecek info detail nomor HP menggunakan base URL api.mayugoro.com</div>
     <div class="checker-form">
       <input type="text" id="checkNomorInput" class="checker-input" placeholder="Masukkan nomor HP (misal: 081912345678)...">
       <button class="checker-btn" onclick="cekInfoDompul()">Cek Nomor</button>
@@ -152,7 +145,6 @@
     </div>
   </div>
 
-  <!-- PANEL MONITORING PRODUK TERTINGGI & TERENDAH -->
   <div class="insight-grid">
     <div class="insight-card">
       <div class="insight-title">🔥 Top 3 Produk Terjual Terbanyak</div>
@@ -164,7 +156,6 @@
     </div>
   </div>
 
-  <!-- PANEL GRAFIK ANALITIK DENGAN FILTER TANGGAL & RATA-RATA HARIAN -->
   <div class="chart-container">
     <div class="chart-header">
       <div>
@@ -184,7 +175,6 @@
     </div>
   </div>
 
-  <!-- PANEL KENDALI -->
   <div class="features-panel">
     <div class="feature-info">
       <b>🚀 Panel Kendali & Ekspor Data</b>
@@ -226,8 +216,9 @@ let transactionLogs = [];
 let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
 let salesChart;
 
-// Khusus Header Cek Kuota/Dompul (Non-ICS)
-const DOMPUL_CREDENTIALS = {
+// Konfigurasi API Mayugoro (Hanya untuk Cek Nomor/Dompul)
+const MAYUGORO_CONFIG = {
+  baseUrl: "https://api.mayugoro.com",
   apiKey: "mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5",
   xClient: "9951786330457fbb6300783a",
   xPak: "3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9"
@@ -256,16 +247,14 @@ function initChart() {
   renderChartFiltered();
 }
 
+// Fetch Produk Murni Menggunakan Endpoint & Header ICS (Bukan Mayugoro)
 async function fetchProducts() {
   try {
     const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
       headers: { 
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
-        'Accept': 'application/json',
-        'x-client': '9951786330457fbb6300783a',
-        'x-pax': '3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9',
-        'x-api-key': 'mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5'
+        'Accept': 'application/json'
       }
     });
     const result = await res.json();
@@ -383,6 +372,7 @@ function updateStatistics() {
 
 setInterval(updateStatistics, 1000);
 
+// Cek Kuota / Dompul Menggunakan Base URL Mayugoro (api.mayugoro.com)
 async function cekInfoDompul() {
   const nomor = document.getElementById("checkNomorInput").value.trim();
   const resultBox = document.getElementById("checkerResult");
@@ -394,9 +384,9 @@ async function cekInfoDompul() {
   }
 
   resultBox.classList.add("active");
-  contentBox.innerHTML = "Sedang memproses pengecekan nomor...";
+  contentBox.innerHTML = "Sedang memproses pengecekan nomor ke server Mayugoro...";
 
-  const targetUrl = "https://api.mayugoro.com/api/v1/sidompul/cek";
+  const targetUrl = MAYUGORO_CONFIG.baseUrl + "/api/v1/sidompul/cek";
   const proxyList = [
     "https://api.allorigins.win/raw?url=",
     "https://thingproxy.freeboard.io/fetch/"
@@ -410,14 +400,14 @@ async function cekInfoDompul() {
       const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + DOMPUL_CREDENTIALS.apiKey,
-          'X-Client': DOMPUL_CREDENTIALS.xClient,
+          'Authorization': 'Bearer ' + MAYUGORO_CONFIG.apiKey,
+          'X-Client': MAYUGORO_CONFIG.xClient,
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
         body: JSON.stringify({
           nomer: nomor,
-          "x-pak": DOMPUL_CREDENTIALS.xPak
+          "x-pak": MAYUGORO_CONFIG.xPak
         })
       });
 
@@ -427,7 +417,7 @@ async function cekInfoDompul() {
         break;
       }
     } catch (e) {
-      console.warn("Proxy mencoba opsi lain...", e);
+      console.warn("Mencoba opsi proxy lain...", e);
     }
   }
 
@@ -461,10 +451,10 @@ async function cekInfoDompul() {
         ${paketHtml || '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">Tidak ada paket aktif.</div>'}
       `;
     } else {
-      contentBox.innerHTML = `<span style="color:#dc2626;">Gagal: ${resJson.keterangan || resJson.message || "Kredensial tidak valid atau tidak cocok."}</span>`;
+      contentBox.innerHTML = `<span style="color:#dc2626;">Gagal: ${resJson.keterangan || resJson.message || "Kredensial atau nomor tidak valid."}</span>`;
     }
   } else {
-    contentBox.innerHTML = `<span style="color:#dc2626;">Terjadi kesalahan koneksi atau akses ditolak server.</span>`;
+    contentBox.innerHTML = `<span style="color:#dc2626;">Terjadi kesalahan koneksi atau akses ditolak server Mayugoro.</span>`;
   }
 }
 
