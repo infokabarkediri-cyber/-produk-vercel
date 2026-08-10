@@ -14,6 +14,14 @@
 .subtitle{font-size:11px;color:#64748b}
 .wrap{padding:16px 12px 80px}
 
+/* Animasi Bola/Loader Berputar di Atas */
+.sync-indicator-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.sync-left{display:flex;align-items:center;gap:10px}
+.spinner-ball{width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:#0f172a;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sync-text{font-size:11px;font-weight:700;color:#0f172a}
+.sync-timer{font-size:11px;font-weight:800;color:#059669;background:#ecfdf5;padding:3px 8px;border-radius:6px}
+
 .stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
 .stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;position:relative;overflow:hidden}
 .stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
@@ -40,7 +48,6 @@
 .checker-item span{display:block;font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
 .checker-item b{font-size:12px;color:#0f172a}
 
-/* Desain Kartu Paket Versi Ringan & Elegan */
 .package-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:8px}
 .package-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;border-bottom:1px solid #f1f5f9;padding-bottom:5px}
 .package-title{font-size:11px;font-weight:800;color:#0f172a}
@@ -67,12 +74,6 @@
 .date-filter-box{display:flex;gap:4px;align-items:center}
 .date-filter-box input{border:1px solid #cbd5e1;border-radius:6px;padding:4px 6px;font-size:10px;outline:none;background:#f8fafc}
 .date-filter-box button{background:#0f172a;color:#fff;border:0;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:700;cursor:pointer}
-
-.features-panel{background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.feature-info b{font-size:12px;display:block;margin-bottom:1px}
-.feature-info span{font-size:10px;color:#94a3b8}
-.action-btns{display:flex;gap:6px}
-.btn-action{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:6px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer}
 
 .panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin-bottom:12px}
 .search{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;outline:none;background:#fff;font-size:12px}
@@ -118,6 +119,18 @@
 </header>
 
 <main class="wrap">
+  <!-- Indikator Bola Berputar & Hitung Mundur Waktu Sinkronisasi di Atas -->
+  <div class="sync-indicator-container">
+    <div class="sync-left">
+      <div class="spinner-ball"></div>
+      <div>
+        <div class="sync-text">Sinkronisasi Real-Time Aktif</div>
+        <div style="font-size:9px;color:#64748b;">Pembaruan data otomatis setiap 1 detik</div>
+      </div>
+    </div>
+    <div class="sync-timer" id="syncTimerBadge">1s</div>
+  </div>
+
   <div class="stats-grid">
     <div class="stat-card ready">
       <div class="stat-label">Tersedia</div>
@@ -193,17 +206,6 @@
     </div>
   </div>
 
-  <div class="features-panel">
-    <div class="feature-info">
-      <b>🚀 Panel Kendali & Ekspor Data</b>
-      <span>Sinkronisasi otomatis real-time tiap 1 detik.</span>
-    </div>
-    <div class="action-btns">
-      <button class="btn-action" onclick="exportDataCSV()">📥 CSV</button>
-      <button class="btn-action" onclick="resetSalesTracker()">🔄 Reset</button>
-    </div>
-  </div>
-
   <div class="panel" style="padding:10px 12px;">
     <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Masukkan kata kunci...">
     <div class="filters">
@@ -233,6 +235,7 @@ let lastDate = new Date().getDate();
 let transactionLogs = [];
 let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
 let salesChart;
+let countdownTimer = 1;
 
 function initChart() {
   const ctx = document.getElementById('salesChart').getContext('2d');
@@ -280,6 +283,7 @@ function cleanAreaValue(rawLine) {
 }
 
 async function fetchProducts() {
+  countdownTimer = 1; // Reset timer hitung mundur saat fetch baru dijalankan
   try {
     const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
       method: 'GET',
@@ -406,11 +410,17 @@ function updateStatistics() {
   document.getElementById("statSec").textContent = lastSecond;
   document.getElementById("statMin").textContent = lastMinute;
   document.getElementById("statHour").textContent = lastHour;
+
+  // Update counter badge hitung mundur bola berputar
+  const timerBadge = document.getElementById("syncTimerBadge");
+  if (timerBadge) {
+    timerBadge.textContent = `${countdownTimer}s`;
+    if (countdownTimer > 0) countdownTimer--;
+  }
 }
 
 setInterval(updateStatistics, 1000);
 
-// Helper parser angka untuk bar progress kuota yang lebih ringan & akurat
 function parseQuotaNumber(str) {
   if (!str) return { current: 0, total: 100, unit: '' };
   let parts = str.split('/');
@@ -420,9 +430,8 @@ function parseQuotaNumber(str) {
       if (numMatch) {
         let val = parseFloat(numMatch[1]);
         let unit = numMatch[2] || '';
-        if (/kb/i.test(unit)) val /= 1024; // Ubah ke MB
-        else if (/gb/i.test(unit)) val *= 1024; // Ubah ke MB
-        else if (/jam|menit|detik/i.test(unit)) { /* biarkan waktu */ }
+        if (/kb/i.test(unit)) val /= 1024;
+        else if (/gb/i.test(unit)) val *= 1024;
         return { val: parseFloat(numMatch[1]), rawUnit: unit };
       }
       return { val: 0, rawUnit: '' };
@@ -594,38 +603,6 @@ function resetDateFilter() {
   document.getElementById("startDateFilter").value = "";
   document.getElementById("endDateFilter").value = "";
   renderChartFiltered();
-}
-
-function resetSalesTracker() {
-  initialStockMap = {};
-  productSoldMap = {};
-  totalSoldUnits = 0;
-  previousTotalSold = 0;
-  transactionLogs = [];
-  totalSoldAtStartOfDay = 0;
-  dailyHistoryRecords = [];
-  localStorage.removeItem("ic_initial_stock");
-  localStorage.removeItem("ic_daily_history");
-  salesChart.data.labels = [];
-  salesChart.data.datasets.forEach(ds => ds.data = []);
-  salesChart.update();
-  fetchProducts();
-  alert("Sesi dan data terjual direset!");
-}
-
-function exportDataCSV() {
-  let csvContent = "data:text/csv;charset=utf-8,Kode,Nama,Kategori,Stok,Terjual,Area 1,Area 2,Area 3,Area 4\n";
-  products.forEach(p => {
-    let row = [p.code, `\"${p.name}\"`, p.v, p.stock, p.sold, `\"${p.areas.a1}\"`, `\"${p.areas.a2}\"`, `\"${p.areas.a3}\"`, `\"${p.areas.a4}\"`].join(",");
-    csvContent += row + "\n";
-  });
-  let encodedUri = encodeURI(csvContent);
-  let link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "analitik_penjualan.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
 }
 
 function setFilter(v, btn) {
