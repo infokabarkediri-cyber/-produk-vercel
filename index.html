@@ -7,12 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
-.top{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}
-.brand-container{display:flex;align-items:center;gap:8px}
-.brand-xl{background:#003781;color:#fff;font-weight:900;font-size:14px;padding:3px 8px;border-radius:4px;letter-spacing:0.5px}
-.brand-axis{background:#6c2d91;color:#fff;font-weight:800;font-size:14px;padding:3px 8px;border-radius:4px;letter-spacing:0.5px}
-.subtitle{font-size:11px;color:#64748b}
-.wrap{padding:16px 12px 80px}
+.wrap{max-width:1200px;margin:auto;padding:16px 12px 80px}
 
 .sync-indicator-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
 .sync-left{display:flex;align-items:center;gap:10px}
@@ -108,15 +103,6 @@
 </style>
 </head>
 <body>
-<header class="top">
-  <div class="brand-container" id="providerLogoContainer">
-    <div class="brand-xl">XL</div>
-    <span style="color:#cbd5e1;font-weight:300;">|</span>
-    <div class="brand-axis">AXIS</div>
-  </div>
-  <div class="subtitle" id="updateTime">Menghubungkan...</div>
-</header>
-
 <main class="wrap">
   <div class="sync-indicator-container">
     <div class="sync-left">
@@ -188,7 +174,7 @@
   <div class="chart-container">
     <div class="chart-header">
       <div>
-        <b>📈 Grafik Rata-Rata Penjualan Per Hari</b>
+        <b>📈 Grafik Penjualan Per Hari</b>
         <span>Analisis tren harian & filter rentang tanggal</span>
       </div>
       <div class="date-filter-box">
@@ -221,7 +207,6 @@
 </main>
 
 <script>
-// Database Area Lokal Mandiri
 const areaDatabase = [
   {
     area: "Area 2",
@@ -342,7 +327,9 @@ function initChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+      plugins: { 
+        legend: { display: false } 
+      },
       scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }
     }
   });
@@ -454,13 +441,9 @@ async function fetchProducts() {
       updateProductInsights();
       renderStock();
       recordDailyData(vSoldCounts);
-
-      const now = new Date();
-      document.getElementById("updateTime").textContent = "Sinkron: " + now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'});
     }
   } catch (err) { 
     console.error(err); 
-    document.getElementById("updateTime").textContent = "Gagal menyinkronkan";
   }
 }
 
@@ -752,19 +735,17 @@ function renderCardsHtml(items) {
   return out;
 }
 
-// Fungsi Pencarian Cerdas berbasis Database Kota -> Area
 function renderStock(){
   const rawQ = (document.getElementById("stockSearch").value || "").trim();
   const q = rawQ.toLowerCase();
 
-  // Cek apakah input mencocokkan kota di database lokal
   let matchedAreaName = "";
   if (q.length > 2) {
     for (let group of areaDatabase) {
       for (let prov of group.provinces) {
         for (let city of prov.cities) {
           if (city.toLowerCase().includes(q)) {
-            matchedAreaName = group.area.toLowerCase(); // contoh: "area 2"
+            matchedAreaName = group.area.toLowerCase();
             break;
           }
         }
@@ -779,10 +760,8 @@ function renderStock(){
     
     let matchesArea = false;
     if (matchedAreaName) {
-      // Jika kota ditemukan di database, filter produk yang area-nya cocok
       matchesArea = p.areasText.includes(matchedAreaName);
     } else {
-      // Jika tidak ditemukan di database kota, gunakan pencarian teks bebas biasa
       matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
     }
 
