@@ -134,8 +134,8 @@
 
   <!-- PANEL CEK NOMOR / DOMPUL (MAYUGORO) -->
   <div class="checker-panel">
-    <div class="checker-header">🔍 Cek Info Dompul & Paket (Mayugoro)</div>
-    <div class="checker-sub">Mengecek info detail nomor HP menggunakan base URL api.mayugoro.com</div>
+    <div class="checker-header">🔍 Cek Info Dompul & Paket Multi Provider</div>
+    <div class="checker-sub">Mengecek info detail nomor HP (wajib format 08xxx) via api.mayugoro.com</div>
     <div class="checker-form">
       <input type="text" id="checkNomorInput" class="checker-input" placeholder="Masukkan nomor HP (misal: 081912345678)...">
       <button class="checker-btn" onclick="cekInfoDompul()">Cek Nomor</button>
@@ -216,7 +216,7 @@ let transactionLogs = [];
 let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
 let salesChart;
 
-// Konfigurasi API Mayugoro (Hanya untuk Cek Nomor/Dompul)
+// Konfigurasi API Mayugoro sesuai Dokumentasi
 const MAYUGORO_CONFIG = {
   baseUrl: "https://api.mayugoro.com",
   apiKey: "mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5",
@@ -247,7 +247,7 @@ function initChart() {
   renderChartFiltered();
 }
 
-// Fetch Produk Murni Menggunakan Endpoint & Header ICS (Bukan Mayugoro)
+// Fetch Produk Murni dari API ICS
 async function fetchProducts() {
   try {
     const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
@@ -372,7 +372,7 @@ function updateStatistics() {
 
 setInterval(updateStatistics, 1000);
 
-// Cek Kuota / Dompul Menggunakan Base URL Mayugoro (api.mayugoro.com)
+// Cek Dompul / Paket Menggunakan CORS Proxy Handal & Header Sesuai Dokumentasi Mayugoro
 async function cekInfoDompul() {
   const nomor = document.getElementById("checkNomorInput").value.trim();
   const resultBox = document.getElementById("checkerResult");
@@ -387,8 +387,11 @@ async function cekInfoDompul() {
   contentBox.innerHTML = "Sedang memproses pengecekan nomor ke server Mayugoro...";
 
   const targetUrl = MAYUGORO_CONFIG.baseUrl + "/api/v1/sidompul/cek";
+  
+  // Menggunakan beberapa CORS proxy alternatif untuk memastikan tembus tanpa blokir browser
   const proxyList = [
     "https://api.allorigins.win/raw?url=",
+    "https://corsproxy.io/?",
     "https://thingproxy.freeboard.io/fetch/"
   ];
 
@@ -397,7 +400,9 @@ async function cekInfoDompul() {
 
   for (let proxyUrl of proxyList) {
     try {
-      const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+      const fetchUrl = proxyUrl.includes("?") ? proxyUrl + encodeURIComponent(targetUrl) : proxyUrl + encodeURIComponent(targetUrl);
+      
+      const response = await fetch(fetchUrl, {
         method: 'POST',
         headers: {
           'Authorization': 'Bearer ' + MAYUGORO_CONFIG.apiKey,
@@ -417,7 +422,7 @@ async function cekInfoDompul() {
         break;
       }
     } catch (e) {
-      console.warn("Mencoba opsi proxy lain...", e);
+      console.warn("Mencoba jalur proxy alternatif...", e);
     }
   }
 
@@ -451,10 +456,10 @@ async function cekInfoDompul() {
         ${paketHtml || '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">Tidak ada paket aktif.</div>'}
       `;
     } else {
-      contentBox.innerHTML = `<span style="color:#dc2626;">Gagal: ${resJson.keterangan || resJson.message || "Kredensial atau nomor tidak valid."}</span>`;
+      contentBox.innerHTML = `<span style="color:#dc2626;">Gagal: ${resJson.keterangan || resJson.message || "Nomor atau kredensial tidak valid."}</span>`;
     }
   } else {
-    contentBox.innerHTML = `<span style="color:#dc2626;">Terjadi kesalahan koneksi atau akses ditolak server Mayugoro.</span>`;
+    contentBox.innerHTML = `<span style="color:#dc2626;">Koneksi diblokir kebijakan browser (CORS). Silakan gunakan ekstensi Allow CORS di browser Anda atau host file ini di backend lokal.</span>`;
   }
 }
 
