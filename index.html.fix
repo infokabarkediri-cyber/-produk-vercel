@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Performa & Stok</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
+.top{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}
+.brand-container{display:flex;align-items:center;gap:8px}
+.brand-xl{background:#003781;color:#fff;font-weight:900;font-size:14px;padding:3px 8px;border-radius:4px;letter-spacing:0.5px}
+.brand-axis{background:#6c2d91;color:#fff;font-weight:800;font-size:14px;padding:3px 8px;border-radius:4px;letter-spacing:0.5px}
+.subtitle{font-size:11px;color:#64748b}
+.wrap{padding:16px 12px 80px}
+
+.sync-indicator-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.sync-left{display:flex;align-items:center;gap:10px}
+.spinner-ball{width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:#0f172a;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sync-text{font-size:11px;font-weight:700;color:#0f172a}
+.sync-timer{font-size:11px;font-weight:800;color:#059669;background:#ecfdf5;padding:3px 8px;border-radius:6px}
+
+.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;position:relative;overflow:hidden}
+.stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
+.stat-card.ready::before{background:#059669}
+.stat-card.sold::before{background:#3b82f6}
+.stat-card.day::before{background:#e11d48}
+.stat-card.sec::before{background:#ec4899}
+.stat-card.rate::before{background:#8b5cf6}
+.stat-card.speed::before{background:#f59e0b}
+.stat-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
+.stat-val{font-size:15px;font-weight:800;color:#0f172a;margin-top:2px}
+.stat-sub{font-size:9px;color:#94a3b8}
+
+.checker-panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
+.checker-header{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
+.checker-sub{font-size:11px;color:#64748b;margin-bottom:10px}
+.checker-form{display:flex;gap:6px;flex-wrap:wrap}
+.checker-input{flex:1;min-width:180px;border:1px solid #cbd5e1;border-radius:8px;padding:8px 12px;outline:none;background:#f8fafc;font-size:12px}
+.checker-btn{background:#0f172a;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer}
+.checker-result{margin-top:10px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;display:none}
+.checker-result.active{display:block}
+.checker-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
+.checker-item{background:#fff;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px}
+.checker-item span{display:block;font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
+.checker-item b{font-size:12px;color:#0f172a}
+
+.package-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:8px}
+.package-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;border-bottom:1px solid #f1f5f9;padding-bottom:5px}
+.package-title{font-size:11px;font-weight:800;color:#0f172a}
+.package-exp{font-size:9px;color:#64748b;font-weight:600}
+.quota-row{margin-top:6px}
+.quota-info{display:flex;justify-content:space-between;font-size:10px;color:#475569;margin-bottom:2px}
+.quota-bar{height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden}
+.quota-progress{height:100%;background:#3b82f6;border-radius:2px}
+
+.insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px}
+.insight-title{font-size:12px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.insight-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:11px}
+.insight-item:last-child{border-bottom:0}
+.insight-item b{color:#0f172a}
+.badge-count{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-weight:800;font-size:10px}
+.badge-top{background:#ecfdf5;color:#059669}
+.badge-low{background:#fff1f2;color:#e11d48}
+
+.chart-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.chart-header b{font-size:13px;color:#0f172a}
+.chart-header span{font-size:10px;color:#64748b;display:block}
+.date-filter-box{display:flex;gap:4px;align-items:center}
+.date-filter-box input{border:1px solid #cbd5e1;border-radius:6px;padding:4px 6px;font-size:10px;outline:none;background:#f8fafc}
+.date-filter-box button{background:#0f172a;color:#fff;border:0;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:700;cursor:pointer}
+
+.panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.search{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;outline:none;background:#fff;font-size:12px}
+.filters{display:flex;gap:4px;overflow:auto;margin-top:8px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:6px;padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
+.head{display:flex;justify-content:space-between;align-items:baseline;padding:12px 6px 6px;border-bottom:1px solid #e2e8f0;margin-bottom:8px}
+.head b{font-size:14px;color:#0f172a}
+.head small{color:#64748b;font-size:10px;font-weight:600}
+
+.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}
+.card{border:1px solid #e2e8f0;border-radius:10px;padding:8px;cursor:pointer;background:#fff;position:relative;transition:all 0.2s ease}
+.card:hover{border-color:#cbd5e1}
+.card.habis{background:#fafafa;opacity:0.85}
+
+.card-top{display:flex;justify-content:space-between;align-items:flex-start}
+.name{font-weight:800;font-size:11px;color:#0f172a}
+.badge-habis{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ffeeee;color:#dc2626}
+.badge-ready{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ecfdf5;color:#059669}
+.slot-label{font-size:8px;color:#64748b;font-weight:700;margin-top:4px;text-transform:uppercase}
+.slot-val{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
+
+.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
+.card.expanded .area-list{display:block}
+.area-row{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#475569;padding:3px 0;border-bottom:1px dashed #f8fafc}
+.area-row:last-child{border-bottom:0}
+.area-row b{color:#0f172a;background:#f8fafc;padding:1px 5px;border-radius:3px;border:1px solid #e2e8f0;font-size:9px}
+
+.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:4px;margin-top:4px}
+.toggle-detail.ready-text{color:#059669}
+.footer-brand{text-align:center;font-size:10px;color:#94a3b8;margin-top:20px;font-weight:600}
+
+@media(max-width:1024px){.stats-grid{grid-template-columns:repeat(3,1fr)}.insight-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:6px}.name{font-size:10px}.slot-val{font-size:11px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand-container" id="providerLogoContainer">
+    <div class="brand-xl">XL</div>
+    <span style="color:#cbd5e1;font-weight:300;">|</span>
+    <div class="brand-axis">AXIS</div>
+  </div>
+  <div class="subtitle" id="updateTime">Menghubungkan...</div>
+</header>
+
+<main class="wrap">
+  <div class="sync-indicator-container">
+    <div class="sync-left">
+      <div class="spinner-ball"></div>
+      <div>
+        <div class="sync-text">Sinkronisasi Real-Time Aktif</div>
+        <div style="font-size:9px;color:#64748b;">Pembaruan data otomatis setiap 1 detik</div>
+      </div>
+    </div>
+    <div class="sync-timer" id="syncTimerBadge">1s</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card ready">
+      <div class="stat-label">Tersedia</div>
+      <div class="stat-val" id="statReady">0</div>
+      <div class="stat-sub" id="statReadyVariant">0 varian</div>
+    </div>
+    <div class="stat-card sold">
+      <div class="stat-label">Total</div>
+      <div class="stat-val" id="statSold">0</div>
+      <div class="stat-sub">Akumulasi</div>
+    </div>
+    <div class="stat-card day">
+      <div class="stat-label">Hari Ini</div>
+      <div class="stat-val" id="statDay">0</div>
+      <div class="stat-sub">Terjual</div>
+    </div>
+    <div class="stat-card sec">
+      <div class="stat-label">Detik Ini</div>
+      <div class="stat-val" id="statSec">0</div>
+      <div class="stat-sub">Masuk</div>
+    </div>
+    <div class="stat-card rate">
+      <div class="stat-label">Menit Ini</div>
+      <div class="stat-val" id="statMin">0</div>
+      <div class="stat-sub">Masuk</div>
+    </div>
+    <div class="stat-card speed">
+      <div class="stat-label">Jam Ini</div>
+      <div class="stat-val" id="statHour">0</div>
+      <div class="stat-sub">Masuk</div>
+    </div>
+  </div>
+
+  <div class="checker-panel">
+    <div class="checker-header">🔍 Cek Info Nomor & Paket</div>
+    <div class="checker-sub">Mengecek info detail nomor HP menggunakan API Serverless</div>
+    <div class="checker-form">
+      <input type="text" id="checkNomorInput" class="checker-input" placeholder="Masukkan nomor HP (misal: 0819...)...">
+      <button class="checker-btn" onclick="cekInfoDompul()">Cek Nomor</button>
+    </div>
+    <div id="checkerResult" class="checker-result">
+      <div id="checkerResultContent">Memuat...</div>
+    </div>
+  </div>
+
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="insight-title">🔥 Top 3 Terjual Terbanyak</div>
+      <div id="topSoldList"><div style="font-size:10px;color:#94a3b8">Memuat data...</div></div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-title">🧊 Top 3 Terjual Terendah</div>
+      <div id="lowSoldList"><div style="font-size:10px;color:#94a3b8">Memuat data...</div></div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-header">
+      <div>
+        <b>📈 Grafik Rata-Rata Penjualan Per Hari</b>
+        <span>Analisis tren harian & filter rentang tanggal</span>
+      </div>
+      <div class="date-filter-box">
+        <input type="date" id="startDateFilter">
+        <span style="font-size:10px;color:#64748b">s/d</span>
+        <input type="date" id="endDateFilter">
+        <button onclick="applyDateFilter()">Filter</button>
+        <button onclick="resetDateFilter()" style="background:#64748b">Reset</button>
+      </div>
+    </div>
+    <div style="position: relative; height: 220px; width: 100%;">
+      <canvas id="salesChart"></canvas>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:10px 12px;">
+    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten (Contoh: Bandung, Surabaya)...">
+    <div class="filters">
+      <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
+      <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
+      <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
+      <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
+      <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
+      <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
+    </div>
+  </div>
+
+  <div id="stockList"></div>
+  <div class="footer-brand">System Dashboard © 2026</div>
+</main>
+
+<script>
+// Database Area Lokal Mandiri
+const areaDatabase = [
+  {
+    area: "Area 2",
+    provinces: [
+      { name: "Banten", cities: ["Kota Tangerang Selatan", "Kota Tangerang", "Kab. Tangerang", "Kab. Pandeglang", "Kab. Lebak", "Kab. Serang", "Kota Serang", "Kota Cilegon"] },
+      { name: "DKI Jakarta", cities: ["Kota Jakarta Pusat", "Kota Jakarta Selatan", "Kota Jakarta Barat", "Kota Jakarta Timur", "Kota Jakarta Utara"] },
+      { name: "Jawa Barat", cities: ["Kab. Bandung Barat", "Kota Cimahi", "Kab. Cirebon", "Kota Cirebon", "Kab. Indramayu", "Kab. Subang"] },
+      { name: "Jawa Tengah", cities: ["Kab. Tegal", "Kota Surakarta", "Kota Tegal", "Kab. Brebes", "Kab. Kebumen", "Kab. Pemalang", "Kota Semarang"] },
+      { name: "Jawa Timur", cities: ["Kota Probolinggo", "Kab. Bangkalan", "Kab. Sidoarjo", "Kab. Banyuwangi", "Kota Surabaya", "Kab. Sampang", "Kab. Pamekasan", "Kab. Sumenep", "Kab. Pacitan"] },
+      { name: "Kepulauan Bangka Belitung", cities: ["Kab. Bangka Selatan", "Kota Pangkal Pinang", "Kab. Belitung", "Kab. Belitung Timur"] },
+      { name: "Kepulauan Riau", cities: ["Kota Batam"] },
+      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Barat Daya", "Kab. Aceh Besar", "Kota Sabang", "Kab. Gayo Lues"] },
+      { name: "Riau", cities: ["Kota Pekanbaru"] },
+      { name: "Sumatera Barat", cities: ["Kab. Kepulauan Mentawai"] },
+      { name: "Sumatera Utara", cities: ["Kab. Karo", "Kota Medan", "Kab. Dairi"] },
+      { name: "Kalimantan Selatan", cities: ["Kab. Hulu Sungai Tengah", "Kab. Tapin", "Kab. Hulu Sungai Utara", "Kab. Tabalong", "Kota Banjarmasin", "Kab. Banjar", "Kab. Tanah Bumbu", "Kota Banjarbaru", "Kab. Hulu Sungai Selatan"] },
+      { name: "Sulawesi Barat", cities: ["Kab. Majene", "Kab. Polewali Mandar", "Kab. Mamuju Utara"] },
+      { name: "Sulawesi Selatan", cities: ["Kab. Barru", "Kota Pare Pare", "Kab. Pinrang"] },
+      { name: "Sulawesi Tenggara", cities: ["Kota Bau Bau", "Kab. Muna", "Kab. Buton Selatan", "Kab. Buton Tengah", "Kab. Muna Barat"] },
+      { name: "Bali", cities: ["Kab. Badung", "Kab. Karangasem", "Kab. Tabanan", "Kab. Bangli", "Kab. Gianyar", "Kab. Klungkung", "Kota Denpasar"] },
+      { name: "Nusa Tenggara Barat", cities: ["Kab. Lombok Barat", "Kab. Lombok Timur", "Kota Mataram", "Kab. Lombok Tengah", "Kab. Lombok Utara", "Kab. Sumbawa Barat", "Kab. Sumbawa", "Kota Bima", "Kab. Dompu"] }
+    ]
+  },
+  {
+    area: "Area 1",
+    provinces: [
+      { name: "DI Yogyakarta", cities: ["Kab. Kulon Progo", "Kota Yogyakarta", "Kab. Sleman", "Kab. Bantul", "Kab. Gunungkidul"] },
+      { name: "Jawa Barat", cities: ["Kab. Bandung", "Kab. Kuningan", "Kab. Purwakarta", "Kota Bandung"] },
+      { name: "Bali", cities: ["Kab. Jembrana", "Kab. Buleleng"] },
+      { name: "Maluku Utara", cities: ["Kab. Halmahera Barat", "Kab. Halmahera Utara", "Kab. Kepulauan Sula", "Kab. Halmahera Timur", "Kab. Pulau Taliabu", "Kab. Halmahera Selatan", "Kota Tidore Kepulauan", "Kota Ternate", "Kab. Halmahera Tengah", "Kab. Pulau Morotai"] },
+      { name: "Papua", cities: ["Kab. Asmat", "Kab. Jayapura", "Kab. Mimika", "Kab. Keerom", "Kab. Biak Numfor", "Kota Jayapura", "Kab. Kepulauan Yapen", "Kab. Boven Digoel", "Kab. Merauke", "Kab. Deiyai", "Kab. Dogiyai", "Kab. Intan Jaya", "Kab. Jayawijaya", "Kab. Lanny Jaya", "Kab. Mamberamo Raya", "Kab. Mamberamo Tengah", "Kab. Mappi", "Kab. Nabire", "Kab. Nduga", "Kab. Paniai", "Kab. Pegunungan Bintang", "Kab. Puncak", "Kab. Puncak Jaya", "Kab. Sarmi", "Kab. Supiori", "Kab. Tolikara", "Kab. Waropen", "Kab. Yahukimo", "Kab. Yalimo"] },
+      { name: "Papua Barat", cities: ["Kab. Teluk Bintuni", "Kab. Sorong Selatan", "Kab. Sorong", "Kab. Teluk Wondama", "Kota Sorong", "Kab. Manokwari", "Kab. Fak Fak", "Kab. Kaimana", "Kab. Manokwari Selatan", "Kab. Maybrat", "Kab. Pegunungan Arfak", "Kab. Raja Ampat", "Kab. Tambrauw"] }
+    ]
+  },
+  {
+    area: "Area 3",
+    provinces: [
+      { name: "DKI Jakarta", cities: ["Kab. Kepulauan Seribu"] },
+      { name: "Jawa Barat", cities: ["Kab. Bogor", "Kota Bogor", "Kota Depok", "Kota Bekasi", "Kota Banjar", "Kab. Ciamis", "Kota Tasikmalaya", "Kab. Majalengka", "Kab. Sumedang", "Kab. Bekasi", "Kab. Tasikmalaya", "Kab. Garut"] },
+      { name: "Jawa Tengah", cities: ["Kab. Boyolali", "Kota Salatiga", "Kab. Semarang", "Kab. Cilacap", "Kab. Grobogan", "Kab. Kendal", "Kab. Rembang"] },
+      { name: "Jawa Timur", cities: ["Kab. Lumajang", "Kab. Probolinggo"] },
+      { name: "Bengkulu", cities: ["Kab. Seluma"] },
+      { name: "Jambi", cities: ["Kab. Batanghari", "Kota Jambi", "Kab. Tanjung Jabung Barat", "Kab. Muaro Jambi", "Kab. Sarolangun"] },
+      { name: "Kepulauan Bangka Belitung", cities: ["Kab. Bangka", "Kab. Bangka Tengah", "Kab. Bangka Barat"] },
+      { name: "Kepulauan Riau", cities: ["Kab. Karimun", "Kab. Bintan", "Kota Tanjung Pinang"] },
+      { name: "Lampung", cities: ["Kab. Lampung Tengah", "Kab. Pringsewu", "Kota Metro", "Kab. Pesawaran", "Kab. Lampung Selatan", "Kota Bandar Lampung"] },
+      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Jaya", "Kab. Aceh Selatan", "Kab. Aceh Tenggara", "Kab. Nagan Raya", "Kota Banda Aceh"] },
+      { name: "Riau", cities: ["Kab. Kuantan Singingi", "Kab. Pelalawan", "Kab. Kampar", "Kab. Siak", "Kota Dumai", "Kab. Rokan Hilir", "Kab. Indragiri Hulu", "Kab. Kepulauan Meranti", "Kab. Bengkalis"] },
+      { name: "Sumatera Barat", cities: ["Kota Payakumbuh", "Kota Padang Panjang", "Kab. Sijunjung", "Kab. Padang Pariaman", "Kota Padang", "Kab. Solok Selatan"] },
+      { name: "Sumatera Selatan", cities: ["Kab. Ogan Komering Ilir", "Kab. Penukal Abab Lematang Ilir", "Kab. Banyuasin", "Kota Palembang", "Kab. Ogan Ilir"] },
+      { name: "Sumatera Utara", cities: ["Kota Binjai", "Kota Tebing Tinggi", "Kab. Serdang Bedagai", "Kab. Langkat", "Kab. Deli Serdang", "Kab. Batu Bara", "Kota Tanjung Balai", "Kab. Asahan", "Kota Gunungsitoli", "Kab. Nias Barat", "Kab. Nias Selatan", "Kab. Nias Utara"] },
+      { name: "Kalimantan Selatan", cities: ["Kab. Balangan", "Kab. Barito Kuala", "Kab. Tanah Laut", "Kab. Kotabaru"] },
+      { name: "Kalimantan Tengah", cities: ["Kab. Kapuas", "Kab. Pulang Pisau", "Kota Palangkaraya"] },
+      { name: "Sulawesi Barat", cities: ["Kab. Mamuju", "Kab. Mamasa"] },
+      { name: "Sulawesi Selatan", cities: ["Kab. Kepulauan Selayar", "Kab. Takalar", "Kab. Jeneponto", "Kab. Bulukumba", "Kab. Pangkajene Kepulauan", "Kota Makassar", "Kab. Gowa", "Kab. Maros", "Kab. Bone", "Kab. Wajo", "Kab. Luwu", "Kab. Luwu Utara", "Kota Palopo", "Kab. Toraja Utara"] },
+      { name: "Sulawesi Tengah", cities: ["Kab. Banggai", "Kab. Parigi Moutong", "Kab. Donggala", "Kab. Sigi", "Kab. Poso", "Kab. Buol"] },
+      { name: "Sulawesi Tenggara", cities: ["Kab. Kolaka", "Kab. Kolaka Utara", "Kab. Konawe", "Kab. Konawe Selatan", "Kota Kendari", "Kab. Kolaka Timur", "Kab. Buton", "Kab. Bombana"] }
+    ]
+  },
+  {
+    area: "Area 4",
+    provinces: [
+      { name: "Jawa Barat", cities: ["Kab. Cianjur", "Kab. Pangandaran", "Kab. Karawang", "Kota Sukabumi", "Kab. Sukabumi"] },
+      { name: "Jawa Tengah", cities: ["Kab. Tegal", "Kota Surakarta", "Kota Tegal", "Kab. Brebes", "Kab. Kebumen", "Kab. Pemalang", "Kota Semarang", "Kota Pekalongan", "Kab. Pekalongan", "Kab. Batang", "Kab. Purbalingga", "Kab. Kudus", "Kab. Sukoharjo", "Kab. Klaten", "Kota Magelang", "Kab. Banyumas", "Kab. Magelang", "Kab. Temanggung", "Kab. Sragen", "Kab. Banjarnegara", "Kab. Karanganyar", "Kab. Wonosobo", "Kab. Jepara", "Kab. Demak", "Kab. Purworejo", "Kab. Blora", "Kab. Wonogiri", "Kab. Pati"] },
+      { name: "Jawa Timur", cities: ["Kab. Jombang", "Kota Blitar", "Kab. Blitar", "Kota Kediri", "Kab. Lamongan", "Kab. Kediri", "Kab. Ngawi", "Kab. Mojokerto", "Kota Mojokerto", "Kab. Magetan", "Kab. Gresik", "Kab. Tulungagung", "Kab. Nganjuk", "Kab. Pasuruan", "Kota Pasuruan", "Kab. Bojonegoro", "Kab. Madiun", "Kab. Bondowoso", "Kab. Tuban", "Kota Madiun", "Kab. Situbondo", "Kab. Jember", "Kota Malang", "Kab. Malang", "Kab. Ponorogo", "Kota Batu", "Kab. Trenggalek"] },
+      { name: "Bengkulu", cities: ["Kab. Bengkulu Selatan", "Kab. Kaur", "Kab. Lebong", "Kab. Rejang Lebong", "Kab. Bengkulu Tengah", "Kota Bengkulu", "Kab. Bengkulu Utara", "Kab. Kepahiang", "Kab. Muko Muko"] },
+      { name: "Jambi", cities: ["Kab. Tanjung Jabung Timur", "Kab. Kerinci", "Kab. Bungo", "Kab. Tebo", "Kab. Merangin", "Kota Sungai Penuh"] },
+      { name: "Kepulauan Riau", cities: ["Kab. Lingga", "Kab. Kepulauan Anambas", "Kab. Natuna"] },
+      { name: "Lampung", cities: ["Kab. Lampung Barat", "Kab. Lampung Timur", "Kab. Tulang Bawang Barat", "Kab. Way Kanan", "Kab. Tulang Bawang", "Kab. Tanggamus", "Kab. Pesisir Barat", "Kab. Lampung Utara", "Kab. Mesuji"] },
+      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Barat", "Kab. Aceh Singkil", "Kab. Aceh Tamiang", "Kab. Aceh Tengah", "Kota Subulussalam", "Kab. Bener Meriah", "Kab. Aceh Utara", "Kota Lhokseumawe", "Kab. Pidie", "Kab. Aceh Timur", "Kab. Simeulue", "Kota Langsa", "Kab. Bireuen", "Kab. Pidie Jaya"] },
+      { name: "Riau", cities: ["Kab. Rokan Hulu", "Kab. Indragiri Hilir"] },
+      { name: "Sumatera Barat", cities: ["Kab. Pasaman Barat", "Kab. Pasaman", "Kab. Lima Puluh Kota", "Kab. Tanah Datar", "Kab. Dharmasraya", "Kota Solok", "Kab. Agam", "Kab. Solok", "Kota Bukittinggi", "Kota Pariaman", "Kota Sawahlunto", "Kab. Pesisir Selatan"] },
+      { name: "Sumatera Selatan", cities: ["Kab. Ogan Komering Ulu Timur", "Kab. Ogan Komering Ulu Selatan", "Kab. Ogan Komering Ulu", "Kab. Musi Rawas", "Kab. Musi Rawas Utara", "Kab. Empat Lawang", "Kota Pagar Alam", "Kota Lubuk Linggau", "Kab. Musi Banyuasin", "Kab. Muara Enim", "Kab. Lahat", "Kota Prabumulih"] },
+      { name: "Sumatera Utara", cities: ["Kab. Pakpak Bharat", "Kab. Mandailing Natal", "Kab. Padang Lawas", "Kab. Labuhanbatu Utara", "Kota Padangsidimpuan", "Kab. Tapanuli Selatan", "Kab. Labuhanbatu Selatan", "Kab. Labuhanbatu", "Kab. Tapanuli Utara", "Kab. Padang Lawas Utara", "Kab. Humbang Hasundutan", "Kab. Simalungun", "Kab. Toba Samosir", "Kota Pematangsiantar", "Kab. Tapanuli Tengah", "Kab. Samosir", "Kota Sibolga", "Kab. Nias"] },
+      { name: "Kalimantan Barat", cities: ["Kab. Sekadau", "Kab. Kapuas Hulu", "Kab. Sintang", "Kab. Bengkayang", "Kab. Melawi", "Kab. Sambas", "Kab. Sanggau", "Kab. Kubu Raya", "Kota Pontianak", "Kab. Kayong Utara", "Kab. Landak", "Kab. Mempawah", "Kota Singkawang", "Kab. Ketapang"] },
+      { name: "Kalimantan Tengah", cities: ["Kab. Seruyan", "Kab. Kotawaringin Barat", "Kab. Katingan", "Kab. Kotawaringin Timur", "Kab. Sukamara", "Kab. Lamandau", "Kab. Murung Raya", "Kab. Barito Timur", "Kab. Barito Utara", "Kab. Barito Selatan", "Kab. Gunung Mas"] },
+      { name: "Kalimantan Timur", cities: ["Kab. Penajam Paser Utara", "Kota Balikpapan", "Kab. Paser", "Kab. Kutai Kartanegara", "Kota Samarinda", "Kota Bontang", "Kab. Berau", "Kab. Kutai Timur", "Kab. Kutai Barat", "Kab. Mahakam Ulu"] },
+      { name: "Kalimantan Utara", cities: ["Kab. Tana Tidung", "Kab. Malinau", "Kab. Bulungan", "Kota Tarakan", "Kab. Nunukan"] },
+      { name: "Gorontalo", cities: ["Kab. Pahuwato", "Kab. Boalemo", "Kab. Gorontalo", "Kota Gorontalo", "Kab. Gorontalo Utara", "Kab. Bone Bolango"] },
+      { name: "Sulawesi Barat", cities: ["Kab. Mamuju Tengah"] },
+      { name: "Sulawesi Selatan", cities: ["Kab. Sinjai", "Kab. Enrekang", "Kab. Sidenreng Rappang", "Kab. Luwu Timur", "Kab. Soppeng", "Kab. Tana Toraja"] },
+      { name: "Sulawesi Tengah", cities: ["Kab. Banggai Kepulauan", "Kab. Banggai Laut", "Kota Palu", "Kab. Toli Toli", "Kab. Tojo Una Una", "Kab. Morowali", "Kab. Morowali Utara"] },
+      { name: "Sulawesi Tenggara", cities: ["Kab. Konawe Kepulauan", "Kab. Konawe Utara", "Kab. Buton Utara", "Kab. Wakatobi"] },
+      { name: "Sulawesi Utara", cities: ["Kab. Bolaang Mongondow", "Kab. Bolaang Mongondow Selatan", "Kota Kotamobagu", "Kab. Minahasa Selatan", "Kab. Bolaang Mongondow Timur", "Kab. Minahasa Tenggara", "Kab. Bolaang Mongondow Utara", "Kota Tomohon", "Kab. Minahasa", "Kota Manado", "Kab. Minahasa Utara", "Kota Bitung", "Kab. Kepulauan Sangihe", "Kab. Kepulauan Talaud", "Kab. Siau Tagulandang Biaro"] },
+      { name: "Nusa Tenggara Timur", cities: ["Kab. Alor", "Kota Kupang", "Kab. Kupang", "Kab. Malaka", "Kab. Manggarai Barat", "Kab. Timor Tengah Selatan", "Kab. Belu", "Kab. Sikka", "Kab. Timor Tengah Utara", "Kab. Lembata", "Kab. Manggarai Timur", "Kab. Ende", "Kab. Sumba Barat Daya", "Kab. Rote Ndao", "Kab. Nagekeo", "Kab. Flores Timur", "Kab. Ngada", "Kab. Sumba Tengah", "Kab. Manggarai", "Kab. Sumba Barat", "Kab. Sumba Timur", "Kab. Sabu Raijua"] },
+      { name: "Maluku", cities: ["Kab. Maluku Tenggara Barat", "Kab. Kepulauan Aru", "Kota Tual", "Kab. Seram Bagian Barat", "Kab. Maluku Tengah", "Kab. Seram Bagian Timur", "Kota Ambon", "Kab. Maluku Tenggara", "Kab. Maluku Barat Daya", "Kab. Buru Selatan", "Kab. Buru"] }
+    ]
+  }
+];
+
+let products = [];
+let initialStockMap = JSON.parse(localStorage.getItem("ic_initial_stock")) || {}; 
+let previousTotalSold = 0;
+let productSoldMap = {}; 
+let totalSoldUnits = 0;   
+let activeVersion = "ALL";
+let totalSoldAtStartOfDay = 0; 
+let lastDate = new Date().getDate();
+
+let transactionLogs = [];
+let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
+let salesChart;
+let countdownTimer = 1;
+
+function initChart() {
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  salesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'V1', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V2', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V3', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V4', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }
+    }
+  });
+  renderChartFiltered();
+}
+
+function getMinGbFromText(text) {
+  const matches = [...text.matchAll(/(\d+)\s*(?:gb|g)/gi)];
+  if (matches.length > 0) {
+    const numbers = matches.map(m => parseInt(m[1]));
+    return Math.min(...numbers);
+  }
+  return 999999;
+}
+
+function cleanAreaValue(rawLine) {
+  let cleaned = rawLine.replace(/^(?:area|total\s*area)\s*\d*\s*[:\-]?\s*/i, "").trim();
+  const matchRange = cleaned.match(/(\d+)\s*-\s*(\d+)\s*(?:gb|g)/i);
+  if (matchRange) {
+    return `${matchRange[1]} GB`;
+  }
+  const matchSingle = cleaned.match(/(\d+)\s*(?:gb|g)/i);
+  if (matchSingle) {
+    return `${matchSingle[1]} GB`;
+  }
+  return cleaned || "-";
+}
+
+async function fetchProducts() {
+  countdownTimer = 1; 
+  try {
+    const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
+      method: 'GET',
+      headers: { 
+        'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
+        'Accept': 'application/json'
+      }
+    });
+    const result = await res.json();
+    if (result.success && Array.isArray(result.data)) {
+      let currentSoldDiff = 0;
+      let vSoldCounts = { V1: 0, V2: 0, V3: 0, V4: 0 };
+
+      products = result.data.map(item => {
+        const code = (item.code || "").toUpperCase();
+        let v = "OTHER";
+        if (code.startsWith("XLA")) v = "V1";
+        else if (code.startsWith("XDA")) v = "V2";
+        else if (code.startsWith("KDA")) v = "V3";
+        else if (code.startsWith("XLF")) v = "V4";
+        else if (code.startsWith("PDA")) v = "V5";
+
+        let currentStock = item.stock !== undefined ? Number(item.stock) : 0;
+        let soldQty = 0;
+
+        if (v !== "V5") {
+          if (!(code in initialStockMap)) {
+            initialStockMap[code] = currentStock;
+            localStorage.setItem("ic_initial_stock", JSON.stringify(initialStockMap));
+          }
+          
+          let diff = initialStockMap[code] - currentStock;
+          if (diff > 0) {
+            soldQty = diff;
+          }
+          currentSoldDiff += soldQty;
+          if (v in vSoldCounts) vSoldCounts[v] += soldQty;
+          productSoldMap[code] = soldQty;
+        }
+
+        let desc = item.description || "";
+        let areas = { a1: "-", a2: "-", a3: "-", a4: "-" };
+        const lines = desc.split("\n");
+        let idx = 1;
+        lines.forEach(l => {
+          if (/kuota\s*sesuai/i.test(l)) return;
+          if (/area/i.test(l) || /(\d+)\s*(?:gb|g)/i.test(l)) {
+            if (idx <= 4) {
+              areas['a' + idx] = cleanAreaValue(l);
+              idx++;
+            }
+          }
+        });
+
+        const combinedAreasText = `${areas.a1} ${areas.a2} ${areas.a3} ${areas.a4}`.toLowerCase();
+        const minGb = getMinGbFromText(desc);
+
+        return {
+          v: v,
+          code: item.code,
+          name: item.name,
+          stock: currentStock,
+          sold: soldQty,
+          descText: desc.toLowerCase(),
+          areasText: combinedAreasText,
+          minGb: minGb,
+          areas: areas
+        };
+      }).filter(p => p.v !== "OTHER");
+      
+      let newlySold = currentSoldDiff - previousTotalSold;
+      if (newlySold > 0) {
+        transactionLogs.push({ time: Date.now(), count: newlySold });
+      }
+      previousTotalSold = currentSoldDiff;
+      totalSoldUnits = currentSoldDiff;
+
+      updateStatistics();
+      updateProductInsights();
+      renderStock();
+      recordDailyData(vSoldCounts);
+
+      const now = new Date();
+      document.getElementById("updateTime").textContent = "Sinkron: " + now.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+    }
+  } catch (err) { 
+    console.error(err); 
+    document.getElementById("updateTime").textContent = "Gagal menyinkronkan";
+  }
+}
+
+function updateStatistics() {
+  let today = new Date().getDate();
+  if (today !== lastDate) {
+    totalSoldAtStartOfDay = totalSoldUnits; 
+    lastDate = today;
+  }
+
+  const now = Date.now();
+  const lastSecond = transactionLogs.filter(t => now - t.time <= 1000).reduce((a, b) => a + b.count, 0);
+  const lastMinute = transactionLogs.filter(t => now - t.time <= 60000).reduce((a, b) => a + b.count, 0);
+  const lastHour   = transactionLogs.filter(t => now - t.time <= 3600000).reduce((a, b) => a + b.count, 0);
+
+  transactionLogs = transactionLogs.filter(t => now - t.time <= 3600000);
+
+  let totalReadyUnits = 0;
+  let readyVariantCount = 0;
+
+  products.forEach(p => {
+    if (p.stock > 0 && p.v !== "V5") {
+      totalReadyUnits += p.stock;
+    }
+    if (p.stock > 0) {
+      readyVariantCount++;
+    }
+  });
+
+  let soldToday = totalSoldUnits - totalSoldAtStartOfDay;
+
+  document.getElementById("statReady").textContent = totalReadyUnits.toLocaleString("id-ID");
+  document.getElementById("statReadyVariant").textContent = `${readyVariantCount} varian aktif`;
+  document.getElementById("statSold").textContent = totalSoldUnits.toLocaleString("id-ID");
+  document.getElementById("statDay").textContent = soldToday.toLocaleString("id-ID");
+  document.getElementById("statSec").textContent = lastSecond;
+  document.getElementById("statMin").textContent = lastMinute;
+  document.getElementById("statHour").textContent = lastHour;
+
+  const timerBadge = document.getElementById("syncTimerBadge");
+  if (timerBadge) {
+    timerBadge.textContent = `${countdownTimer}s`;
+    if (countdownTimer > 0) countdownTimer--;
+  }
+}
+
+setInterval(updateStatistics, 1000);
+
+function parseQuotaNumber(str) {
+  if (!str) return { current: 0, total: 100, unit: '' };
+  let parts = str.split('/');
+  if (parts.length === 2) {
+    let parseVal = (s) => {
+      let numMatch = s.trim().match(/([\d\.]+)\s*([a-zA-Z%]+)?/);
+      if (numMatch) {
+        let val = parseFloat(numMatch[1]);
+        let unit = numMatch[2] || '';
+        if (/kb/i.test(unit)) val /= 1024;
+        else if (/gb/i.test(unit)) val *= 1024;
+        return { val: parseFloat(numMatch[1]), rawUnit: unit };
+      }
+      return { val: 0, rawUnit: '' };
+    };
+    let curObj = parseVal(parts[0]);
+    let totObj = parseVal(parts[1]);
+    return { current: curObj.val, total: totObj.val || 1, unit: totObj.rawUnit };
+  }
+  return { current: 0, total: 100, unit: '' };
+}
+
+async function cekInfoDompul() {
+  const nomor = document.getElementById("checkNomorInput").value.trim();
+  const resultBox = document.getElementById("checkerResult");
+  const contentBox = document.getElementById("checkerResultContent");
+
+  if (!nomor) {
+    alert("Silakan masukkan nomor HP terlebih dahulu!");
+    return;
+  }
+
+  resultBox.classList.add("active");
+  contentBox.innerHTML = "Memproses...";
+
+  try {
+    const response = await fetch('/api/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nomer: nomor })
+    });
+
+    const resJson = await response.json();
+
+    if (resJson.status === "success" && resJson.data) {
+      const info = resJson.data.info_kartu || {};
+      const paketList = resJson.data.info_paket || [];
+
+      let paketHtml = "";
+      paketList.forEach(pkt => {
+        let namaPkt = (pkt.nama_paket && pkt.nama_paket !== "undefined" && pkt.nama_paket.trim() !== "") ? pkt.nama_paket : "Paket Utama";
+        let expirePkt = pkt.tanggal_expire ? `Exp: ${pkt.tanggal_expire}` : "";
+        
+        let kuotaHtml = "";
+        (pkt.kuota || []).forEach(k => {
+          let parsed = parseQuotaNumber(`${k.sisa} / ${k.total}`);
+          let percent = Math.min(100, Math.max(0, (parsed.current / parsed.total) * 100));
+          
+          kuotaHtml += `<div class="quota-row">
+            <div class="quota-info">
+              <span>• ${k.name || k.nama}</span>
+              <b>${k.sisa} / ${k.total}</b>
+            </div>
+            <div class="quota-bar">
+              <div class="quota-progress" style="width: ${percent}%"></div>
+            </div>
+          </div>`;
+        });
+
+        paketHtml += `<div class="package-card">
+          <div class="package-header">
+            <span class="package-title">📦 ${namaPkt}</span>
+            <span class="package-exp">${expirePkt}</span>
+          </div>
+          ${kuotaHtml || '<div style="font-size:10px;color:#94a3b8;">Tidak ada rincian kuota.</div>'}
+        </div>`;
+      });
+
+      contentBox.innerHTML = `
+        <div style="font-weight:800;color:#059669;margin-bottom:6px;font-size:12px;">✅ ${resJson.keterangan || "Berhasil cek dompul"}</div>
+        <div class="checker-grid">
+          <div class="checker-item"><span>Nomor</span><b>${info.msisdn || nomor}</b></div>
+          <div class="checker-item"><span>Operator</span><b>${info.operator || "XL / AXIS"}</b></div>
+          <div class="checker-item"><span>Masa Aktif</span><b>${info.masa_aktif || "-"}</b></div>
+          <div class="checker-item"><span>Tenggang</span><b>${info.masa_tenggang || "-"}</b></div>
+        </div>
+        <div style="margin-top:10px;font-weight:800;font-size:11px;color:#0f172a;">Paket Aktif:</div>
+        ${paketHtml || '<div style="font-size:10px;color:#94a3b8;margin-top:4px;">Tidak ada paket aktif.</div>'}
+      `;
+    } else {
+      contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Gagal: ${resJson.keterangan || resJson.message || "Data tidak valid."}</span>`;
+    }
+  } catch (e) {
+    contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Koneksi error: ${e.message}</span>`;
+  }
+}
+
+function updateProductInsights() {
+  let validProducts = products.filter(p => p.v !== "V5");
+  let sortedDesc = [...validProducts].sort((a, b) => b.sold - a.sold);
+  let sortedAsc = [...validProducts].sort((a, b) => {
+    if (a.sold !== b.sold) return a.sold - b.sold;
+    return a.code.localeCompare(b.code);
+  });
+
+  let topHtml = "";
+  for (let i = 0; i < Math.min(3, sortedDesc.length); i++) {
+    let p = sortedDesc[i];
+    topHtml += `<div class="insight-item">
+      <div><b>${p.code}</b></div>
+      <span class="badge-count badge-top">+${p.sold}</span>
+    </div>`;
+  }
+  document.getElementById("topSoldList").innerHTML = topHtml || '<div style="font-size:10px;color:#94a3b8">Belum ada data.</div>';
+
+  let lowHtml = "";
+  for (let i = 0; i < Math.min(3, sortedAsc.length); i++) {
+    let p = sortedAsc[i];
+    lowHtml += `<div class="insight-item">
+      <div><b>${p.code}</b></div>
+      <span class="badge-count badge-low">${p.sold}</span>
+    </div>`;
+  }
+  document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:10px;color:#94a3b8">Belum ada data.</div>';
+}
+
+function recordDailyData(vSoldCounts) {
+  const todayStr = new Date().toISOString().split('T')[0];
+  let existingIndex = dailyHistoryRecords.findIndex(r => r.date === todayStr);
+  if (existingIndex >= 0) {
+    dailyHistoryRecords[existingIndex].v1 = Math.max(dailyHistoryRecords[existingIndex].v1, vSoldCounts.V1);
+    dailyHistoryRecords[existingIndex].v2 = Math.max(dailyHistoryRecords[existingIndex].v2, vSoldCounts.V2);
+    dailyHistoryRecords[existingIndex].v3 = Math.max(dailyHistoryRecords[existingIndex].v3, vSoldCounts.V3);
+    dailyHistoryRecords[existingIndex].v4 = Math.max(dailyHistoryRecords[existingIndex].v4, vSoldCounts.V4);
+  } else {
+    dailyHistoryRecords.push({
+      date: todayStr,
+      v1: vSoldCounts.V1,
+      v2: vSoldCounts.V2,
+      v3: vSoldCounts.V3,
+      v4: vSoldCounts.V4
+    });
+  }
+  localStorage.setItem("ic_daily_history", JSON.stringify(dailyHistoryRecords));
+  renderChartFiltered();
+}
+
+function renderChartFiltered(startDate = "", endDate = "") {
+  let filtered = dailyHistoryRecords;
+  if (startDate && endDate) {
+    filtered = dailyHistoryRecords.filter(r => r.date >= startDate && r.date <= endDate);
+  }
+  filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  let labels = filtered.map(r => r.date);
+  let dataV1 = filtered.map(r => r.v1);
+  let dataV2 = filtered.map(r => r.v2);
+  let dataV3 = filtered.map(r => r.v3);
+  let dataV4 = filtered.map(r => r.v4);
+
+  salesChart.data.labels = labels;
+  salesChart.data.datasets[0].data = dataV1;
+  salesChart.data.datasets[1].data = dataV2;
+  salesChart.data.datasets[2].data = dataV3;
+  salesChart.data.datasets[3].data = dataV4;
+  salesChart.update();
+}
+
+function applyDateFilter() {
+  const start = document.getElementById("startDateFilter").value;
+  const end = document.getElementById("endDateFilter").value;
+  if (!start || !end) {
+    alert("Pilih tanggal awal & akhir!");
+    return;
+  }
+  renderChartFiltered(start, end);
+}
+
+function resetDateFilter() {
+  document.getElementById("startDateFilter").value = "";
+  document.getElementById("endDateFilter").value = "";
+  renderChartFiltered();
+}
+
+function setFilter(v, btn) {
+  activeVersion = v;
+  document.querySelectorAll(".filters .filter").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  renderStock();
+}
+
+function toggleCard(elem) {
+  elem.classList.toggle("expanded");
+  const toggleText = elem.querySelector(".toggle-detail");
+  if (elem.classList.contains("expanded")) {
+    toggleText.innerHTML = `Tutup <span>▲</span>`;
+  } else {
+    toggleText.innerHTML = `Detail <span>▼</span>`;
+  }
+}
+
+function renderCardsHtml(items) {
+  items.sort((a, b) => {
+    let aReady = a.stock > 0 ? 1 : 0;
+    let bReady = b.stock > 0 ? 1 : 0;
+    if (aReady !== bReady) return bReady - aReady;
+    if (a.minGb !== b.minGb) return a.minGb - b.minGb;
+    return b.sold - a.sold;
+  });
+
+  let out = `<div class="grid">`;
+  items.forEach(p => {
+    const isPDA = p.v === "V5";
+    const isReady = p.stock > 0;
+    const cardClass = isReady ? 'card' : 'card habis';
+    
+    out += `<div class="${cardClass}" onclick="toggleCard(this)">
+      <div class="card-top">
+        <div class="name">${p.code}</div>
+        <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
+      </div>
+      <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
+      <div class="slot-val" style="color:${isReady ? '#0f172a' : '#dc2626'}">
+        ${isPDA ? (isReady ? 'OPEN' : 'CLOSE') : (isReady ? p.stock.toLocaleString("id-ID") : 'Habis')}
+      </div>
+      <div style="font-size:9px; color:#3b82f6; font-weight:700; margin-top:1px;">Terjual: ${p.sold}</div>
+      
+      <div class="area-list">
+        <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
+        <div class="area-row"><span>Area 2</span><b>${p.areas.a2}</b></div>
+        <div class="area-row"><span>Area 3</span><b>${p.areas.a3}</b></div>
+        <div class="area-row"><span>Area 4</span><b>${p.areas.a4}</b></div>
+      </div>
+      
+      <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
+        Detail <span>▼</span>
+      </div>
+    </div>`;
+  });
+  out += `</div>`;
+  return out;
+}
+
+// Fungsi Pencarian Cerdas berbasis Database Kota -> Area
+function renderStock(){
+  const rawQ = (document.getElementById("stockSearch").value || "").trim();
+  const q = rawQ.toLowerCase();
+
+  // Cek apakah input mencocokkan kota di database lokal
+  let matchedAreaName = "";
+  if (q.length > 2) {
+    for (let group of areaDatabase) {
+      for (let prov of group.provinces) {
+        for (let city of prov.cities) {
+          if (city.toLowerCase().includes(q)) {
+            matchedAreaName = group.area.toLowerCase(); // contoh: "area 2"
+            break;
+          }
+        }
+        if (matchedAreaName) break;
+      }
+      if (matchedAreaName) break;
+    }
+  }
+
+  const arr = products.filter(p => {
+    const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
+    
+    let matchesArea = false;
+    if (matchedAreaName) {
+      // Jika kota ditemukan di database, filter produk yang area-nya cocok
+      matchesArea = p.areasText.includes(matchedAreaName);
+    } else {
+      // Jika tidak ditemukan di database kota, gunakan pencarian teks bebas biasa
+      matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
+    }
+
+    return matchesCategory && matchesArea;
+  });
+  
+  const groups = {};
+  arr.forEach(p => (groups[p.v] ??=[]).push(p));
+  
+  let out = "";
+  for(const [v, items] of Object.entries(groups)){
+    let totalStockInGroup = items.reduce((acc, curr) => acc + (curr.stock > 0 ? curr.stock : 0), 0);
+    let readyVariantCount = items.filter(i => i.stock > 0).length;
+    
+    out += `<div class="head"><b>Kategori ${v}</b> ${matchedAreaName ? `<small style="color:#059669; font-weight:800;">(Rekomendasi untuk ${rawQ} -> ${matchedAreaName.toUpperCase()})</small>` : ''}<small>${readyVariantCount} aktif (${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
+    out += renderCardsHtml(items);
+  }
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data area atau paket tidak ditemukan.</div>';
+}
+
+initChart();
+fetchProducts();
+setInterval(fetchProducts, 1000);
+
+document.getElementById("stockSearch").addEventListener("input", renderStock);
+</script>
+</body>
+</html>
