@@ -3,152 +3,266 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Portal Cek Area & Stok</title>
+    <title>Portal Dashboard & Cek Paket</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: #f8fafc; margin: 0; padding: 16px; color: #1e293b; }
-        .card { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card { background: #fff; padding: 16px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
         .input-field { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px; font-size: 13px; outline: none; }
-        .btn { background: #2563eb; color: #fff; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 13px; }
-        .btn:hover { background: #1d4ed8; }
-        .btn-wa { background: #22c55e; }
-        .btn-wa:hover { background: #16a34a; }
-        .product-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding: 10px 0; }
-        .product-info b { font-size: 14px; color: #0f172a; display: block; }
-        .product-info span { font-size: 12px; color: #64748b; }
+        .btn { background: #0f172a; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .btn:hover { background: #334155; }
+        
+        /* Desain Tab Provider XL / AXIS */
+        .provider-tabs { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; justify-content: space-between; }
+        .tab-btn { padding: 6px 16px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; }
+        .tab-xl { background: #0060af; color: #fff; }
+        .tab-axis { background: #6b21a8; color: #fff; }
+        .tab-inactive { background: #e2e8f0; color: #64748b; }
+
+        /* Grid Statistik ala Gambar */
+        .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .stat-card { background: #fff; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; position: relative; }
+        .stat-card.blue-border { border-left: 4px solid #0060af; }
+        .stat-card.purple-border { border-left: 4px solid #6b21a8; }
+        .stat-card.red-border { border-left: 4px solid #e11d48; }
+        .stat-card.orange-border { border-left: 4px solid #f59e0b; }
+        .stat-title { font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-value { font-size: 20px; font-weight: 800; color: #0f172a; }
+        .stat-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .badge-count { position: absolute; top: 12px; right: 12px; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; color: #0f172a; }
+
+        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 600; }
+        .list-row:last-child { border-bottom: none; }
+        .badge-num { background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 6px; font-size: 11px; }
+        .badge-zero { background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 6px; font-size: 11px; }
     </style>
 </head>
 <body>
 
-<!-- 1. HALAMAN LOGIN AGEN / PUSAT -->
-<div id="loginSection" class="card" style="max-width: 380px; margin: 40px auto; text-align: center;">
-    <h3>🔒 Login Akses Agen</h3>
-    <p style="font-size: 12px; color: #64748b;">Masukkan kode agen Anda untuk masuk ke portal:</p>
-    <input type="password" id="kodeInput" class="input-field" placeholder="Masukkan Kode Agen..." style="text-align:center; letter-spacing:1px; font-weight:bold;">
-    <button class="btn" onclick="checkLogin()">Masuk Portal</button>
-    <p id="errorMsg" style="color:red; font-size:11px; margin-top:8px; display:none;">❌ Kode Agen Tidak Terdaftar!</p>
-</div>
-
-<!-- 2. DASHBOARD UTAMA -->
-<div id="dashboardSection" style="display:none; max-width: 600px; margin: auto;">
-    
-    <!-- Panel Khusus Agen (Hanya muncul jika login mandiri) -->
-    <div id="panelGenerator" class="card" style="background: #eff6ff; border-color: #bfdbfe; display: none;">
-        <h4 style="margin: 0 0 8px 0; color: #1e40af; font-size: 13px;">🛠️ Panel Agen: Buat Link Share</h4>
-        <p style="font-size: 11px; color: #3b82f6; margin-bottom: 8px;">Bagikan link ini ke customer Anda agar pesanan masuk ke WhatsApp Anda:</p>
-        <input type="text" id="shareLink" class="input-field" readonly style="background:#fff; font-size:11px; font-weight:bold; color:#2563eb;">
-        <button class="btn" style="background:#dc2626; padding:6px; font-size:11px;" onclick="logout()">Keluar Portal 🔒</button>
+    <!-- 1. HALAMAN LOGIN AGEN (Validasi Kode & Gmail) -->
+    <div id="loginSection" class="card" style="max-width: 380px; margin: 40px auto; text-align: center;">
+        <h3>🔒 Login Akses Agen</h3>
+        <p style="font-size: 12px; color: #64748b;">Masukkan kode agen dan Gmail terdaftar Anda:</p>
+        <input type="text" id="kodeInput" class="input-field" placeholder="Masukkan Kode Agen..." style="text-align:center; font-weight:bold;">
+        <input type="email" id="emailInput" class="input-field" placeholder="Masukkan Gmail Terdaftar..." style="text-align:center;">
+        <button class="btn" style="width:100%;" onclick="checkLogin()">Masuk Dashboard</button>
+        <p id="errorMsg" style="color:red; font-size:11px; margin-top:8px; display:none;">❌ Kode Agen atau Gmail Tidak Sesuai!</p>
     </div>
 
-    <!-- Informasi Mitra yang Melayani -->
-    <div class="card" style="background: #f0fdf4; border-color: #bbf7d0; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <span style="font-size: 10px; font-weight: bold; color: #166534; text-transform: uppercase;">Mitra / Konter Dilayani:</span>
-            <div id="displayNamaToko" style="font-size: 14px; font-weight: 900; color: #14532d;">-</div>
-        </div>
-        <div style="font-size: 11px; color: #166534; font-weight: bold;" id="statusMode">Mode Publik</div>
-    </div>
-
-    <!-- Cek Area / Kota -->
-    <div class="card">
-        <h4 style="margin: 0 0 8px 0; font-size: 13px;">🏙️ Cek Ketersediaan Berdasarkan Area</h4>
-        <div style="display: flex; gap: 8px;">
-            <input type="text" id="inputKota" class="input-field" placeholder="Ketik Kota (Contoh: Salatiga, Semarang)..." style="margin:0;">
-            <button class="btn" style="width: 120px;" onclick="cekAreaStok()">Cek Area</button>
-        </div>
-    </div>
-
-    <!-- Hasil Display Stok Global (Berdasarkan Kota) -->
-    <div id="hasilStokSection" class="card" style="display:none;">
-        <h4 style="margin: 0 0 4px 0; font-size: 13px; color: #0f172a;">📦 Stok Global di Area: <span id="textKotaTerpilih" style="color: #2563eb;">-</span></h4>
-        <p style="font-size: 11px; color: #64748b; margin-bottom: 12px;">Stok dipantau secara real-time dari pusat.</p>
+    <!-- 2. DASHBOARD UTAMA (Tampilan Sesuai Gambar Asli) -->
+    <div id="dashboardSection" style="display:none; max-width: 500px; margin: auto;">
         
-        <div id="listProdukStok">
-            <!-- Produk 1 -->
-            <div class="product-item">
-                <div class="product-info">
-                    <b>PDA13 (10 GB)</b>
-                    <span>Stok Tersedia: <strong id="stokPda13" style="color: #059669;">-</strong> Unit</span>
-                </div>
-                <button class="btn btn-wa" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="orderProduk('PDA13 (10 GB)')">Order (WA)</button>
+        <!-- Header Provider & Sinkronisasi -->
+        <div class="provider-tabs">
+            <div>
+                <button id="btnXl" class="tab-btn tab-xl" onclick="switchProvider('xl')">XL</button>
+                <button id="btnAxis" class="tab-btn tab-inactive" onclick="switchProvider('axis')">AXIS</button>
             </div>
-            <!-- Produk 2 -->
-            <div class="product-item">
-                <div class="product-info">
-                    <b>PDA20 (20 GB)</b>
-                    <span>Stok Tersedia: <strong id="stokPda20" style="color: #059669;">-</strong> Unit</span>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;" id="textSinkron">Sinkron: 18.20.56</div>
+        </div>
+
+        <!-- PANEL KHUSUS AGEN: Tambahan Fitur Ganti Nomor WA & Link Share -->
+        <div id="panelAgenKhusus" class="card" style="background: #eff6ff; border-color: #bfdbfe; display: none;">
+            <h4 style="margin: 0 0 6px 0; color: #1e40af; font-size: 12px;">🛠️ Panel Agen: <span id="namaAgenLogin">-</span></h4>
+            
+            <p style="font-size: 10px; color: #3b82f6; margin-bottom: 3px;">Link Share Khusus Customer Anda:</p>
+            <input type="text" id="shareLink" class="input-field" readonly style="background:#fff; font-size:10px; font-weight:bold; color:#2563eb; margin-bottom:6px;">
+            
+            <!-- Fitur Ganti Nomor HP / WhatsApp -->
+            <div style="background: #e0f2fe; padding: 6px; border-radius: 6px; margin-bottom: 6px;">
+                <label style="font-size: 10px; font-weight: bold; color: #0369a1; display: block; margin-bottom: 2px;">📱 Ganti Nomor WhatsApp Tujuan Pesanan:</label>
+                <div style="display: flex; gap: 4px;">
+                    <input type="text" id="inputGantiWa" class="input-field" placeholder="Contoh: 628123456789" style="margin:0; font-size:10px; padding:6px;">
+                    <button class="btn" style="width: 90px; padding: 4px; font-size: 10px;" onclick="updateNomorWa()">Simpan</button>
                 </div>
-                <button class="btn btn-wa" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="orderProduk('PDA20 (20 GB)')">Order (WA)</button>
+            </div>
+
+            <button class="btn" style="background:#dc2626; padding:4px 8px; font-size:10px; width:100%;" onclick="logout()">Keluar Portal 🔒</button>
+        </div>
+
+        <!-- Status Real-Time Bar -->
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></div>
+                <span style="font-size: 12px; font-weight: bold;">Sinkronisasi Real-Time Aktif</span>
+            </div>
+            <span style="background: #f0fdf4; color: #166534; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold;">0s</span>
+        </div>
+
+        <!-- Grid Statistik Utama (4 Kotak Atas) -->
+        <div class="grid-stats">
+            <div class="stat-card blue-border">
+                <div class="stat-title">Tersedia</div>
+                <div class="stat-value" id="valTersedia">18</div>
+                <div class="stat-desc">3 varian aktif</div>
+            </div>
+            <div class="stat-card blue-border">
+                <div class="stat-title">Total</div>
+                <div class="stat-value" id="valTotal">162</div>
+                <div class="stat-desc">Akumulasi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Hari Ini</div>
+                <div class="stat-value" id="valHariIni">162</div>
+                <div class="stat-desc">Terjual</div>
+            </div>
+            <div class="stat-card red-border">
+                <div class="stat-title">Detik Ini</div>
+                <div class="stat-value">0</div>
+                <div class="stat-desc">Masuk</div>
             </div>
         </div>
-    </div>
 
-</div>
+        <!-- Grid Statistik Tambahan (2 Kotak Bawah) -->
+        <div class="grid-stats" style="grid-template-columns: 1fr 1fr; margin-bottom: 12px;">
+            <div class="stat-card">
+                <div class="stat-title">Menit Ini</div>
+                <div class="stat-value">0</div>
+                <div class="stat-desc">Masuk</div>
+            </div>
+            <div class="stat-card orange-border">
+                <div class="stat-title">Jam Ini</div>
+                <div class="stat-value">162</div>
+                <div class="stat-desc">Masuk</div>
+            </div>
+        </div>
+
+        <!-- Cek Info Nomor & Paket -->
+        <div class="card">
+            <div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🔍 Cek Info Nomor & Paket</div>
+            <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Mengecek info detail nomor HP menggunakan API Serverless</div>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="inputNomorHp" class="input-field" placeholder="Masukkan nomor HP (misal: 0819...)..." style="margin:0;">
+                <button class="btn" onclick="cekNomorHp()">Cek Nomor</button>
+            </div>
+        </div>
+
+        <!-- Top 3 Terjual Terbanyak -->
+        <div class="card">
+            <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">🔥 Top 3 Terjual Terbanyak</div>
+            <div class="list-row">
+                <span>XDA38</span>
+                <span class="badge-num">+22</span>
+            </div>
+            <div class="list-row">
+                <span>KDA38A</span>
+                <span class="badge-num">+22</span>
+            </div>
+            <div class="list-row" style="border-bottom:none;">
+                <span>KDA47A</span>
+                <span class="badge-num">+22</span>
+            </div>
+        </div>
+
+        <!-- Top 3 Terjual Terendah -->
+        <div class="card">
+            <div style="font-weight: bold; font-size: 13px; margin-bottom: 8px;">💧 Top 3 Terjual Terendah</div>
+            <div class="list-row">
+                <span>KDA13</span>
+                <span class="badge-zero">0</span>
+            </div>
+            <div class="list-row">
+                <span>KDA20</span>
+                <span class="badge-zero">0</span>
+            </div>
+            <div class="list-row" style="border-bottom:none;">
+                <span>KDA30</span>
+                <span class="badge-zero">0</span>
+            </div>
+        </div>
+
+    </div>
 
 <script>
 // ==========================================
-// DATA BASE AGEN (KODE AGEN ANDA)
+// DATABASE AGEN (Kode, Gmail, Nama, & WA)
 // ==========================================
-const databaseAgen = [
-    { kode: "ICS-MASTER-01", nama: "Pusat Konter Utama", wa: "628123456789" },
-    { kode: "AGEN-BUDI", nama: "Budi Cell Salatiga", wa: "628987654321" }
+let databaseAgen = [
+    { kode: "ICS-MASTER-01", email: "admin@gmail.com", nama: "Pusat Konter Utama", wa: "628123456789" },
+    { kode: "AGEN-BUDI", email: "budi@gmail.com", nama: "Budi Cell Salatiga", wa: "628987654321" }
 ];
 
-// DATA STOK GLOBAL (Pusat mengatur jumlah stok per kota)
-const stokGlobalData = {
-    "salatiga": { pda13: "150", pda20: "85" },
-    "semarang": { pda13: "1.420", pda20: "600" },
-    "solo": { pda13: "430", pda20: "210" },
-    "jakarta": { pda13: "2.500", pda20: "1.100" }
-};
-
-// Menangkap parameter dari URL (jika customer membuka link share dari agen)
+// Menangkap parameter URL jika diakses oleh customer dari link agen
 const urlParams = new URLSearchParams(window.location.search);
 const paramToko = urlParams.get('toko');
 const paramWa = urlParams.get('wa');
 
 window.onload = function() {
     if (paramToko && paramWa) {
-        // Mode Customer (Membuka link agen)
+        // Mode Customer: Tampilan dashboard bersih tanpa panel generator agen
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('dashboardSection').style.display = 'block';
-        document.getElementById('displayNamaToko').textContent = decodeURIComponent(paramToko);
-        document.getElementById('statusMode').textContent = "Via Link Agen";
-    } else {
-        // Cek apakah agen sudah pernah login di perangkat ini sebelumnya
-        if (sessionStorage.getItem("agenLogin") === "true") {
-            bukaDashboardAgen(
-                sessionStorage.getItem("agenNama"), 
-                sessionStorage.getItem("agenWa")
-            );
-        }
+        document.getElementById('panelAgenKhusus').style.display = 'none';
+    } 
+    else if (sessionStorage.getItem("agenLogin") === "true") {
+        bukaDashboardAgen(
+            sessionStorage.getItem("agenNama"), 
+            sessionStorage.getItem("agenWa"),
+            sessionStorage.getItem("agenEmail")
+        );
+    } 
+    else {
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('dashboardSection').style.display = 'none';
     }
 };
 
 function checkLogin() {
     const kode = document.getElementById('kodeInput').value.trim();
-    const agenDitemukan = databaseAgen.find(a => a.kode === kode);
+    const email = document.getElementById('emailInput').value.trim().toLowerCase();
+    
+    // Validasi pencocokan Kode Agen dan Gmail
+    const agenDitemukan = databaseAgen.find(a => a.kode === kode && a.email.toLowerCase() === email);
 
     if (agenDitemukan) {
         sessionStorage.setItem("agenLogin", "true");
+        sessionStorage.setItem("agenKode", agenDitemukan.kode);
         sessionStorage.setItem("agenNama", agenDitemukan.nama);
         sessionStorage.setItem("agenWa", agenDitemukan.wa);
-        bukaDashboardAgen(agenDitemukan.nama, agenDitemukan.wa);
+        sessionStorage.setItem("agenEmail", agenDitemukan.email);
+        
+        bukaDashboardAgen(agenDitemukan.nama, agenDitemukan.wa, agenDitemukan.email);
     } else {
         document.getElementById('errorMsg').style.display = 'block';
     }
 }
 
-function bukaDashboardAgen(nama, wa) {
+function bukaDashboardAgen(nama, wa, email) {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('dashboardSection').style.display = 'block';
-    document.getElementById('panelGenerator').style.display = 'block';
-    document.getElementById('displayNamaToko').textContent = nama;
-    document.getElementById('statusMode').textContent = "Panel Utama Agen";
+    document.getElementById('panelAgenKhusus').style.display = 'block';
+    
+    document.getElementById('namaAgenLogin').textContent = nama;
+    document.getElementById('inputGantiWa').value = wa;
 
+    updateLinkShare(nama, wa);
+}
+
+function updateLinkShare(nama, wa) {
     const baseUrl = window.location.origin + window.location.pathname;
     const linkUnik = `${baseUrl}?toko=${encodeURIComponent(nama)}&wa=${encodeURIComponent(wa)}`;
     document.getElementById('shareLink').value = linkUnik;
+}
+
+// Fitur Ganti Nomor HP / WhatsApp
+function updateNomorWa() {
+    const nomorBaru = document.getElementById('inputGantiWa').value.trim();
+    const currentKode = sessionStorage.getItem("agenKode");
+
+    if (!nomorBaru) {
+        alert("Nomor WhatsApp tidak boleh kosong!");
+        return;
+    }
+
+    sessionStorage.setItem("agenWa", nomorBaru);
+    
+    const agen = databaseAgen.find(a => a.kode === currentKode);
+    if(agen) {
+        agen.wa = nomorBaru;
+    }
+
+    updateLinkShare(sessionStorage.getItem("agenNama"), nomorBaru);
+    alert("✅ Nomor WhatsApp pesanan berhasil diperbarui!");
 }
 
 function logout() {
@@ -156,40 +270,40 @@ function logout() {
     location.href = window.location.pathname;
 }
 
-let kotaAktif = "";
-function cekAreaStok() {
-    const input = document.getElementById('inputKota').value.trim().toLowerCase();
+// Interaksi tombol provider XL / AXIS
+function switchProvider(provider) {
+    const btnXl = document.getElementById('btnXl');
+    const btnAxis = document.getElementById('btnAxis');
     
-    if (!input) {
-        alert("Silakan ketik nama kota terlebih dahulu!");
-        return;
-    }
-
-    if (stokGlobalData[input]) {
-        kotaAktif = input.charAt(0).toUpperCase() + input.slice(1);
-        document.getElementById('textKotaTerpilih').textContent = kotaAktif;
-        
-        document.getElementById('stokPda13').textContent = stokGlobalData[input].pda13 + " Unit";
-        document.getElementById('stokPda20').textContent = stokGlobalData[input].pda20 + " Unit";
-        
-        document.getElementById('hasilStokSection').style.display = 'block';
+    if(provider === 'xl') {
+        btnXl.className = "tab-btn tab-xl";
+        btnAxis.className = "tab-btn tab-inactive";
+        document.getElementById('valTersedia').textContent = "18";
+        document.getElementById('valTotal').textContent = "162";
     } else {
-        alert("Maaf, area/kota '" + input + "' belum tersedia atau stok kosong.");
-        document.getElementById('hasilStokSection').style.display = 'none';
+        btnAxis.className = "tab-btn tab-axis";
+        btnXl.className = "tab-btn tab-inactive";
+        document.getElementById('valTersedia').textContent = "12";
+        document.getElementById('valTotal').textContent = "98";
     }
 }
 
-function orderProduk(namaProduk) {
+// Aksi tombol cek nomor HP
+function cekNomorHp() {
+    const noHp = document.getElementById('inputNomorHp').value.trim();
     const tujuanWa = paramWa ? decodeURIComponent(paramWa) : sessionStorage.getItem("agenWa");
-    const namaMitra = paramToko ? decodeURIComponent(paramToko) : sessionStorage.getItem("agenNama");
 
-    if (!tujuanWa) {
-        alert("Terjadi kesalahan data agen. Silakan ulangi buka link dari agen.");
+    if (!noHp) {
+        alert("Masukkan nomor HP terlebih dahulu!");
         return;
     }
 
-    const pesan = `Halo ${namaMitra}, saya mau order:\n\n* Produk: ${namaProduk}\n* Area Tujuan: ${kotaAktif}\n\nMohon diproses ya Kak!`;
-    
+    if (!tujuanWa) {
+        alert("Nomor tujuan WhatsApp belum diatur.");
+        return;
+    }
+
+    const pesan = `Halo, saya ingin mengecek info paket untuk nomor: ${noHp}`;
     const linkWa = `https://wa.me/${tujuanWa}?text=${encodeURIComponent(pesan)}`;
     window.open(linkWa, '_blank');
 }
