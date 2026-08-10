@@ -396,27 +396,46 @@ async function cekInfoDompul() {
   contentBox.innerHTML = "Sedang memproses pengecekan nomor...";
 
   const targetUrl = "https://api.mayugoro.com/api/v1/sidompul/cek";
-  const proxyUrl = "https://corsproxy.io/?";
+  
+  // Menggunakan multiple cadangan proxy publik agar jika salah satu down, yang lain tetap merespons
+  const proxyList = [
+    "https://api.allorigins.win/raw?url=",
+    "https://thingproxy.freeboard.io/fetch/"
+  ];
 
-  try {
-    const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + CREDENTIALS.apiKey,
-        'X-Client': CREDENTIALS.xClient,
-        'X-Pak': CREDENTIALS.xPak,
-        'X-Pax': CREDENTIALS.xPak,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        nomer: nomor,
-        "x-pak": CREDENTIALS.xPak,
-        "x-pax": CREDENTIALS.xPak
-      })
-    });
+  let success = false;
+  let resJson = null;
 
-    const resJson = await response.json();
+  for (let proxyUrl of proxyList) {
+    try {
+      const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + CREDENTIALS.apiKey,
+          'X-Client': CREDENTIALS.xClient,
+          'X-Pak': CREDENTIALS.xPak,
+          'X-Pax': CREDENTIALS.xPak,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          nomer: nomor,
+          "x-pak": CREDENTIALS.xPak,
+          "x-pax": CREDENTIALS.xPak
+        })
+      });
+
+      resJson = await response.json();
+      if (resJson) {
+        success = true;
+        break;
+      }
+    } catch (e) {
+      console.warn("Proxy gagal, mencoba opsi berikutnya...", e);
+    }
+  }
+
+  if (success && resJson) {
     if (resJson.status === "success" && resJson.data) {
       const info = resJson.data.info_kartu;
       const paketList = resJson.data.info_paket || [];
@@ -448,8 +467,7 @@ async function cekInfoDompul() {
     } else {
       contentBox.innerHTML = `<span style="color:#dc2626;">Gagal: ${resJson.keterangan || "Nomor tidak valid atau gangguan."}</span>`;
     }
-  } catch (err) {
-    console.error(err);
+  } else {
     contentBox.innerHTML = `<span style="color:#dc2626;">Terjadi kesalahan koneksi saat memeriksa nomor.</span>`;
   }
 }
