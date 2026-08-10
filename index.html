@@ -396,15 +396,13 @@ async function cekInfoDompul() {
   contentBox.innerHTML = "Sedang memproses pengecekan nomor...";
 
   try {
-    const response = await fetch('https://api.ics-store.my.id/api/v1/sidompul/cek', {
+    const response = await fetch('https://api.mayugoro.com/api/v1/sidompul/cek', {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
-        'Accept': 'application/json',
+        'X-Client': CREDENTIALS.xClient,
         'Content-Type': 'application/json',
-        'x-client': CREDENTIALS.xClient,
-        'x-pax': CREDENTIALS.xPax,
-        'x-api-key': CREDENTIALS.apiKey
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
         nomer: nomor,
