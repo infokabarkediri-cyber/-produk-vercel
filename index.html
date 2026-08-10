@@ -3,923 +3,255 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dashboard Performa & Stok</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Portal Cek Area & Stok Agen</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
-.wrap{max-width:1200px;margin:auto;padding:16px 12px 80px}
+* { box-sizing: border-box; }
+body { margin: 0; background: #f8fafc; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+button, input { font: inherit; }
 
-.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.operator-tabs{display:flex;gap:6px}
-.op-btn{border:0;padding:6px 16px;border-radius:6px;font-weight:800;font-size:12px;cursor:pointer;background:#e2e8f0;color:#64748b}
-.op-btn.active-xl{background:#1d4ed8;color:#fff}
-.op-btn.active-axis{background:#7e22ce;color:#fff}
-.sync-time{font-size:11px;color:#64748b;font-weight:600}
+/* Modal Login Khusus Agen */
+#authModal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.85); display: flex; justify-content: center; align-items: center; z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+.auth-card {
+  background: #ffffff; padding: 24px; border-radius: 14px; width: 100%; max-width: 380px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;
+}
+.auth-title { font-size: 15px; font-weight: 900; color: #0f172a; margin-bottom: 6px; }
+.auth-desc { font-size: 11px; color: #64748b; margin-bottom: 16px; font-weight: 600; line-height: 1.4; }
+.auth-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font-size: 13px; outline: none; margin-bottom: 10px; font-weight: 700; text-align: center; letter-spacing: 1px; }
+.auth-btn { width: 100%; background: #2563eb; color: #fff; border: 0; border-radius: 8px; padding: 10px; font-weight: 800; font-size: 12px; cursor: pointer; }
+.auth-btn:hover { background: #1d4ed8; }
+.auth-error { font-size: 10px; color: #dc2626; font-weight: 700; margin-top: 8px; display: none; }
 
-.sync-indicator-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
-.sync-left{display:flex;align-items:center;gap:10px}
-.spinner-ball{width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:#0f172a;border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.sync-text{font-size:11px;font-weight:700;color:#0f172a}
-.sync-timer{font-size:11px;font-weight:800;color:#059669;background:#ecfdf5;padding:3px 8px;border-radius:6px}
+/* Konten Utama */
+#mainDashboard { display: none; }
+.wrap { max-width: 1200px; margin: auto; padding: 16px 12px 80px; }
 
-.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
-.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;position:relative;overflow:hidden}
-.stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
-.stat-card.ready::before{background:#059669}
-.stat-card.sold::before{background:#3b82f6}
-.stat-card.day::before{background:#e11d48}
-.stat-card.sec::before{background:#ec4899}
-.stat-card.rate::before{background:#8b5cf6}
-.stat-card.speed::before{background:#f59e0b}
-.stat-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
-.stat-val{font-size:15px;font-weight:800;color:#0f172a;margin-top:2px}
-.stat-sub{font-size:9px;color:#94a3b8}
+/* Panel Generator Link Kustom Khusus Agen */
+.generator-box {
+  background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 14px; margin-bottom: 14px;
+}
+.gen-title { font-size: 12px; font-weight: 900; color: #1e40af; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.gen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+@media(max-width: 640px) { .gen-grid { grid-template-columns: 1fr; } }
+.gen-input { width: 100%; border: 1px solid #93c5fd; border-radius: 6px; padding: 8px 10px; font-size: 11px; outline: none; background: #fff; font-weight: 600; }
+.gen-result { background: #fff; border: 1px dashed #3b82f6; padding: 8px; border-radius: 6px; font-size: 11px; color: #1e3a8a; font-weight: 700; word-break: break-all; margin-top: 6px; }
 
-.checker-panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
-.checker-header{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
-.checker-sub{font-size:11px;color:#64748b;margin-bottom:10px}
-.checker-form{display:flex;gap:6px;flex-wrap:wrap}
-.checker-input{flex:1;min-width:180px;border:1px solid #cbd5e1;border-radius:8px;padding:8px 12px;outline:none;background:#f8fafc;font-size:12px}
-.checker-btn{background:#0f172a;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer}
-.checker-result{margin-top:10px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;display:none}
-.checker-result.active{display:block}
-.checker-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
-.checker-item{background:#fff;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px}
-.checker-item span{display:block;font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
-.checker-item b{font-size:12px;color:#0f172a}
+/* Komponen Asli Dashboard */
+.top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.operator-tabs { display: flex; gap: 6px; }
+.op-btn { border: 0; padding: 6px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; background: #e2e8f0; color: #64748b; }
+.op-btn.active-xl { background: #1d4ed8; color: #fff; }
 
-.package-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:8px}
-.package-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;border-bottom:1px solid #f1f5f9;padding-bottom:5px}
-.package-title{font-size:11px;font-weight:800;color:#0f172a}
-.package-exp{font-size:9px;color:#64748b;font-weight:600}
-.quota-row{margin-top:6px}
-.quota-info{display:flex;justify-content:space-between;font-size:10px;color:#475569;margin-bottom:2px}
-.quota-bar{height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden}
-.quota-progress{height:100%;background:#3b82f6;border-radius:2px}
+.area-dashboard-section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+.area-dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+.area-title-group { display: flex; align-items: center; gap: 8px; }
+.area-badge-pulse { display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+.pulse-dot { width: 6px; height: 6px; background: #059669; border-radius: 50%; }
 
-.insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-.insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px}
-.insight-title{font-size:12px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.insight-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:11px}
-.insight-item:last-child{border-bottom:0}
-.insight-item b{color:#0f172a}
-.badge-count{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-weight:800;font-size:10px}
-.badge-top{background:#ecfdf5;color:#059669}
-.badge-low{background:#fff1f2;color:#e11d48}
+.panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+.search-group { display: flex; gap: 8px; }
+.search { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; outline: none; background: #fff; font-size: 12px; }
+.search-btn { background: #1d4ed8; color: #fff; border: 0; border-radius: 8px; padding: 0 16px; font-size: 12px; font-weight: 800; cursor: pointer; }
 
-.chart-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
-.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
-.chart-header b{font-size:13px;color:#0f172a}
-.chart-header span{font-size:10px;color:#64748b;display:block}
-.date-filter-box{display:flex;gap:4px;align-items:center}
-.date-filter-box input{border:1px solid #cbd5e1;border-radius:6px;padding:4px 6px;font-size:10px;outline:none;background:#f8fafc}
-.date-filter-box button{background:#0f172a;color:#fff;border:0;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:700;cursor:pointer}
+.head { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 6px 6px; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px; }
+.head b { font-size: 14px; color: #0f172a; }
 
-.panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin-bottom:12px}
-.search{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;outline:none;background:#fff;font-size:12px}
-.filters{display:flex;gap:4px;overflow:auto;margin-top:8px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:6px;padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
-.head{display:flex;justify-content:space-between;align-items:baseline;padding:12px 6px 6px;border-bottom:1px solid #e2e8f0;margin-bottom:8px}
-.head b{font-size:14px;color:#0f172a}
-.head small{color:#64748b;font-size:10px;font-weight:600}
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px; cursor: pointer; background: #fff; position: relative; }
+.card:hover { border-color: #cbd5e1; }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.name { font-weight: 800; font-size: 11px; color: #0f172a; }
+.badge-open { font-size: 7px; font-weight: 800; border-radius: 99px; padding: 2px 5px; background: #ecfdf5; color: #059669; }
+.slot-label { font-size: 8px; color: #64748b; font-weight: 700; margin-top: 4px; text-transform: uppercase; }
+.slot-val { font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
 
-/* Quick Area Offer Banner */
-.area-offer-banner{background:linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);border:1px solid #bfdbfe;border-radius:12px;padding:14px;margin-bottom:12px;display:none;animation:fadeIn 0.3s ease}
-.area-offer-banner.active{display:block}
-.area-offer-title{font-size:13px;font-weight:800;color:#1e40af;margin-bottom:4px;display:flex;align-items:center;gap:6px}
-.area-offer-desc{font-size:11px;color:#475569;margin-bottom:10px}
-.area-offer-chips{display:flex;gap:6px;flex-wrap:wrap}
-.quota-chip{background:#fff;border:1px solid #93c5fd;color:#1d4ed8;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 1px 2px rgba(0,0,0,0.05);transition:all 0.2s}
-.quota-chip:hover{background:#dbeafe;border-color:#3b82f6}
+.area-list { border-top: 1px solid #f1f5f9; padding-top: 6px; margin-top: 6px; display: none; }
+.card.expanded .area-list { display: block; }
+.area-row { display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #475569; padding: 3px 0; border-bottom: 1px dashed #f8fafc; }
+.area-row b { color: #0f172a; background: #f8fafc; padding: 1px 5px; border-radius: 3px; border: 1px solid #e2e8f0; }
 
-@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-
-.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}
-.card{border:1px solid #e2e8f0;border-radius:10px;padding:8px;cursor:pointer;background:#fff;position:relative;transition:all 0.2s ease}
-.card:hover{border-color:#cbd5e1}
-.card.habis{background:#fafafa;opacity:0.85}
-
-.card-top{display:flex;justify-content:space-between;align-items:flex-start}
-.name{font-weight:800;font-size:11px;color:#0f172a}
-.badge-habis{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ffeeee;color:#dc2626}
-.badge-ready{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ecfdf5;color:#059669}
-.slot-label{font-size:8px;color:#64748b;font-weight:700;margin-top:4px;text-transform:uppercase}
-.slot-val{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
-
-.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
-.card.expanded .area-list{display:block}
-.area-row{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#475569;padding:3px 0;border-bottom:1px dashed #f8fafc}
-.area-row:last-child{border-bottom:0}
-.area-row b{color:#0f172a;background:#f8fafc;padding:1px 5px;border-radius:3px;border:1px solid #e2e8f0;font-size:9px}
-
-.card-actions{display:flex;gap:4px;margin-top:6px}
-.btn-detail{flex:1;background:#f1f5f9;color:#475569;border:0;border-radius:6px;padding:5px 0;font-size:9px;font-weight:700;cursor:pointer;text-align:center}
-.btn-autobuy{flex:1;background:#2563eb;color:#fff;border:0;border-radius:6px;padding:5px 0;font-size:9px;font-weight:800;cursor:pointer;text-align:center}
-.btn-autobuy:hover{background:#1d4ed8}
-
-/* Modal Auto Beli */
-.modal-backdrop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
-.modal-backdrop.active{display:flex}
-.modal-box{background:#fff;border-radius:12px;max-width:400px;width:100%;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.1);animation:fadeIn 0.2s ease}
-.modal-title{font-size:14px;font-weight:800;color:#0f172a;margin-bottom:4px}
-.modal-sub{font-size:11px;color:#64748b;margin-bottom:14px}
-.modal-input{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:12px;outline:none;background:#f8fafc;margin-bottom:12px}
-.modal-buttons{display:flex;gap:8px}
-.modal-btn-cancel{flex:1;background:#e2e8f0;color:#475569;border:0;border-radius:8px;padding:10px;font-size:11px;font-weight:700;cursor:pointer}
-.modal-btn-submit{flex:1;background:#059669;color:#fff;border:0;border-radius:8px;padding:10px;font-size:11px;font-weight:800;cursor:pointer}
-
-.footer-brand{text-align:center;font-size:10px;color:#94a3b8;margin-top:20px;font-weight:600}
-
-@media(max-width:1024px){.stats-grid{grid-template-columns:repeat(3,1fr)}.insight-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:6px}.name{font-size:10px}.slot-val{font-size:11px}}
+.card-actions { display: flex; gap: 4px; margin-top: 6px; }
+.btn-detail { flex: 1; background: #f1f5f9; color: #475569; border: 0; border-radius: 6px; padding: 5px 0; font-size: 9px; font-weight: 700; cursor: pointer; text-align: center; }
+.btn-autobuy { flex: 1; background: #2563eb; color: #fff; border: 0; border-radius: 6px; padding: 5px 0; font-size: 9px; font-weight: 800; cursor: pointer; text-align: center; }
 </style>
 </head>
 <body>
-<main class="wrap">
-  <div class="top-nav">
-    <div class="operator-tabs">
-      <button class="op-btn active-xl" id="btnXl" onclick="switchOperator('XL')">XL</button>
-      <button class="op-btn" id="btnAxis" onclick="switchOperator('AXIS')">AXIS</button>
+
+  <!-- MODAL LOGIN KHUSUS AGEN -->
+  <div id="authModal">
+    <div class="auth-card">
+      <div class="auth-title">🔒 Portal Akses Agen</div>
+      <div class="auth-desc">Masukkan Kode Akses Khusus Agen untuk masuk ke Cek Area & Generator Link:</div>
+      <input type="password" id="resellerTokenInput" class="auth-input" placeholder="Kode Akses Agen...">
+      <button class="auth-btn" onclick="verifikasiReseller()">Masuk Portal</button>
+      <div id="authErrorMsg" class="auth-error">❌ Kode Akses Salah! Hubungi Admin.</div>
     </div>
-    <div class="sync-time" id="syncClockTime">Sinkron: --.--.--</div>
   </div>
 
-  <div class="sync-indicator-container">
-    <div class="sync-left">
-      <div class="spinner-ball"></div>
-      <div>
-        <div class="sync-text">Sinkronisasi Real-Time Aktif</div>
-        <div style="font-size:9px;color:#64748b;">Pembaruan data otomatis setiap 1 detik</div>
+  <!-- DASHBOARD UTAMA -->
+  <div id="mainDashboard">
+    <main class="wrap">
+      
+      <!-- PANEL KHUSUS AGEN BUAT BIKIN LINK CUSTOM -->
+      <div class="generator-box">
+        <div class="gen-title">
+          <span>🛠️ Panel Agen: Buat Link Share untuk Customer</span>
+          <span style="cursor:pointer; color:#dc2626;" onclick="logoutReseller()">Keluar 🔒</span>
+        </div>
+        <div class="gen-grid">
+          <input type="text" id="customNamaToko" class="gen-input" placeholder="Nama Toko/Konter Anda">
+          <input type="text" id="customNoWa" class="gen-input" placeholder="No WhatsApp (Contoh: 62812...)">
+        </div>
+        <button class="auth-btn" style="padding: 6px; font-size:11px;" onclick="generateLinkCustom()">Generate Link Khusus Toko Saya</button>
+        <div class="gen-result" id="hasilLinkContainer" style="display:none;">
+          🔗 Link Toko Anda: <span id="textLinkJadi" style="color:#2563eb; font-weight:900;">-</span>
+        </div>
       </div>
-    </div>
-    <div class="sync-timer" id="syncTimerBadge">1s</div>
-  </div>
 
-  <div class="stats-grid">
-    <div class="stat-card ready">
-      <div class="stat-label">Tersedia</div>
-      <div class="stat-val" id="statReady">0</div>
-      <div class="stat-sub" id="statReadyVariant">0 varian</div>
-    </div>
-    <div class="stat-card sold">
-      <div class="stat-label">Total</div>
-      <div class="stat-val" id="statSold">0</div>
-      <div class="stat-sub">Akumulasi</div>
-    </div>
-    <div class="stat-card day">
-      <div class="stat-label">Hari Ini</div>
-      <div class="stat-val" id="statDay">0</div>
-      <div class="stat-sub">Terjual</div>
-    </div>
-    <div class="stat-card sec">
-      <div class="stat-label">Detik Ini</div>
-      <div class="stat-val" id="statSec">0</div>
-      <div class="stat-sub">Masuk</div>
-    </div>
-    <div class="stat-card rate">
-      <div class="stat-label">Menit Ini</div>
-      <div class="stat-val" id="statMin">0</div>
-      <div class="stat-sub">Masuk</div>
-    </div>
-    <div class="stat-card speed">
-      <div class="stat-label">Jam Ini</div>
-      <div class="stat-val" id="statHour">0</div>
-      <div class="stat-sub">Masuk</div>
-    </div>
-  </div>
-
-  <div class="checker-panel">
-    <div class="checker-header">🔍 Cek Info Nomor & Paket</div>
-    <div class="checker-sub">Mengecek info detail nomor HP menggunakan API Serverless</div>
-    <div class="checker-form">
-      <input type="text" id="checkNomorInput" class="checker-input" placeholder="Masukkan nomor HP (misal: 0819...)...">
-      <button class="checker-btn" onclick="cekInfoDompul()">Cek Nomor</button>
-    </div>
-    <div id="checkerResult" class="checker-result">
-      <div id="checkerResultContent">Memuat...</div>
-    </div>
-  </div>
-
-  <div class="insight-grid">
-    <div class="insight-card">
-      <div class="insight-title">🔥 Top 3 Terjual Terbanyak</div>
-      <div id="topSoldList"><div style="font-size:10px;color:#94a3b8">Memuat data...</div></div>
-    </div>
-    <div class="insight-card">
-      <div class="insight-title">🧊 Top 3 Terjual Terendah</div>
-      <div id="lowSoldList"><div style="font-size:10px;color:#94a3b8">Memuat data...</div></div>
-    </div>
-  </div>
-
-  <div class="chart-container">
-    <div class="chart-header">
-      <div>
-        <b>📈 Grafik Penjualan Per Hari</b>
-        <span>Analisis tren harian & filter rentang tanggal</span>
+      <div class="top-nav">
+        <div class="operator-tabs">
+          <button class="op-btn active-xl">XL</button>
+          <button class="op-btn">AXIS</button>
+        </div>
+        <div class="sync-time" id="labelInfoPelanggan" style="font-weight:700; color:#1e40af;">Sistem Agen Aktif</div>
       </div>
-      <div class="date-filter-box">
-        <input type="date" id="startDateFilter">
-        <span style="font-size:10px;color:#64748b">s/d</span>
-        <input type="date" id="endDateFilter">
-        <button onclick="applyDateFilter()">Filter</button>
-        <button onclick="resetDateFilter()" style="background:#64748b">Reset</button>
+
+      <div class="panel" style="padding:10px 12px;">
+        <div class="search-group">
+          <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten...">
+          <button class="search-btn" onclick="prosesCekArea()">Cek Area</button>
+        </div>
       </div>
-    </div>
-    <div style="position: relative; height: 220px; width: 100%;">
-      <canvas id="salesChart"></canvas>
-    </div>
-  </div>
 
-  <div class="panel" style="padding:10px 12px;">
-    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten (Contoh: Bandung, Surabaya, Blitar)...">
-    <div class="filters">
-      <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
-      <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
-      <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
-      <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
-      <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
-      <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
-    </div>
-  </div>
+      <div id="areaDashboardSection" class="area-dashboard-section">
+        <div class="area-dashboard-header">
+          <div class="area-title-group">
+            <div class="area-badge-pulse">
+              <div class="pulse-dot"></div>
+              <span>AREA AKTIF</span>
+            </div>
+            <span id="displayAreaName" style="font-size:12px; font-weight:800; color:#0f172a;">Semarang</span>
+          </div>
+          <div class="area-meta-info" id="badgeTokoAktif">Mitra: Agen Resmi</div>
+        </div>
+      </div>
 
-  <!-- Menu Baru: Banner Penawaran Kuota Instan Berdasarkan Area Terdeteksi -->
-  <div id="areaOfferBanner" class="area-offer-banner">
-    <div class="area-offer-title">⚡ Penawaran Khusus <span id="bannerAreaName">-</span></div>
-    <div class="area-offer-desc" id="bannerAreaDesc">Pilih opsi kuota cepat untuk area ini dan lakukan transaksi otomatis secara instan:</div>
-    <div class="area-offer-chips" id="bannerChipsContainer"></div>
+      <div class="head"><b>Kategori V5</b> <small>Ready Stok</small></div>
+      <div class="grid">
+        <div class="card" onclick="toggleCard(this)">
+          <div class="card-top">
+            <div class="name">PDA13 (10 GB)</div>
+            <span class="badge-open">OPEN</span>
+          </div>
+          <div class="slot-label">Stok</div>
+          <div class="slot-val" id="stok-pda13">1.420 Unit</div>
+          <div class="area-list">
+            <div class="area-row"><span>Area</span><b class="val-area-text">Semarang</b></div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-detail">Detail ▼</button>
+            <button class="btn-autobuy" onclick="event.stopPropagation(); beliKeReseller('PDA13', '10 GB')">Auto Beli (WA)</button>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
-
-  <div id="stockList"></div>
-  <div class="footer-brand">System Dashboard © 2026</div>
-</main>
-
-<!-- Modal Auto Beli -->
-<div id="autoBuyModal" class="modal-backdrop">
-  <div class="modal-box">
-    <div class="modal-title">🚀 Auto Beli Produk</div>
-    <div class="modal-sub" id="modalProductSub">Konfirmasi transaksi untuk produk ini</div>
-    <input type="text" id="modalNomorInput" class="modal-input" placeholder="Nomor HP Tujuan (Contoh: 0819...)">
-    <div class="modal-buttons">
-      <button class="modal-btn-cancel" onclick="closeAutoBuyModal()">Batal</button>
-      <button class="modal-btn-submit" onclick="submitAutoBuy()">Proses Beli</button>
-    </div>
-  </div>
-</div>
 
 <script>
-const areaDatabase = [
-  {
-    area: "Area 2",
-    provinces: [
-      { name: "Banten", cities: ["Kota Tangerang Selatan", "Kota Tangerang", "Kab. Tangerang", "Kab. Pandeglang", "Kab. Lebak", "Kab. Serang", "Kota Serang", "Kota Cilegon"] },
-      { name: "DKI Jakarta", cities: ["Kota Jakarta Pusat", "Kota Jakarta Selatan", "Kota Jakarta Barat", "Kota Jakarta Timur", "Kota Jakarta Utara"] },
-      { name: "Jawa Barat", cities: ["Kab. Bandung Barat", "Kota Cimahi", "Kab. Cirebon", "Kota Cirebon", "Kab. Indramayu", "Kab. Subang"] },
-      { name: "Jawa Tengah", cities: ["Kab. Tegal", "Kota Surakarta", "Kota Tegal", "Kab. Brebes", "Kab. Kebumen", "Kab. Pemalang", "Kota Semarang"] },
-      { name: "Jawa Timur", cities: ["Kota Probolinggo", "Kab. Bangkalan", "Kab. Sidoarjo", "Kab. Banyuwangi", "Kota Surabaya", "Kab. Sampang", "Kab. Pamekasan", "Kab. Sumenep", "Kab. Pacitan"] },
-      { name: "Kepulauan Bangka Belitung", cities: ["Kab. Bangka Selatan", "Kota Pangkal Pinang", "Kab. Belitung", "Kab. Belitung Timur"] },
-      { name: "Kepulauan Riau", cities: ["Kota Batam"] },
-      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Barat Daya", "Kab. Aceh Besar", "Kota Sabang", "Kab. Gayo Lues"] },
-      { name: "Riau", cities: ["Kota Pekanbaru"] },
-      { name: "Sumatera Barat", cities: ["Kab. Kepulauan Mentawai"] },
-      { name: "Sumatera Utara", cities: ["Kab. Karo", "Kota Medan", "Kab. Dairi"] },
-      { name: "Kalimantan Selatan", cities: ["Kab. Hulu Sungai Tengah", "Kab. Tapin", "Kab. Hulu Sungai Utara", "Kab. Tabalong", "Kota Banjarmasin", "Kab. Banjar", "Kab. Tanah Bumbu", "Kota Banjarbaru", "Kab. Hulu Sungai Selatan"] },
-      { name: "Sulawesi Barat", cities: ["Kab. Majene", "Kab. Polewali Mandar", "Kab. Mamuju Utara"] },
-      { name: "Sulawesi Selatan", cities: ["Kab. Barru", "Kota Pare Pare", "Kab. Pinrang"] },
-      { name: "Sulawesi Tenggara", cities: ["Kota Bau Bau", "Kab. Muna", "Kab. Buton Selatan", "Kab. Buton Tengah", "Kab. Muna Barat"] },
-      { name: "Bali", cities: ["Kab. Badung", "Kab. Karangasem", "Kab. Tabanan", "Kab. Bangli", "Kab. Gianyar", "Kab. Klungkung", "Kota Denpasar"] },
-      { name: "Nusa Tenggara Barat", cities: ["Kab. Lombok Barat", "Kab. Lombok Timur", "Kota Mataram", "Kab. Lombok Tengah", "Kab. Lombok Utara", "Kab. Sumbawa Barat", "Kab. Sumbawa", "Kota Bima", "Kab. Dompu"] }
-    ]
-  },
-  {
-    area: "Area 1",
-    provinces: [
-      { name: "DI Yogyakarta", cities: ["Kab. Kulon Progo", "Kota Yogyakarta", "Kab. Sleman", "Kab. Bantul", "Kab. Gunungkidul"] },
-      { name: "Jawa Barat", cities: ["Kab. Bandung", "Kab. Kuningan", "Kab. Purwakarta", "Kota Bandung"] },
-      { name: "Bali", cities: ["Kab. Jembrana", "Kab. Buleleng"] },
-      { name: "Maluku Utara", cities: ["Kab. Halmahera Barat", "Kab. Halmahera Utara", "Kab. Kepulauan Sula", "Kab. Halmahera Timur", "Kab. Pulau Taliabu", "Kab. Halmahera Selatan", "Kota Tidore Kepulauan", "Kota Ternate", "Kab. Halmahera Tengah", "Kab. Pulau Morotai"] },
-      { name: "Papua", cities: ["Kab. Asmat", "Kab. Jayapura", "Kab. Mimika", "Kab. Keerom", "Kab. Biak Numfor", "Kota Jayapura", "Kab. Kepulauan Yapen", "Kab. Boven Digoel", "Kab. Merauke", "Kab. Deiyai", "Kab. Dogiyai", "Kab. Intan Jaya", "Kab. Jayawijaya", "Kab. Lanny Jaya", "Kab. Mamberamo Raya", "Kab. Mamberamo Tengah", "Kab. Mappi", "Kab. Nabire", "Kab. Nduga", "Kab. Paniai", "Kab. Pegunungan Bintang", "Kab. Puncak", "Kab. Puncak Jaya", "Kab. Sarmi", "Kab. Supiori", "Kab. Tolikara", "Kab. Waropen", "Kab. Yahukimo", "Kab. Yalimo"] },
-      { name: "Papua Barat", cities: ["Kab. Teluk Bintuni", "Kab. Sorong Selatan", "Kab. Sorong", "Kab. Teluk Wondama", "Kota Sorong", "Kab. Manokwari", "Kab. Fak Fak", "Kab. Kaimana", "Kab. Manokwari Selatan", "Kab. Maybrat", "Kab. Pegunungan Arfak", "Kab. Raja Ampat", "Kab. Tambrauw"] }
-    ]
-  },
-  {
-    area: "Area 3",
-    provinces: [
-      { name: "DKI Jakarta", cities: ["Kab. Kepulauan Seribu"] },
-      { name: "Jawa Barat", cities: ["Kab. Bogor", "Kota Bogor", "Kota Depok", "Kota Bekasi", "Kota Banjar", "Kab. Ciamis", "Kota Tasikmalaya", "Kab. Majalengka", "Kab. Sumedang", "Kab. Bekasi", "Kab. Tasikmalaya", "Kab. Garut"] },
-      { name: "Jawa Tengah", cities: ["Kab. Boyolali", "Kota Salatiga", "Kab. Semarang", "Kab. Cilacap", "Kab. Grobogan", "Kab. Kendal", "Kab. Rembang"] },
-      { name: "Jawa Timur", cities: ["Kab. Lumajang", "Kab. Probolinggo"] },
-      { name: "Bengkulu", cities: ["Kab. Seluma"] },
-      { name: "Jambi", cities: ["Kab. Batanghari", "Kota Jambi", "Kab. Tanjung Jabung Barat", "Kab. Muaro Jambi", "Kab. Sarolangun"] },
-      { name: "Kepulauan Bangka Belitung", cities: ["Kab. Bangka", "Kab. Bangka Tengah", "Kab. Bangka Barat"] },
-      { name: "Kepulauan Riau", cities: ["Kab. Karimun", "Kab. Bintan", "Kota Tanjung Pinang"] },
-      { name: "Lampung", cities: ["Kab. Lampung Tengah", "Kab. Pringsewu", "Kota Metro", "Kab. Pesawaran", "Kab. Lampung Selatan", "Kota Bandar Lampung"] },
-      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Jaya", "Kab. Aceh Selatan", "Kab. Aceh Tenggara", "Kab. Nagan Raya", "Kota Banda Aceh"] },
-      { name: "Riau", cities: ["Kab. Kuantan Singingi", "Kab. Pelalawan", "Kab. Kampar", "Kab. Siak", "Kota Dumai", "Kab. Rokan Hilir", "Kab. Indragiri Hulu", "Kab. Kepulauan Meranti", "Kab. Bengkalis"] },
-      { name: "Sumatera Barat", cities: ["Kota Payakumbuh", "Kota Padang Panjang", "Kab. Sijunjung", "Kab. Padang Pariaman", "Kota Padang", "Kab. Solok Selatan"] },
-      { name: "Sumatera Selatan", cities: ["Kab. Ogan Komering Ilir", "Kab. Penukal Abab Lematang Ilir", "Kab. Banyuasin", "Kota Palembang", "Kab. Ogan Ilir"] },
-      { name: "Sumatera Utara", cities: ["Kota Binjai", "Kota Tebing Tinggi", "Kab. Serdang Bedagai", "Kab. Langkat", "Kab. Deli Serdang", "Kab. Batu Bara", "Kota Tanjung Balai", "Kab. Asahan", "Kota Gunungsitoli", "Kab. Nias Barat", "Kab. Nias Selatan", "Kab. Nias Utara"] },
-      { name: "Kalimantan Selatan", cities: ["Kab. Balangan", "Kab. Barito Kuala", "Kab. Tanah Laut", "Kab. Kotabaru"] },
-      { name: "Kalimantan Tengah", cities: ["Kab. Kapuas", "Kab. Pulang Pisau", "Kota Palangkaraya"] },
-      { name: "Sulawesi Barat", cities: ["Kab. Mamuju", "Kab. Mamasa"] },
-      { name: "Sulawesi Selatan", cities: ["Kab. Kepulauan Selayar", "Kab. Takalar", "Kab. Jeneponto", "Kab. Bulukumba", "Kab. Pangkajene Kepulauan", "Kota Makassar", "Kab. Gowa", "Kab. Maros", "Kab. Bone", "Kab. Wajo", "Kab. Luwu", "Kab. Luwu Utara", "Kota Palopo", "Kab. Toraja Utara"] },
-      { name: "Sulawesi Tengah", cities: ["Kab. Banggai", "Kab. Parigi Moutong", "Kab. Donggala", "Kab. Sigi", "Kab. Poso", "Kab. Buol"] },
-      { name: "Sulawesi Tenggara", cities: ["Kab. Kolaka", "Kab. Kolaka Utara", "Kab. Konawe", "Kab. Konawe Selatan", "Kota Kendari", "Kab. Kolaka Timur", "Kab. Buton", "Kab. Bombana"] }
-    ]
-  },
-  {
-    area: "Area 4",
-    provinces: [
-      { name: "Jawa Barat", cities: ["Kab. Cianjur", "Kab. Pangandaran", "Kab. Karawang", "Kota Sukabumi", "Kab. Sukabumi"] },
-      { name: "Jawa Tengah", cities: ["Kab. Tegal", "Kota Surakarta", "Kota Tegal", "Kab. Brebes", "Kab. Kebumen", "Kab. Pemalang", "Kota Semarang", "Kota Pekalongan", "Kab. Pekalongan", "Kab. Batang", "Kab. Purbalingga", "Kab. Kudus", "Kab. Sukoharjo", "Kab. Klaten", "Kota Magelang", "Kab. Banyumas", "Kab. Magelang", "Kab. Temanggung", "Kab. Sragen", "Kab. Banjarnegara", "Kab. Karanganyar", "Kab. Wonosobo", "Kab. Jepara", "Kab. Demak", "Kab. Purworejo", "Kab. Blora", "Kab. Wonogiri", "Kab. Pati"] },
-      { name: "Jawa Timur", cities: ["Kab. Jombang", "Kota Blitar", "Kab. Blitar", "Kota Kediri", "Kab. Lamongan", "Kab. Kediri", "Kab. Ngawi", "Kab. Mojokerto", "Kota Mojokerto", "Kab. Magetan", "Kab. Gresik", "Kab. Tulungagung", "Kab. Nganjuk", "Kab. Pasuruan", "Kota Pasuruan", "Kab. Bojonegoro", "Kab. Madiun", "Kab. Bondowoso", "Kab. Tuban", "Kota Madiun", "Kab. Situbondo", "Kab. Jember", "Kota Malang", "Kab. Malang", "Kab. Ponorogo", "Kota Batu", "Kab. Trenggalek"] },
-      { name: "Bengkulu", cities: ["Kab. Bengkulu Selatan", "Kab. Kaur", "Kab. Lebong", "Kab. Rejang Lebong", "Kab. Bengkulu Tengah", "Kota Bengkulu", "Kab. Bengkulu Utara", "Kab. Kepahiang", "Kab. Muko Muko"] },
-      { name: "Jambi", cities: ["Kab. Tanjung Jabung Timur", "Kab. Kerinci", "Kab. Bungo", "Kab. Tebo", "Kab. Merangin", "Kota Sungai Penuh"] },
-      { name: "Kepulauan Riau", cities: ["Kab. Lingga", "Kab. Kepulauan Anambas", "Kab. Natuna"] },
-      { name: "Lampung", cities: ["Kab. Lampung Barat", "Kab. Lampung Timur", "Kab. Tulang Bawang Barat", "Kab. Way Kanan", "Kab. Tulang Bawang", "Kab. Tanggamus", "Kab. Pesisir Barat", "Kab. Lampung Utara", "Kab. Mesuji"] },
-      { name: "Nanggroe Aceh Darussalam", cities: ["Kab. Aceh Barat", "Kab. Aceh Singkil", "Kab. Aceh Tamiang", "Kab. Aceh Tengah", "Kota Subulussalam", "Kab. Bener Meriah", "Kab. Aceh Utara", "Kota Lhokseumawe", "Kab. Pidie", "Kab. Aceh Timur", "Kab. Simeulue", "Kota Langsa", "Kab. Bireuen", "Kab. Pidie Jaya"] },
-      { name: "Riau", cities: ["Kab. Rokan Hulu", "Kab. Indragiri Hilir"] },
-      { name: "Sumatera Barat", cities: ["Kab. Pasaman Barat", "Kab. Pasaman", "Kab. Lima Puluh Kota", "Kab. Tanah Datar", "Kab. Dharmasraya", "Kota Solok", "Kab. Agam", "Kab. Solok", "Kota Bukittinggi", "Kota Pariaman", "Kota Sawahlunto", "Kab. Pesisir Selatan"] },
-      { name: "Sumatera Selatan", cities: ["Kab. Ogan Komering Ulu Timur", "Kab. Ogan Komering Ulu Selatan", "Kab. Ogan Komering Ulu", "Kab. Musi Rawas", "Kab. Musi Rawas Utara", "Kab. Empat Lawang", "Kota Pagar Alam", "Kota Lubuk Linggau", "Kab. Musi Banyuasin", "Kab. Muara Enim", "Kab. Lahat", "Kota Prabumulih"] },
-      { name: "Sumatera Utara", cities: ["Kab. Pakpak Bharat", "Kab. Mandailing Natal", "Kab. Padang Lawas", "Kab. Labuhanbatu Utara", "Kota Padangsidimpuan", "Kab. Tapanuli Selatan", "Kab. Labuhanbatu Selatan", "Kab. Labuhanbatu", "Kab. Tapanuli Utara", "Kab. Padang Lawas Utara", "Kab. Humbang Hasundutan", "Kab. Simalungun", "Kab. Toba Samosir", "Kota Pematangsiantar", "Kab. Tapanuli Tengah", "Kab. Samosir", "Kota Sibolga", "Kab. Nias"] },
-      { name: "Kalimantan Barat", cities: ["Kab. Sekadau", "Kab. Kapuas Hulu", "Kab. Sintang", "Kab. Bengkayang", "Kab. Melawi", "Kab. Sambas", "Kab. Sanggau", "Kab. Kubu Raya", "Kota Pontianak", "Kab. Kayong Utara", "Kab. Landak", "Kab. Mempawah", "Kota Singkawang", "Kab. Ketapang"] },
-      { name: "Kalimantan Tengah", cities: ["Kab. Seruyan", "Kab. Kotawaringin Barat", "Kab. Katingan", "Kab. Kotawaringin Timur", "Kab. Sukamara", "Kab. Lamandau", "Kab. Murung Raya", "Kab. Barito Timur", "Kab. Barito Utara", "Kab. Barito Selatan", "Kab. Gunung Mas"] },
-      { name: "Kalimantan Timur", cities: ["Kab. Penajam Paser Utara", "Kota Balikpapan", "Kab. Paser", "Kab. Kutai Kartanegara", "Kota Samarinda", "Kota Bontang", "Kab. Berau", "Kab. Kutai Timur", "Kab. Kutai Barat", "Kab. Mahakam Ulu"] },
-      { name: "Kalimantan Utara", cities: ["Kab. Tana Tidung", "Kab. Malinau", "Kab. Bulungan", "Kota Tarakan", "Kab. Nunukan"] },
-      { name: "Gorontalo", cities: ["Kab. Pahuwato", "Kab. Boalemo", "Kab. Gorontalo", "Kota Gorontalo", "Kab. Gorontalo Utara", "Kab. Bone Bolango"] },
-      { name: "Sulawesi Barat", cities: ["Kab. Mamuju Tengah"] },
-      { name: "Sulawesi Selatan", cities: ["Kab. Sinjai", "Kab. Enrekang", "Kab. Sidenreng Rappang", "Kab. Luwu Timur", "Kab. Soppeng", "Kab. Tana Toraja"] },
-      { name: "Sulawesi Tengah", cities: ["Kab. Banggai Kepulauan", "Kab. Banggai Laut", "Kota Palu", "Kab. Toli Toli", "Kab. Tojo Una Una", "Kab. Morowali", "Kab. Morowali Utara"] },
-      { name: "Sulawesi Tenggara", cities: ["Kab. Konawe Kepulauan", "Kab. Konawe Utara", "Kab. Buton Utara", "Kab. Wakatobi"] },
-      { name: "Sulawesi Utara", cities: ["Kab. Bolaang Mongondow", "Kab. Bolaang Mongondow Selatan", "Kota Kotamobagu", "Kab. Minahasa Selatan", "Kab. Bolaang Mongondow Timur", "Kab. Minahasa Tenggara", "Kab. Bolaang Mongondow Utara", "Kota Tomohon", "Kab. Minahasa", "Kota Manado", "Kab. Minahasa Utara", "Kota Bitung", "Kab. Kepulauan Sangihe", "Kab. Kepulauan Talaud", "Kab. Siau Tagulandang Biaro"] },
-      { name: "Nusa Tenggara Timur", cities: ["Kab. Alor", "Kota Kupang", "Kab. Kupang", "Kab. Malaka", "Kab. Manggarai Barat", "Kab. Timor Tengah Selatan", "Kab. Belu", "Kab. Sikka", "Kab. Timor Tengah Utara", "Kab. Lembata", "Kab. Manggarai Timur", "Kab. Ende", "Kab. Sumba Barat Daya", "Kab. Rote Ndao", "Kab. Nagekeo", "Kab. Flores Timur", "Kab. Ngada", "Kab. Sumba Tengah", "Kab. Manggarai", "Kab. Sumba Barat", "Kab. Sumba Timur", "Kab. Sabu Raijua"] },
-      { name: "Maluku", cities: ["Kab. Maluku Tenggara Barat", "Kab. Kepulauan Aru", "Kota Tual", "Kab. Seram Bagian Barat", "Kab. Maluku Tengah", "Kab. Seram Bagian Timur", "Kota Ambon", "Kab. Maluku Tenggara", "Kab. Maluku Barat Daya", "Kab. Buru Selatan", "Kab. Buru"] }
-    ]
+// Token resmi untuk login agen
+const daftarKodeReseller = ["AGEN2026", "PARTNERKU"];
+
+// Menangkap data dari URL jika customer membuka link share dari agen
+const urlParams = new URLSearchParams(window.location.search);
+const paramToko = urlParams.get('toko');
+const paramWa = urlParams.get('wa');
+
+window.onload = function() {
+  if (paramToko && paramWa) {
+    // Customer membuka link dari agen
+    document.getElementById('authModal').style.display = 'none';
+    document.getElementById('mainDashboard').style.display = 'block';
+    document.querySelector('.generator-box').style.display = 'none';
+    
+    document.getElementById('labelInfoPelanggan').textContent = "Konter: " + decodeURIComponent(paramToko);
+    document.getElementById('badgeTokoAktif').textContent = "Layanan oleh: " + decodeURIComponent(paramToko);
+  } 
+  else {
+    // Login Agen
+    if (sessionStorage.getItem("isAgentAuthenticated") === "true") {
+      document.getElementById('authModal').style.display = 'none';
+      document.getElementById('mainDashboard').style.display = 'block';
+    }
   }
-];
+};
 
-let products = [];
-let initialStockMap = JSON.parse(localStorage.getItem("ic_initial_stock")) || {}; 
-let previousTotalSold = 0;
-let productSoldMap = {}; 
-let totalSoldUnits = 0;   
-let activeVersion = "ALL";
-let activeOperator = "XL";
-let totalSoldAtStartOfDay = 0; 
-let lastDate = new Date().getDate();
+function verifikasiReseller() {
+  const inputCode = document.getElementById('resellerTokenInput').value.trim();
+  const errorMsg = document.getElementById('authErrorMsg');
 
-let transactionLogs = [];
-let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
-let salesChart;
-let countdownTimer = 1;
-let selectedProductForAutoBuy = null;
-
-function switchOperator(op) {
-  activeOperator = op;
-  const btnXl = document.getElementById("btnXl");
-  const btnAxis = document.getElementById("btnAxis");
-  if (op === 'XL') {
-    btnXl.className = "op-btn active-xl";
-    btnAxis.className = "op-btn";
+  if (daftarKodeReseller.includes(inputCode)) {
+    sessionStorage.setItem("isAgentAuthenticated", "true");
+    document.getElementById('authModal').style.display = 'none';
+    document.getElementById('mainDashboard').style.display = 'block';
   } else {
-    btnXl.className = "op-btn";
-    btnAxis.className = "op-btn active-axis";
-  }
-  fetchProducts();
-}
-
-function initChart() {
-  const ctx = document.getElementById('salesChart').getContext('2d');
-  salesChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [
-        { label: 'V1', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V2', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V3', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V4', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }
-    }
-  });
-  renderChartFiltered();
-}
-
-function getMinGbFromText(text) {
-  const matches = [...text.matchAll(/(\d+)\s*(?:gb|g)/gi)];
-  if (matches.length > 0) {
-    const numbers = matches.map(m => parseInt(m[1]));
-    return Math.min(...numbers);
-  }
-  return 999999;
-}
-
-function cleanAreaValue(rawLine) {
-  let cleaned = rawLine.replace(/^(?:area|total\s*area)\s*\d*\s*[:\-]?\s*/i, "").trim();
-  const matchRange = cleaned.match(/(\d+)\s*-\s*(\d+)\s*(?:gb|g)/i);
-  if (matchRange) return `${matchRange[1]} GB`;
-  const matchSingle = cleaned.match(/(\d+)\s*(?:gb|g)/i);
-  if (matchSingle) return `${matchSingle[1]} GB`;
-  return cleaned || "-";
-}
-
-async function fetchProducts() {
-  countdownTimer = 1; 
-  try {
-    const res = await fetch('https://api.ics-store.my.id/api/reseller/products', {
-      method: 'GET',
-      headers: { 
-        'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
-        'Accept': 'application/json'
-      }
-    });
-    const result = await res.json();
-    if (result.success && Array.isArray(result.data)) {
-      let currentSoldDiff = 0;
-      let vSoldCounts = { V1: 0, V2: 0, V3: 0, V4: 0 };
-
-      products = result.data.map(item => {
-        const code = (item.code || "").toUpperCase();
-        let v = "OTHER";
-        if (code.startsWith("XLA")) v = "V1";
-        else if (code.startsWith("XDA")) v = "V2";
-        else if (code.startsWith("KDA")) v = "V3";
-        else if (code.startsWith("XLF")) v = "V4";
-        else if (code.startsWith("PDA")) v = "V5";
-
-        let currentStock = item.stock !== undefined ? Number(item.stock) : 0;
-        let soldQty = 0;
-
-        if (v !== "V5") {
-          if (!(code in initialStockMap)) {
-            initialStockMap[code] = currentStock;
-            localStorage.setItem("ic_initial_stock", JSON.stringify(initialStockMap));
-          }
-          let diff = initialStockMap[code] - currentStock;
-          if (diff > 0) soldQty = diff;
-          currentSoldDiff += soldQty;
-          if (v in vSoldCounts) vSoldCounts[v] += soldQty;
-          productSoldMap[code] = soldQty;
-        }
-
-        let desc = item.description || "";
-        let areas = { a1: "-", a2: "-", a3: "-", a4: "-" };
-        const lines = desc.split("\n");
-        let idx = 1;
-        lines.forEach(l => {
-          if (/kuota\s*sesuai/i.test(l)) return;
-          if (/area/i.test(l) || /(\d+)\s*(?:gb|g)/i.test(l)) {
-            if (idx <= 4) {
-              areas['a' + idx] = cleanAreaValue(l);
-              idx++;
-            }
-          }
-        });
-
-        const combinedAreasText = `${areas.a1} ${areas.a2} ${areas.a3} ${areas.a4}`.toLowerCase();
-        let quotaText = "-";
-        const matchQuota = desc.match(/(\d+)\s*(?:gb|g)/i);
-        if (matchQuota) quotaText = `${matchQuota[1]} GB`;
-
-        return {
-          v: v,
-          code: item.code,
-          name: item.name,
-          stock: currentStock,
-          sold: soldQty,
-          descText: desc.toLowerCase(),
-          areasText: combinedAreasText,
-          minGb: getMinGbFromText(desc),
-          quotaText: quotaText,
-          areas: areas
-        };
-      }).filter(p => p.v !== "OTHER");
-      
-      let newlySold = currentSoldDiff - previousTotalSold;
-      if (newlySold > 0) {
-        transactionLogs.push({ time: Date.now(), count: newlySold });
-      }
-      previousTotalSold = currentSoldDiff;
-      totalSoldUnits = currentSoldDiff;
-
-      updateStatistics();
-      updateProductInsights();
-      renderStock();
-      recordDailyData(vSoldCounts);
-    }
-  } catch (err) { 
-    console.error(err); 
+    errorMsg.style.display = 'block';
   }
 }
 
-function updateStatistics() {
-  let today = new Date().getDate();
-  if (today !== lastDate) {
-    totalSoldAtStartOfDay = totalSoldUnits; 
-    lastDate = today;
-  }
-
-  const now = Date.now();
-  const lastSecond = transactionLogs.filter(t => now - t.time <= 1000).reduce((a, b) => a + b.count, 0);
-  const lastMinute = transactionLogs.filter(t => now - t.time <= 60000).reduce((a, b) => a + b.count, 0);
-  const lastHour   = transactionLogs.filter(t => now - t.time <= 3600000).reduce((a, b) => a + b.count, 0);
-
-  transactionLogs = transactionLogs.filter(t => now - t.time <= 3600000);
-
-  let totalReadyUnits = 0;
-  let readyVariantCount = 0;
-
-  products.forEach(p => {
-    if (p.stock > 0 && p.v !== "V5") {
-      totalReadyUnits += p.stock;
-    }
-    if (p.stock > 0) {
-      readyVariantCount++;
-    }
-  });
-
-  let soldToday = totalSoldUnits - totalSoldAtStartOfDay;
-
-  document.getElementById("statReady").textContent = totalReadyUnits.toLocaleString("id-ID");
-  document.getElementById("statReadyVariant").textContent = `${readyVariantCount} varian aktif`;
-  document.getElementById("statSold").textContent = totalSoldUnits.toLocaleString("id-ID");
-  document.getElementById("statDay").textContent = soldToday.toLocaleString("id-ID");
-  document.getElementById("statSec").textContent = lastSecond;
-  document.getElementById("statMin").textContent = lastMinute;
-  document.getElementById("statHour").textContent = lastHour;
-
-  const nowTime = new Date();
-  const timeString = `Sinkron: ${String(nowTime.getHours()).padStart(2, '0')}.${String(nowTime.getMinutes()).padStart(2, '0')}.${String(nowTime.getSeconds()).padStart(2, '0')}`;
-  document.getElementById("syncClockTime").textContent = timeString;
-
-  const timerBadge = document.getElementById("syncTimerBadge");
-  if (timerBadge) {
-    timerBadge.textContent = `${countdownTimer}s`;
-    if (countdownTimer > 0) countdownTimer--;
-  }
+function logoutReseller() {
+  sessionStorage.removeItem("isAgentAuthenticated");
+  location.href = window.location.pathname;
 }
 
-setInterval(updateStatistics, 1000);
+// Generator Link Kustom Agen
+function generateLinkCustom() {
+  const namaToko = document.getElementById('customNamaToko').value.trim();
+  const noWa = document.getElementById('customNoWa').value.trim();
 
-function parseQuotaNumber(str) {
-  if (!str) return { current: 0, total: 100, unit: '' };
-  let parts = str.split('/');
-  if (parts.length === 2) {
-    let parseVal = (s) => {
-      let numMatch = s.trim().match(/([\d\.]+)\s*([a-zA-Z%]+)?/);
-      if (numMatch) {
-        let val = parseFloat(numMatch[1]);
-        let unit = numMatch[2] || '';
-        if (/kb/i.test(unit)) val /= 1024;
-        else if (/gb/i.test(unit)) val *= 1024;
-        return { val: parseFloat(numMatch[1]), rawUnit: unit };
-      }
-      return { val: 0, rawUnit: '' };
-    };
-    let curObj = parseVal(parts[0]);
-    let totObj = parseVal(parts[1]);
-    return { current: curObj.val, total: totObj.val || 1, unit: totObj.rawUnit };
-  }
-  return { current: 0, total: 100, unit: '' };
-}
-
-async function cekInfoDompul() {
-  const nomor = document.getElementById("checkNomorInput").value.trim();
-  const resultBox = document.getElementById("checkerResult");
-  const contentBox = document.getElementById("checkerResultContent");
-
-  if (!nomor) {
-    alert("Silakan masukkan nomor HP terlebih dahulu!");
+  if (!namaToko || !noWa) {
+    alert("Harap isi Nama Toko/Konter dan Nomor WhatsApp terlebih dahulu!");
     return;
   }
 
-  resultBox.classList.add("active");
-  contentBox.innerHTML = "Memproses...";
+  const baseUrl = window.location.origin + window.location.pathname;
+  const generatedLink = `${baseUrl}?toko=${encodeURIComponent(namaToko)}&wa=${encodeURIComponent(noWa)}`;
 
-  try {
-    const response = await fetch('/api/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nomer: nomor })
-    });
-    const resJson = await response.json();
-
-    if (resJson.status === "success" && resJson.data) {
-      const info = resJson.data.info_kartu || {};
-      const paketList = resJson.data.info_paket || [];
-
-      let paketHtml = "";
-      paketList.forEach(pkt => {
-        let namaPkt = (pkt.nama_paket && pkt.nama_paket !== "undefined" && pkt.nama_paket.trim() !== "") ? pkt.nama_paket : "Paket Utama";
-        let expirePkt = pkt.tanggal_expire ? `Exp: ${pkt.tanggal_expire}` : "";
-        
-        let kuotaHtml = "";
-        (pkt.kuota || []).forEach(k => {
-          let parsed = parseQuotaNumber(`${k.sisa} / ${k.total}`);
-          let percent = Math.min(100, Math.max(0, (parsed.current / parsed.total) * 100));
-          
-          kuotaHtml += `<div class="quota-row">
-            <div class="quota-info">
-              <span>• ${k.name || k.nama}</span>
-              <b>${k.sisa} / ${k.total}</b>
-            </div>
-            <div class="quota-bar">
-              <div class="quota-progress" style="width: ${percent}%"></div>
-            </div>
-          </div>`;
-        });
-
-        paketHtml += `<div class="package-card">
-          <div class="package-header">
-            <span class="package-title">📦 ${namaPkt}</span>
-            <span class="package-exp">${expirePkt}</span>
-          </div>
-          ${kuotaHtml || '<div style="font-size:10px;color:#94a3b8;">Tidak ada rincian kuota.</div>'}
-        </div>`;
-      });
-
-      contentBox.innerHTML = `
-        <div style="font-weight:800;color:#059669;margin-bottom:6px;font-size:12px;">✅ ${resJson.keterangan || "Berhasil cek dompul"}</div>
-        <div class="checker-grid">
-          <div class="checker-item"><span>Nomor</span><b>${info.msisdn || nomor}</b></div>
-          <div class="checker-item"><span>Operator</span><b>${info.operator || "XL / AXIS"}</b></div>
-          <div class="checker-item"><span>Masa Aktif</span><b>${info.masa_aktif || "-"}</b></div>
-          <div class="checker-item"><span>Tenggang</span><b>${info.masa_tenggang || "-"}</b></div>
-        </div>
-        <div style="margin-top:10px;font-weight:800;font-size:11px;color:#0f172a;">Paket Aktif:</div>
-        ${paketHtml || '<div style="font-size:10px;color:#94a3b8;margin-top:4px;">Tidak ada paket aktif.</div>'}
-      `;
-    } else {
-      contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Gagal: ${resJson.keterangan || resJson.message || "Data tidak valid."}</span>`;
-    }
-  } catch (e) {
-    contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Koneksi error: ${e.message}</span>`;
-  }
+  document.getElementById('textLinkJadi').textContent = generatedLink;
+  document.getElementById('hasilLinkContainer').style.display = 'block';
 }
 
-function updateProductInsights() {
-  let validProducts = products.filter(p => p.v !== "V5");
-  let sortedDesc = [...validProducts].sort((a, b) => b.sold - a.sold);
-  let sortedAsc = [...validProducts].sort((a, b) => {
-    if (a.sold !== b.sold) return a.sold - b.sold;
-    return a.code.localeCompare(b.code);
-  });
-
-  let topHtml = "";
-  for (let i = 0; i < Math.min(3, sortedDesc.length); i++) {
-    let p = sortedDesc[i];
-    topHtml += `<div class="insight-item">
-      <div><b>${p.code}</b></div>
-      <span class="badge-count badge-top">+${p.sold}</span>
-    </div>`;
-  }
-  document.getElementById("topSoldList").innerHTML = topHtml || '<div style="font-size:10px;color:#94a3b8">Belum ada data.</div>';
-
-  let lowHtml = "";
-  for (let i = 0; i < Math.min(3, sortedAsc.length); i++) {
-    let p = sortedAsc[i];
-    lowHtml += `<div class="insight-item">
-      <div><b>${p.code}</b></div>
-      <span class="badge-count badge-low">${p.sold}</span>
-    </div>`;
-  }
-  document.getElementById("lowSoldList").innerHTML = lowHtml || '<div style="font-size:10px;color:#94a3b8">Belum ada data.</div>';
+function toggleCard(cardElement) {
+  cardElement.classList.toggle('expanded');
 }
 
-function recordDailyData(vSoldCounts) {
-  const todayStr = new Date().toISOString().split('T')[0];
-  let existingIndex = dailyHistoryRecords.findIndex(r => r.date === todayStr);
-  if (existingIndex >= 0) {
-    dailyHistoryRecords[existingIndex].v1 = Math.max(dailyHistoryRecords[existingIndex].v1, vSoldCounts.V1);
-    dailyHistoryRecords[existingIndex].v2 = Math.max(dailyHistoryRecords[existingIndex].v2, vSoldCounts.V2);
-    dailyHistoryRecords[existingIndex].v3 = Math.max(dailyHistoryRecords[existingIndex].v3, vSoldCounts.V3);
-    dailyHistoryRecords[existingIndex].v4 = Math.max(dailyHistoryRecords[existingIndex].v4, vSoldCounts.V4);
-  } else {
-    dailyHistoryRecords.push({
-      date: todayStr,
-      v1: vSoldCounts.V1,
-      v2: vSoldCounts.V2,
-      v3: vSoldCounts.V3,
-      v4: vSoldCounts.V4
-    });
-  }
-  localStorage.setItem("ic_daily_history", JSON.stringify(dailyHistoryRecords));
-  renderChartFiltered();
-}
-
-function renderChartFiltered(startDate = "", endDate = "") {
-  let filtered = dailyHistoryRecords;
-  if (startDate && endDate) {
-    filtered = dailyHistoryRecords.filter(r => r.date >= startDate && r.date <= endDate);
-  }
-  filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  let labels = filtered.map(r => r.date);
-  let dataV1 = filtered.map(r => r.v1);
-  let dataV2 = filtered.map(r => r.v2);
-  let dataV3 = filtered.map(r => r.v3);
-  let dataV4 = filtered.map(r => r.v4);
-
-  salesChart.data.labels = labels;
-  salesChart.data.datasets[0].data = dataV1;
-  salesChart.data.datasets[1].data = dataV2;
-  salesChart.data.datasets[2].data = dataV3;
-  salesChart.data.datasets[3].data = dataV4;
-  salesChart.update();
-}
-
-function applyDateFilter() {
-  const start = document.getElementById("startDateFilter").value;
-  const end = document.getElementById("endDateFilter").value;
-  if (!start || !end) {
-    alert("Pilih tanggal awal & akhir!");
+function prosesCekArea() {
+  const inputVal = document.getElementById('stockSearch').value.trim();
+  if (!inputVal) {
+    alert("Ketik nama kota dulu!");
     return;
   }
-  renderChartFiltered(start, end);
+  const formatted = inputVal.charAt(0).toUpperCase() + inputVal.slice(1);
+  document.getElementById('displayAreaName').textContent = formatted;
+  document.querySelectorAll('.val-area-text').forEach(el => el.textContent = formatted);
+  alert("Area diperbarui untuk kota: " + formatted);
 }
 
-function resetDateFilter() {
-  document.getElementById("startDateFilter").value = "";
-  document.getElementById("endDateFilter").value = "";
-  renderChartFiltered();
-}
+// Fungsi tombol beli yang mengarahkan langsung ke WhatsApp agen yang bersangkutan
+function beliKeReseller(kodeProduk, namaProduk) {
+  const areaDipilih = document.getElementById('displayAreaName').textContent;
+  const tujuanWa = paramWa ? decodeURIComponent(paramWa) : "6281122334455"; 
+  const namaMitra = paramToko ? decodeURIComponent(paramToko) : "Mitra Agen Utama";
 
-function setFilter(v, btn) {
-  activeVersion = v;
-  document.querySelectorAll(".filters .filter").forEach(b => b.classList.remove("on"));
-  btn.classList.add("on");
-  renderStock();
-}
-
-function toggleCard(elem) {
-  elem.classList.toggle("expanded");
-  const toggleText = elem.querySelector(".btn-detail");
-  if (elem.classList.contains("expanded")) {
-    toggleText.innerHTML = `Tutup ▲`;
-  } else {
-    toggleText.innerHTML = `Detail ▼`;
-  }
-}
-
-function openAutoBuyModal(code, name) {
-  selectedProductForAutoBuy = code;
-  document.getElementById("modalProductSub").textContent = `Produk: ${code} - ${name}`;
-  document.getElementById("modalNomorInput").value = "";
-  document.getElementById("autoBuyModal").classList.add("active");
-}
-
-function closeAutoBuyModal() {
-  document.getElementById("autoBuyModal").classList.remove("active");
-  selectedProductForAutoBuy = null;
-}
-
-function submitAutoBuy() {
-  const nomor = document.getElementById("modalNomorInput").value.trim();
-  if (!nomor) {
-    alert("Masukkan nomor HP tujuan terlebih dahulu!");
-    return;
-  }
-  alert(`Memproses pembelian produk ${selectedProductForAutoBuy} ke nomor ${nomor}...`);
-  closeAutoBuyModal();
-}
-
-function renderCardsHtml(items) {
-  items.sort((a, b) => {
-    let aReady = a.stock > 0 ? 1 : 0;
-    let bReady = b.stock > 0 ? 1 : 0;
-    if (aReady !== bReady) return bReady - aReady;
-    if (a.minGb !== b.minGb) return a.minGb - b.minGb;
-    return b.sold - a.sold;
-  });
-
-  let out = `<div class="grid">`;
-  items.forEach(p => {
-    const isPDA = p.v === "V5";
-    const isReady = p.stock > 0;
-    const cardClass = isReady ? 'card' : 'card habis';
-    
-    out += `<div class="${cardClass}">
-      <div class="card-top" onclick="toggleCard(this)">
-        <div class="name">${p.code}</div>
-        <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
-      </div>
-      <div class="slot-label" onclick="toggleCard(this)">${isPDA ? 'Status' : 'Slot'}</div>
-      <div class="slot-val" style="color:${isReady ? '#0f172a' : '#dc2626'}" onclick="toggleCard(this)">
-        ${isPDA ? (isReady ? 'OPEN' : 'CLOSE') : (isReady ? p.stock.toLocaleString("id-ID") : 'Habis')}
-      </div>
-      <div style="font-size:9px; color:#3b82f6; font-weight:700; margin-top:1px;" onclick="toggleCard(this)">Terjual: ${p.sold}</div>
-      
-      <div class="area-list">
-        <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
-        <div class="area-row"><span>Area 2</span><b>${p.areas.a2}</b></div>
-        <div class="area-row"><span>Area 3</span><b>${p.areas.a3}</b></div>
-        <div class="area-row"><span>Area 4</span><b>${p.areas.a4}</b></div>
-      </div>
-      
-      <div class="card-actions">
-        <button class="btn-detail" onclick="toggleCard(this.closest('.card'))">Detail ▼</button>
-        <button class="btn-autobuy" onclick="openAutoBuyModal('${p.code}', '${p.name.replace(/'/g, "")}')">Auto Beli</button>
-      </div>
-    </div>`;
-  });
-  out += `</div>`;
-  return out;
-}
-
-function renderStock(){
-  const rawQ = (document.getElementById("stockSearch").value || "").trim();
-  const q = rawQ.toLowerCase();
-
-  let matchedAreaName = "";
-  let matchedAreaGroupKey = "";
-  if (q.length > 0) {
-    for (let group of areaDatabase) {
-      for (let prov of group.provinces) {
-        for (let city of prov.cities) {
-          if (city.toLowerCase().includes(q)) {
-            matchedAreaName = group.area.toLowerCase();
-            matchedAreaGroupKey = 'a' + matchedAreaName.replace(/[^0-9]/g, '');
-            break;
-          }
-        }
-        if (matchedAreaName) break;
-      }
-      if (matchedAreaName) break;
-    }
-  }
-
-  // Update Menu Banner Penawaran Kuota Berdasarkan Area Terdeteksi
-  const banner = document.getElementById("areaOfferBanner");
-  const chipsContainer = document.getElementById("bannerChipsContainer");
+  const pesan = `Halo kak dari ${namaMitra}, saya mau order produk:\n\n* Produk: ${kodeProduk} (${namaProduk})\n* Area: ${areaDipilih}\n\nMohon diproses ya Kak!`;
   
-  if (matchedAreaName && matchedAreaGroupKey) {
-    document.getElementById("bannerAreaName").textContent = `${rawQ.toUpperCase()} (${matchedAreaName.toUpperCase()})`;
-    
-    // Ambil produk unik berdasarkan besaran kuota di area tersebut
-    let areaProducts = products.filter(p => p.areas[matchedAreaGroupKey] && p.areas[matchedAreaGroupKey] !== "-");
-    let quotaMap = {};
-    areaProducts.forEach(p => {
-      if (!quotaMap[p.quotaText] && p.quotaText !== "-") {
-        quotaMap[p.quotaText] = p;
-      }
-    });
-
-    let chipsHtml = "";
-    let uniqueQuotas = Object.keys(quotaMap);
-    if (uniqueQuotas.length > 0) {
-      uniqueQuotas.forEach(qText => {
-        let sampleP = quotaMap[qText];
-        chipsHtml += `<button class="quota-chip" onclick="openAutoBuyModal('${sampleP.code}', '${sampleP.name.replace(/'/g, "")}')">
-          📦 ${qText} <span style="font-size:9px;color:#059669;background:#ecfdf5;padding:2px 6px;border-radius:4px;">${sampleP.code}</span>
-        </button>`;
-      });
-    } else {
-      chipsHtml = `<div style="font-size:11px;color:#64748b;">Tidak ada paket spesifik untuk area ini, silakan pilih produk di bawah.</div>`;
-    }
-    chipsContainer.innerHTML = chipsHtml;
-    banner.classList.add("active");
-  } else {
-    banner.classList.remove("active");
-  }
-
-  const arr = products.filter(p => {
-    const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
-    let matchesArea = false;
-
-    if (matchedAreaName) {
-      const areaKey = 'a' + matchedAreaName.replace(/[^0-9]/g, '');
-      matchesArea = (p.areas[areaKey] && p.areas[areaKey] !== "-");
-    } else {
-      matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
-    }
-
-    return matchesCategory && matchesArea;
-  });
-  
-  const groups = {};
-  arr.forEach(p => (groups[p.v] ??=[]).push(p));
-  
-  let out = "";
-  for(const [v, items] of Object.entries(groups)){
-    let totalStockInGroup = items.reduce((acc, curr) => acc + (curr.stock > 0 ? curr.stock : 0), 0);
-    let readyVariantCount = items.filter(i => i.stock > 0).length;
-    
-    out += `<div class="head"><b>Kategori ${v}</b> ${matchedAreaName ? `<small style="color:#059669; font-weight:800;">(Filter Otomatis: ${rawQ.toUpperCase()} terdeteksi di ${matchedAreaName.toUpperCase()})</small>` : ''}<small>${readyVariantCount} aktif (${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
-    out += renderCardsHtml(items);
-  }
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data area atau paket tidak ditemukan.</div>';
+  const linkWA = `https://wa.me/${tujuanWa}?text=${encodeURIComponent(pesan)}`;
+  window.open(linkWA, '_blank');
 }
-
-initChart();
-fetchProducts();
-setInterval(fetchProducts, 1000);
-
-document.getElementById("stockSearch").addEventListener("input", renderStock);
 </script>
+
 </body>
 </html>
