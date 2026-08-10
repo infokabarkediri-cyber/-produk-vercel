@@ -33,12 +33,22 @@
 .checker-form{display:flex;gap:6px;flex-wrap:wrap}
 .checker-input{flex:1;min-width:180px;border:1px solid #cbd5e1;border-radius:8px;padding:8px 12px;outline:none;background:#f8fafc;font-size:12px}
 .checker-btn{background:#0f172a;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer}
-.checker-result{margin-top:10px;padding:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;display:none}
+.checker-result{margin-top:10px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;display:none}
 .checker-result.active{display:block}
 .checker-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
 .checker-item{background:#fff;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px}
 .checker-item span{display:block;font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
 .checker-item b{font-size:12px;color:#0f172a}
+
+/* Desain Kartu Paket Versi Ringan & Elegan */
+.package-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:8px}
+.package-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;border-bottom:1px solid #f1f5f9;padding-bottom:5px}
+.package-title{font-size:11px;font-weight:800;color:#0f172a}
+.package-exp{font-size:9px;color:#64748b;font-weight:600}
+.quota-row{margin-top:6px}
+.quota-info{display:flex;justify-content:space-between;font-size:10px;color:#475569;margin-bottom:2px}
+.quota-bar{height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden}
+.quota-progress{height:100%;background:#3b82f6;border-radius:2px}
 
 .insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
 .insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px}
@@ -83,7 +93,6 @@
 .slot-label{font-size:8px;color:#64748b;font-weight:700;margin-top:4px;text-transform:uppercase}
 .slot-val{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
 
-/* Format area konsisten di semua varian */
 .area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
 .area-row{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#475569;padding:3px 0;border-bottom:1px dashed #f8fafc}
@@ -213,7 +222,7 @@
 
 <script>
 let products = [];
-let initialStockMap = {}; 
+let initialStockMap = JSON.parse(localStorage.getItem("ic_initial_stock")) || {}; 
 let previousTotalSold = 0;
 let productSoldMap = {}; 
 let totalSoldUnits = 0;   
@@ -258,7 +267,6 @@ function getMinGbFromText(text) {
 }
 
 function cleanAreaValue(rawLine) {
-  // Membersihkan teks area agar konsisten seragam (misal mengambil angka GB atau rentang bersih)
   let cleaned = rawLine.replace(/^(?:area|total\s*area)\s*\d*\s*[:\-]?\s*/i, "").trim();
   const matchRange = cleaned.match(/(\d+)\s*-\s*(\d+)\s*(?:gb|g)/i);
   if (matchRange) {
@@ -300,15 +308,15 @@ async function fetchProducts() {
         if (v !== "V5") {
           if (!(code in initialStockMap)) {
             initialStockMap[code] = currentStock;
-            productSoldMap[code] = 0;
-          } else {
-            let diff = initialStockMap[code] - currentStock;
-            if (diff > 0) {
-              soldQty = diff;
-              currentSoldDiff += diff;
-              if (v in vSoldCounts) vSoldCounts[v] += diff;
-            }
+            localStorage.setItem("ic_initial_stock", JSON.stringify(initialStockMap));
           }
+          
+          let diff = initialStockMap[code] - currentStock;
+          if (diff > 0) {
+            soldQty = diff;
+          }
+          currentSoldDiff += soldQty;
+          if (v in vSoldCounts) vSoldCounts[v] += soldQty;
           productSoldMap[code] = soldQty;
         }
 
@@ -317,6 +325,7 @@ async function fetchProducts() {
         const lines = desc.split("\n");
         let idx = 1;
         lines.forEach(l => {
+          if (/kuota\s*sesuai/i.test(l)) return;
           if (/area/i.test(l) || /(\d+)\s*(?:gb|g)/i.test(l)) {
             if (idx <= 4) {
               areas['a' + idx] = cleanAreaValue(l);
@@ -401,6 +410,30 @@ function updateStatistics() {
 
 setInterval(updateStatistics, 1000);
 
+// Helper parser angka untuk bar progress kuota yang lebih ringan & akurat
+function parseQuotaNumber(str) {
+  if (!str) return { current: 0, total: 100, unit: '' };
+  let parts = str.split('/');
+  if (parts.length === 2) {
+    let parseVal = (s) => {
+      let numMatch = s.trim().match(/([\d\.]+)\s*([a-zA-Z%]+)?/);
+      if (numMatch) {
+        let val = parseFloat(numMatch[1]);
+        let unit = numMatch[2] || '';
+        if (/kb/i.test(unit)) val /= 1024; // Ubah ke MB
+        else if (/gb/i.test(unit)) val *= 1024; // Ubah ke MB
+        else if (/jam|menit|detik/i.test(unit)) { /* biarkan waktu */ }
+        return { val: parseFloat(numMatch[1]), rawUnit: unit };
+      }
+      return { val: 0, rawUnit: '' };
+    };
+    let curObj = parseVal(parts[0]);
+    let totObj = parseVal(parts[1]);
+    return { current: curObj.val, total: totObj.val || 1, unit: totObj.rawUnit };
+  }
+  return { current: 0, total: 100, unit: '' };
+}
+
 async function cekInfoDompul() {
   const nomor = document.getElementById("checkNomorInput").value.trim();
   const resultBox = document.getElementById("checkerResult");
@@ -424,7 +457,7 @@ async function cekInfoDompul() {
     const resJson = await response.json();
 
     if (resJson.status === "success" && resJson.data) {
-      const info = resJson.data.info_kartu;
+      const info = resJson.data.info_kartu || {};
       const paketList = resJson.data.info_paket || [];
 
       let paketHtml = "";
@@ -434,31 +467,39 @@ async function cekInfoDompul() {
         
         let kuotaHtml = "";
         (pkt.kuota || []).forEach(k => {
-          kuotaHtml += `<div style="display:flex;justify-content:space-between;font-size:10px;color:#475569;margin-top:3px;border-bottom:1px dashed #f1f5f9;padding-bottom:2px;">
-            <span>• ${k.name || k.nama}</span>
-            <b>${k.sisa} / ${k.total}</b>
+          let parsed = parseQuotaNumber(`${k.sisa} / ${k.total}`);
+          let percent = Math.min(100, Math.max(0, (parsed.current / parsed.total) * 100));
+          
+          kuotaHtml += `<div class="quota-row">
+            <div class="quota-info">
+              <span>• ${k.name || k.nama}</span>
+              <b>${k.sisa} / ${k.total}</b>
+            </div>
+            <div class="quota-bar">
+              <div class="quota-progress" style="width: ${percent}%"></div>
+            </div>
           </div>`;
         });
 
-        paketHtml += `<div style="margin-top:6px;padding:8px;background:#fff;border-radius:6px;border:1px solid #e2e8f0;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <b style="font-size:11px;color:#0f172a;">📦 ${namaPkt}</b>
-            <span style="font-size:9px;color:#64748b;">${expirePkt}</span>
+        paketHtml += `<div class="package-card">
+          <div class="package-header">
+            <span class="package-title">📦 ${namaPkt}</span>
+            <span class="package-exp">${expirePkt}</span>
           </div>
           ${kuotaHtml || '<div style="font-size:10px;color:#94a3b8;">Tidak ada rincian kuota.</div>'}
         </div>`;
       });
 
       contentBox.innerHTML = `
-        <div style="font-weight:800;color:#059669;margin-bottom:6px;font-size:12px;">✅ ${resJson.keterangan || "Berhasil"}</div>
+        <div style="font-weight:800;color:#059669;margin-bottom:6px;font-size:12px;">✅ ${resJson.keterangan || "Berhasil cek dompul"}</div>
         <div class="checker-grid">
           <div class="checker-item"><span>Nomor</span><b>${info.msisdn || nomor}</b></div>
-          <div class="checker-item"><span>Operator</span><b>${info.operator || "-"}</b></div>
+          <div class="checker-item"><span>Operator</span><b>${info.operator || "XL / AXIS"}</b></div>
           <div class="checker-item"><span>Masa Aktif</span><b>${info.masa_aktif || "-"}</b></div>
           <div class="checker-item"><span>Tenggang</span><b>${info.masa_tenggang || "-"}</b></div>
         </div>
-        <div style="margin-top:8px;font-weight:800;font-size:11px;color:#0f172a;">Paket Aktif:</div>
-        ${paketHtml || '<div style="font-size:10px;color:#94a3b8;margin-top:3px;">Tidak ada paket aktif.</div>'}
+        <div style="margin-top:10px;font-weight:800;font-size:11px;color:#0f172a;">Paket Aktif:</div>
+        ${paketHtml || '<div style="font-size:10px;color:#94a3b8;margin-top:4px;">Tidak ada paket aktif.</div>'}
       `;
     } else {
       contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Gagal: ${resJson.keterangan || resJson.message || "Data tidak valid."}</span>`;
@@ -563,12 +604,13 @@ function resetSalesTracker() {
   transactionLogs = [];
   totalSoldAtStartOfDay = 0;
   dailyHistoryRecords = [];
+  localStorage.removeItem("ic_initial_stock");
   localStorage.removeItem("ic_daily_history");
   salesChart.data.labels = [];
   salesChart.data.datasets.forEach(ds => ds.data = []);
   salesChart.update();
   fetchProducts();
-  alert("Sesi direset!");
+  alert("Sesi dan data terjual direset!");
 }
 
 function exportDataCSV() {
