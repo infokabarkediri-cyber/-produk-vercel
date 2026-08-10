@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IC Store - Analitik Performa & Stok Pro</title>
+<title>Analitik Performa & Stok Pro</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
@@ -229,7 +229,7 @@ let salesChart;
 const CREDENTIALS = {
   apiKey: "mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5",
   xClient: "9951786330457fbb6300783a",
-  xPax: "3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9"
+  xPak: "3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9"
 };
 
 function initChart() {
@@ -263,7 +263,7 @@ async function fetchProducts() {
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
         'Accept': 'application/json',
         'x-client': CREDENTIALS.xClient,
-        'x-pax': CREDENTIALS.xPax,
+        'x-pax': CREDENTIALS.xPak,
         'x-api-key': CREDENTIALS.apiKey
       }
     });
@@ -395,18 +395,21 @@ async function cekInfoDompul() {
   resultBox.classList.add("active");
   contentBox.innerHTML = "Sedang memproses pengecekan nomor...";
 
+  const targetUrl = "https://api.mayugoro.com/api/v1/sidompul/cek";
+  const proxyUrl = "https://corsproxy.io/?";
+
   try {
-    const response = await fetch('https://api.mayugoro.com/api/v1/sidompul/cek', {
+    const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f',
+        'Authorization': 'Bearer ' + CREDENTIALS.apiKey,
         'X-Client': CREDENTIALS.xClient,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
       body: JSON.stringify({
         nomer: nomor,
-        "x-pak": CREDENTIALS.xPax
+        "x-pak": CREDENTIALS.xPak
       })
     });
 
