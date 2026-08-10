@@ -8,8 +8,9 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}
-.brand-container{display:flex;align-items:center;gap:10px}
-.brand-logo-svg{height:22px;display:flex;align-items:center}
+.brand-container{display:flex;align-items:center;gap:8px}
+.brand-xl{background:#003781;color:#fff;font-weight:900;font-size:14px;padding:3px 8px;border-radius:4px;letter-spacing:0.5px}
+.brand-axis{background:#6c2d91;color:#fff;font-weight:800;font-size:14px;padding:3px 8px;border-radius:4px;letter-spacing:0.5px}
 .subtitle{font-size:11px;color:#64748b}
 .wrap{padding:16px 12px 80px}
 
@@ -82,11 +83,12 @@
 .slot-label{font-size:8px;color:#64748b;font-weight:700;margin-top:4px;text-transform:uppercase}
 .slot-val{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
 
+/* Format area konsisten di semua varian */
 .area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
-.area-row{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#475569;padding:2px 0;border-bottom:1px dashed #f8fafc}
+.area-row{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#475569;padding:3px 0;border-bottom:1px dashed #f8fafc}
 .area-row:last-child{border-bottom:0}
-.area-row b{color:#0f172a;background:#f8fafc;padding:1px 4px;border-radius:3px;border:1px solid #e2e8f0;font-size:9px}
+.area-row b{color:#0f172a;background:#f8fafc;padding:1px 5px;border-radius:3px;border:1px solid #e2e8f0;font-size:9px}
 
 .toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:4px;margin-top:4px}
 .toggle-detail.ready-text{color:#059669}
@@ -99,21 +101,9 @@
 <body>
 <header class="top">
   <div class="brand-container" id="providerLogoContainer">
-    <!-- Logo XL (Inline SVG) -->
-    <div class="brand-logo-svg">
-      <svg viewBox="0 0 100 35" height="22">
-        <path d="M5 28L25 5H18L2 24V5H0V28H5ZM30 5H32V28H30V5ZM42 5H44V28H42V5Z" fill="#003781"/>
-        <text x="35" y="25" font-weight="900" font-size="24" fill="#001489" font-family="Arial">XL</text>
-      </svg>
-    </div>
+    <div class="brand-xl">XL</div>
     <span style="color:#cbd5e1;font-weight:300;">|</span>
-    <!-- Logo AXIS (Inline SVG Badge) -->
-    <div class="brand-logo-svg">
-      <svg viewBox="0 0 90 28" height="22">
-        <rect width="90" height="28" rx="14" fill="#6c2d91"/>
-        <text x="45" y="19" font-weight="800" font-size="14" fill="#ffffff" text-anchor="middle" font-family="Arial">AXIS</text>
-      </svg>
-    </div>
+    <div class="brand-axis">AXIS</div>
   </div>
   <div class="subtitle" id="updateTime">Menghubungkan...</div>
 </header>
@@ -267,14 +257,18 @@ function getMinGbFromText(text) {
   return 999999;
 }
 
-function formatAreaMinText(lineText) {
-  let formatted = lineText;
-  const matchRange = lineText.match(/(\d+)\s*-\s*(\d+)\s*(?:gb|g)/i);
+function cleanAreaValue(rawLine) {
+  // Membersihkan teks area agar konsisten seragam (misal mengambil angka GB atau rentang bersih)
+  let cleaned = rawLine.replace(/^(?:area|total\s*area)\s*\d*\s*[:\-]?\s*/i, "").trim();
+  const matchRange = cleaned.match(/(\d+)\s*-\s*(\d+)\s*(?:gb|g)/i);
   if (matchRange) {
-    const minVal = matchRange[1];
-    formatted = `${minVal} GB`;
+    return `${matchRange[1]} GB`;
   }
-  return formatted;
+  const matchSingle = cleaned.match(/(\d+)\s*(?:gb|g)/i);
+  if (matchSingle) {
+    return `${matchSingle[1]} GB`;
+  }
+  return cleaned || "-";
 }
 
 async function fetchProducts() {
@@ -323,12 +317,11 @@ async function fetchProducts() {
         const lines = desc.split("\n");
         let idx = 1;
         lines.forEach(l => {
-          let cleanLine = l.replace(/^(?:area|total\s*area)\s*\d*\s*[:\-]?\s*/i, "").trim();
-          let match = cleanLine.match(/(\d+\s*(?:gb|g))/i) || l.match(/(\d+\s*(?:gb|g))/i);
-          if (match && idx <= 4) {
-            let val = cleanLine.length > 0 ? formatAreaMinText(cleanLine) : formatAreaMinText(l.trim());
-            areas['a' + idx] = val;
-            idx++;
+          if (/area/i.test(l) || /(\d+)\s*(?:gb|g)/i.test(l)) {
+            if (idx <= 4) {
+              areas['a' + idx] = cleanAreaValue(l);
+              idx++;
+            }
           }
         });
 
@@ -433,8 +426,6 @@ async function cekInfoDompul() {
     if (resJson.status === "success" && resJson.data) {
       const info = resJson.data.info_kartu;
       const paketList = resJson.data.info_paket || [];
-      
-      let tenureDisplay = (info.tenure && info.tenure !== "undefined") ? info.tenure : "-";
 
       let paketHtml = "";
       paketList.forEach(pkt => {
