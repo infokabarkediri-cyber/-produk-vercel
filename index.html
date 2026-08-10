@@ -83,6 +83,17 @@
 .head b{font-size:14px;color:#0f172a}
 .head small{color:#64748b;font-size:10px;font-weight:600}
 
+/* Quick Area Offer Banner */
+.area-offer-banner{background:linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);border:1px solid #bfdbfe;border-radius:12px;padding:14px;margin-bottom:12px;display:none;animation:fadeIn 0.3s ease}
+.area-offer-banner.active{display:block}
+.area-offer-title{font-size:13px;font-weight:800;color:#1e40af;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.area-offer-desc{font-size:11px;color:#475569;margin-bottom:10px}
+.area-offer-chips{display:flex;gap:6px;flex-wrap:wrap}
+.quota-chip{background:#fff;border:1px solid #93c5fd;color:#1d4ed8;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 1px 2px rgba(0,0,0,0.05);transition:all 0.2s}
+.quota-chip:hover{background:#dbeafe;border-color:#3b82f6}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
 .grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}
 .card{border:1px solid #e2e8f0;border-radius:10px;padding:8px;cursor:pointer;background:#fff;position:relative;transition:all 0.2s ease}
 .card:hover{border-color:#cbd5e1}
@@ -101,8 +112,22 @@
 .area-row:last-child{border-bottom:0}
 .area-row b{color:#0f172a;background:#f8fafc;padding:1px 5px;border-radius:3px;border:1px solid #e2e8f0;font-size:9px}
 
-.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:4px;margin-top:4px}
-.toggle-detail.ready-text{color:#059669}
+.card-actions{display:flex;gap:4px;margin-top:6px}
+.btn-detail{flex:1;background:#f1f5f9;color:#475569;border:0;border-radius:6px;padding:5px 0;font-size:9px;font-weight:700;cursor:pointer;text-align:center}
+.btn-autobuy{flex:1;background:#2563eb;color:#fff;border:0;border-radius:6px;padding:5px 0;font-size:9px;font-weight:800;cursor:pointer;text-align:center}
+.btn-autobuy:hover{background:#1d4ed8}
+
+/* Modal Auto Beli */
+.modal-backdrop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
+.modal-backdrop.active{display:flex}
+.modal-box{background:#fff;border-radius:12px;max-width:400px;width:100%;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.1);animation:fadeIn 0.2s ease}
+.modal-title{font-size:14px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.modal-sub{font-size:11px;color:#64748b;margin-bottom:14px}
+.modal-input{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;font-size:12px;outline:none;background:#f8fafc;margin-bottom:12px}
+.modal-buttons{display:flex;gap:8px}
+.modal-btn-cancel{flex:1;background:#e2e8f0;color:#475569;border:0;border-radius:8px;padding:10px;font-size:11px;font-weight:700;cursor:pointer}
+.modal-btn-submit{flex:1;background:#059669;color:#fff;border:0;border-radius:8px;padding:10px;font-size:11px;font-weight:800;cursor:pointer}
+
 .footer-brand{text-align:center;font-size:10px;color:#94a3b8;margin-top:20px;font-weight:600}
 
 @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(3,1fr)}.insight-grid{grid-template-columns:1fr}}
@@ -206,7 +231,7 @@
   </div>
 
   <div class="panel" style="padding:10px 12px;">
-    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten (Contoh: Bandung, Surabaya)...">
+    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten (Contoh: Bandung, Surabaya, Blitar)...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -217,9 +242,29 @@
     </div>
   </div>
 
+  <!-- Menu Baru: Banner Penawaran Kuota Instan Berdasarkan Area Terdeteksi -->
+  <div id="areaOfferBanner" class="area-offer-banner">
+    <div class="area-offer-title">⚡ Penawaran Khusus <span id="bannerAreaName">-</span></div>
+    <div class="area-offer-desc" id="bannerAreaDesc">Pilih opsi kuota cepat untuk area ini dan lakukan transaksi otomatis secara instan:</div>
+    <div class="area-offer-chips" id="bannerChipsContainer"></div>
+  </div>
+
   <div id="stockList"></div>
   <div class="footer-brand">System Dashboard © 2026</div>
 </main>
+
+<!-- Modal Auto Beli -->
+<div id="autoBuyModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-title">🚀 Auto Beli Produk</div>
+    <div class="modal-sub" id="modalProductSub">Konfirmasi transaksi untuk produk ini</div>
+    <input type="text" id="modalNomorInput" class="modal-input" placeholder="Nomor HP Tujuan (Contoh: 0819...)">
+    <div class="modal-buttons">
+      <button class="modal-btn-cancel" onclick="closeAutoBuyModal()">Batal</button>
+      <button class="modal-btn-submit" onclick="submitAutoBuy()">Proses Beli</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const areaDatabase = [
@@ -326,6 +371,7 @@ let transactionLogs = [];
 let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
 let salesChart;
 let countdownTimer = 1;
+let selectedProductForAutoBuy = null;
 
 function switchOperator(op) {
   activeOperator = op;
@@ -436,7 +482,9 @@ async function fetchProducts() {
         });
 
         const combinedAreasText = `${areas.a1} ${areas.a2} ${areas.a3} ${areas.a4}`.toLowerCase();
-        const minGb = getMinGbFromText(desc);
+        let quotaText = "-";
+        const matchQuota = desc.match(/(\d+)\s*(?:gb|g)/i);
+        if (matchQuota) quotaText = `${matchQuota[1]} GB`;
 
         return {
           v: v,
@@ -446,7 +494,8 @@ async function fetchProducts() {
           sold: soldQty,
           descText: desc.toLowerCase(),
           areasText: combinedAreasText,
-          minGb: minGb,
+          minGb: getMinGbFromText(desc),
+          quotaText: quotaText,
           areas: areas
         };
       }).filter(p => p.v !== "OTHER");
@@ -709,12 +758,34 @@ function setFilter(v, btn) {
 
 function toggleCard(elem) {
   elem.classList.toggle("expanded");
-  const toggleText = elem.querySelector(".toggle-detail");
+  const toggleText = elem.querySelector(".btn-detail");
   if (elem.classList.contains("expanded")) {
-    toggleText.innerHTML = `Tutup <span>▲</span>`;
+    toggleText.innerHTML = `Tutup ▲`;
   } else {
-    toggleText.innerHTML = `Detail <span>▼</span>`;
+    toggleText.innerHTML = `Detail ▼`;
   }
+}
+
+function openAutoBuyModal(code, name) {
+  selectedProductForAutoBuy = code;
+  document.getElementById("modalProductSub").textContent = `Produk: ${code} - ${name}`;
+  document.getElementById("modalNomorInput").value = "";
+  document.getElementById("autoBuyModal").classList.add("active");
+}
+
+function closeAutoBuyModal() {
+  document.getElementById("autoBuyModal").classList.remove("active");
+  selectedProductForAutoBuy = null;
+}
+
+function submitAutoBuy() {
+  const nomor = document.getElementById("modalNomorInput").value.trim();
+  if (!nomor) {
+    alert("Masukkan nomor HP tujuan terlebih dahulu!");
+    return;
+  }
+  alert(`Memproses pembelian produk ${selectedProductForAutoBuy} ke nomor ${nomor}...`);
+  closeAutoBuyModal();
 }
 
 function renderCardsHtml(items) {
@@ -732,16 +803,16 @@ function renderCardsHtml(items) {
     const isReady = p.stock > 0;
     const cardClass = isReady ? 'card' : 'card habis';
     
-    out += `<div class="${cardClass}" onclick="toggleCard(this)">
-      <div class="card-top">
+    out += `<div class="${cardClass}">
+      <div class="card-top" onclick="toggleCard(this)">
         <div class="name">${p.code}</div>
         <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
       </div>
-      <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-      <div class="slot-val" style="color:${isReady ? '#0f172a' : '#dc2626'}">
+      <div class="slot-label" onclick="toggleCard(this)">${isPDA ? 'Status' : 'Slot'}</div>
+      <div class="slot-val" style="color:${isReady ? '#0f172a' : '#dc2626'}" onclick="toggleCard(this)">
         ${isPDA ? (isReady ? 'OPEN' : 'CLOSE') : (isReady ? p.stock.toLocaleString("id-ID") : 'Habis')}
       </div>
-      <div style="font-size:9px; color:#3b82f6; font-weight:700; margin-top:1px;">Terjual: ${p.sold}</div>
+      <div style="font-size:9px; color:#3b82f6; font-weight:700; margin-top:1px;" onclick="toggleCard(this)">Terjual: ${p.sold}</div>
       
       <div class="area-list">
         <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
@@ -750,8 +821,9 @@ function renderCardsHtml(items) {
         <div class="area-row"><span>Area 4</span><b>${p.areas.a4}</b></div>
       </div>
       
-      <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
-        Detail <span>▼</span>
+      <div class="card-actions">
+        <button class="btn-detail" onclick="toggleCard(this.closest('.card'))">Detail ▼</button>
+        <button class="btn-autobuy" onclick="openAutoBuyModal('${p.code}', '${p.name.replace(/'/g, "")}')">Auto Beli</button>
       </div>
     </div>`;
   });
@@ -764,12 +836,14 @@ function renderStock(){
   const q = rawQ.toLowerCase();
 
   let matchedAreaName = "";
+  let matchedAreaGroupKey = "";
   if (q.length > 0) {
     for (let group of areaDatabase) {
       for (let prov of group.provinces) {
         for (let city of prov.cities) {
           if (city.toLowerCase().includes(q)) {
             matchedAreaName = group.area.toLowerCase();
+            matchedAreaGroupKey = 'a' + matchedAreaName.replace(/[^0-9]/g, '');
             break;
           }
         }
@@ -777,6 +851,40 @@ function renderStock(){
       }
       if (matchedAreaName) break;
     }
+  }
+
+  // Update Menu Banner Penawaran Kuota Berdasarkan Area Terdeteksi
+  const banner = document.getElementById("areaOfferBanner");
+  const chipsContainer = document.getElementById("bannerChipsContainer");
+  
+  if (matchedAreaName && matchedAreaGroupKey) {
+    document.getElementById("bannerAreaName").textContent = `${rawQ.toUpperCase()} (${matchedAreaName.toUpperCase()})`;
+    
+    // Ambil produk unik berdasarkan besaran kuota di area tersebut
+    let areaProducts = products.filter(p => p.areas[matchedAreaGroupKey] && p.areas[matchedAreaGroupKey] !== "-");
+    let quotaMap = {};
+    areaProducts.forEach(p => {
+      if (!quotaMap[p.quotaText] && p.quotaText !== "-") {
+        quotaMap[p.quotaText] = p;
+      }
+    });
+
+    let chipsHtml = "";
+    let uniqueQuotas = Object.keys(quotaMap);
+    if (uniqueQuotas.length > 0) {
+      uniqueQuotas.forEach(qText => {
+        let sampleP = quotaMap[qText];
+        chipsHtml += `<button class="quota-chip" onclick="openAutoBuyModal('${sampleP.code}', '${sampleP.name.replace(/'/g, "")}')">
+          📦 ${qText} <span style="font-size:9px;color:#059669;background:#ecfdf5;padding:2px 6px;border-radius:4px;">${sampleP.code}</span>
+        </button>`;
+      });
+    } else {
+      chipsHtml = `<div style="font-size:11px;color:#64748b;">Tidak ada paket spesifik untuk area ini, silakan pilih produk di bawah.</div>`;
+    }
+    chipsContainer.innerHTML = chipsHtml;
+    banner.classList.add("active");
+  } else {
+    banner.classList.remove("active");
   }
 
   const arr = products.filter(p => {
