@@ -226,7 +226,8 @@ let transactionLogs = [];
 let dailyHistoryRecords = JSON.parse(localStorage.getItem("ic_daily_history")) || [];
 let salesChart;
 
-const CREDENTIALS = {
+// Khusus Header Cek Kuota/Dompul (Non-ICS)
+const DOMPUL_CREDENTIALS = {
   apiKey: "mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5",
   xClient: "9951786330457fbb6300783a",
   xPak: "3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9"
@@ -262,9 +263,9 @@ async function fetchProducts() {
       headers: { 
         'Authorization': 'Bearer 9f31c11bacdcc071d6d689e21f5cef36417068fe1dd60f8f', 
         'Accept': 'application/json',
-        'x-client': CREDENTIALS.xClient,
-        'x-pax': CREDENTIALS.xPak,
-        'x-api-key': CREDENTIALS.apiKey
+        'x-client': '9951786330457fbb6300783a',
+        'x-pax': '3e8d4a7c1f9b2d6e5a8c3f7b1d4e9a2c6f8d3e1b5a7c9d2e4f6a8b1c3d5e7f9',
+        'x-api-key': 'mayu_262794d5d80f0d65359b3d0834bae55c73cb55ed793dae58ed8f46493027b5c5'
       }
     });
     const result = await res.json();
@@ -409,14 +410,14 @@ async function cekInfoDompul() {
       const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + CREDENTIALS.apiKey,
-          'X-Client': CREDENTIALS.xClient,
+          'Authorization': 'Bearer ' + DOMPUL_CREDENTIALS.apiKey,
+          'X-Client': DOMPUL_CREDENTIALS.xClient,
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
         body: JSON.stringify({
           nomer: nomor,
-          "x-pak": CREDENTIALS.apiKey
+          "x-pak": DOMPUL_CREDENTIALS.xPak
         })
       });
 
