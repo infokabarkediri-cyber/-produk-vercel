@@ -8,10 +8,8 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
 .top{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1200px;margin:auto}
-.brand-container{display:flex;align-items:center;gap:10px}
-.brand-badge{font-size:12px;font-weight:800;padding:5px 10px;border-radius:6px;letter-spacing:0.5px}
-.brand-primary{background:#003d79;color:#fff}
-.brand-secondary{background:#8a2be2;color:#fff}
+.brand-container{display:flex;align-items:center;gap:12px}
+.brand-logo{height:24px;object-fit:contain}
 .subtitle{font-size:11px;color:#64748b}
 .wrap{padding:20px 15px 80px}
 
@@ -86,7 +84,7 @@
 .slot-label{font-size:9px;color:#64748b;font-weight:700;margin-top:8px;text-transform:uppercase}
 .slot-val{font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px}
 
-/* Area list yang rapi & bersih */
+/* Area list yang konsisten, rapi & bersih */
 .area-list{border-top:1px solid #f1f5f9;padding-top:8px;margin-top:8px;display:none}
 .card.expanded .area-list{display:block}
 .area-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#475569;padding:3px 0;border-bottom:1px dashed #f8fafc}
@@ -104,8 +102,8 @@
 <body>
 <header class="top">
   <div class="brand-container" id="providerLogoContainer">
-    <span class="brand-badge brand-primary">PROV 1</span>
-    <span class="brand-badge brand-secondary">PROV 2</span>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/XL_Axiata_2016.svg" alt="XL Logo" class="brand-logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/37/AXIS_Logo_2015.svg" alt="AXIS Logo" class="brand-logo" style="height: 22px;">
   </div>
   <div class="subtitle" id="updateTime">Menghubungkan...</div>
 </header>
@@ -315,8 +313,8 @@ async function fetchProducts() {
         const lines = desc.split("\n");
         let idx = 1;
         lines.forEach(l => {
-          let cleanLine = l.replace(/^area\s*\d*\s*[:\-]?\s*/i, "").trim();
-          let match = cleanLine.match(/(\d+\s*GB)/i) || l.match(/(\d+\s*GB)/i);
+          let cleanLine = l.replace(/^(?:area|total\s*area)\s*\d*\s*[:\-]?\s*/i, "").trim();
+          let match = cleanLine.match(/(\d+\s*(?:gb|g))/i) || l.match(/(\d+\s*(?:gb|g))/i);
           if (match && idx <= 4) {
             let val = cleanLine.length > 0 ? formatAreaMinText(cleanLine) : formatAreaMinText(l.trim());
             areas['a' + idx] = val;
