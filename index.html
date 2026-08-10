@@ -764,7 +764,7 @@ function renderStock(){
   const q = rawQ.toLowerCase();
 
   let matchedAreaName = "";
-  if (q.length > 2) {
+  if (q.length > 0) {
     for (let group of areaDatabase) {
       for (let prov of group.provinces) {
         for (let city of prov.cities) {
@@ -782,11 +782,14 @@ function renderStock(){
   const arr = products.filter(p => {
     const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
     let matchesArea = false;
+
     if (matchedAreaName) {
-      matchesArea = p.areasText.includes(matchedAreaName);
+      const areaKey = 'a' + matchedAreaName.replace(/[^0-9]/g, '');
+      matchesArea = (p.areas[areaKey] && p.areas[areaKey] !== "-");
     } else {
       matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
     }
+
     return matchesCategory && matchesArea;
   });
   
@@ -798,7 +801,7 @@ function renderStock(){
     let totalStockInGroup = items.reduce((acc, curr) => acc + (curr.stock > 0 ? curr.stock : 0), 0);
     let readyVariantCount = items.filter(i => i.stock > 0).length;
     
-    out += `<div class="head"><b>Kategori ${v}</b> ${matchedAreaName ? `<small style="color:#059669; font-weight:800;">(Rekomendasi untuk ${rawQ} -> ${matchedAreaName.toUpperCase()})</small>` : ''}<small>${readyVariantCount} aktif (${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
+    out += `<div class="head"><b>Kategori ${v}</b> ${matchedAreaName ? `<small style="color:#059669; font-weight:800;">(Filter Otomatis: ${rawQ.toUpperCase()} terdeteksi di ${matchedAreaName.toUpperCase()})</small>` : ''}<small>${readyVariantCount} aktif (${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
     out += renderCardsHtml(items);
   }
   document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data area atau paket tidak ditemukan.</div>';
