@@ -206,8 +206,8 @@
   </div>
 
   <div class="panel" style="padding:10px 12px;">
-    <!-- Diubah default value menjadi Area 4 agar langsung menampilkan Area 4 -->
-    <input id="stockSearch" class="search" value="Area 4" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten atau Area (Contoh: Area 4, Kediri)...">
+    <!-- Default diset Area 4, namun jika diketik "Salatiga" akan mencari Area yang sesuai -->
+    <input id="stockSearch" class="search" value="Area 4" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten atau Area (Contoh: Area 4, Salatiga)...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -424,7 +424,6 @@ async function fetchProducts() {
 
         let desc = item.description || "";
         let areas = { a1: "-", a2: "-", a3: "-", a4: "-" };
-        let area4GbText = "0 GB"; // Targetkan pengambilan khusus Area 4
         
         const lines = desc.split("\n");
         let idx = 1;
@@ -434,24 +433,10 @@ async function fetchProducts() {
           if (/area/i.test(l) || /(\d+)\s*(?:gb|g)/i.test(l)) {
             if (idx <= 4) {
               areas['a' + idx] = cleanedArea;
-              if (idx === 4) area4GbText = cleanedArea; // Ambil nilai Area 4 untuk kartu utama
               idx++;
             }
           }
         });
-
-        // Fallback jika baris area tidak terindeks berurutan
-        if (area4GbText === "0 GB") {
-          lines.forEach(l => {
-            if (/area\s*4/i.test(l)) {
-              area4GbText = cleanAreaValue(l);
-            }
-          });
-        }
-
-        if (area4GbText === "0 GB" && getMinGbFromText(desc) !== 999999) {
-          area4GbText = `${getMinGbFromText(desc)} GB`;
-        }
 
         const combinedAreasText = `${areas.a1} ${areas.a2} ${areas.a3} ${areas.a4}`.toLowerCase();
         const minGb = getMinGbFromText(desc);
@@ -465,8 +450,7 @@ async function fetchProducts() {
           descText: desc.toLowerCase(),
           areasText: combinedAreasText,
           minGb: minGb,
-          areas: areas,
-          quotaDisplay: area4GbText
+          areas: areas
         };
       }).filter(p => p.v !== "OTHER");
       
@@ -738,7 +722,7 @@ function toggleCard(elem) {
   }
 }
 
-function renderCardsHtml(items) {
+function renderCardsHtml(items, targetAreaKey) {
   items.sort((a, b) => {
     let aReady = a.stock > 0 ? 1 : 0;
     let bReady = b.stock > 0 ? 1 : 0;
@@ -753,12 +737,27 @@ function renderCardsHtml(items) {
     const isReady = p.stock > 0;
     const cardClass = isReady ? 'card' : 'card habis';
     
+    // Menyesuaikan tampilan kartu berdasarkan area yang sedang dicari/dipilih (misal: Salatiga masuk Area 3 -> ambil p.areas.a3)
+    let displayQuota = p.areas.a4; // Default Area 4
+    let displayLabel = "KUOTA AREA 4";
+    
+    if (targetAreaKey === "area 3") {
+      displayQuota = p.areas.a3;
+      displayLabel = "KUOTA AREA 3";
+    } else if (targetAreaKey === "area 2") {
+      displayQuota = p.areas.a2;
+      displayLabel = "KUOTA AREA 2";
+    } else if (targetAreaKey === "area 1") {
+      displayQuota = p.areas.a1;
+      displayLabel = "KUOTA AREA 1";
+    }
+
     out += `<div class="${cardClass}" onclick="toggleCard(this)">
       <div class="card-top">
-        <div class="slot-label" style="margin-top:0;">KUOTA AREA 4</div>
+        <div class="slot-label" style="margin-top:0;">${displayLabel}</div>
         <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
       </div>
-      <div class="slot-val">${p.quotaDisplay}</div>
+      <div class="slot-val">${displayQuota}</div>
       <div class="name">${p.code}</div>
       
       <div class="area-list">
@@ -782,11 +781,11 @@ function renderStock(){
   const q = rawQ.toLowerCase();
 
   let matchedAreaName = "";
-  if (q.length > 2) {
+  if (q.length > 0) {
     for (let group of areaDatabase) {
       for (let prov of group.provinces) {
         for (let city of prov.cities) {
-          if (city.toLowerCase().includes(q)) {
+          if (city.toLowerCase().includes(q) || group.area.toLowerCase().includes(q)) {
             matchedAreaName = group.area.toLowerCase();
             break;
           }
@@ -796,20 +795,21 @@ function renderStock(){
       if (matchedAreaName) break;
     }
   }
+  
+  if (!matchedAreaName && q.includes("area")) {
+    matchedAreaName = q;
+  }
 
   const arr = products.filter(p => {
     const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
     let matchesArea = false;
     if (matchedAreaName) {
-      matchesArea = p.areasText.includes(matchedAreaName);
+      matchesArea = p.areasText.includes(matchedAreaName) || p.descText.includes(q);
     } else {
       matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
     }
     return matchesCategory && matchesArea;
   });
-  
-  const groups = {};
-  arr.forEach(p => (groups[p.v] ??=[]).push(p));
   
   let out = "";
   const displayTitle = rawQ ? rawQ.charAt(0).toUpperCase() + rawQ.slice(1) : "Area 4";
@@ -824,7 +824,7 @@ function renderStock(){
   });
 
   out += `<div class="head"><b>${displayTitle}</b> <small style="color:#059669; font-weight:800;">${totalActiveVariants} aktif (${totalFilteredUnits.toLocaleString("id-ID")} unit)</small></div>`;
-  out += renderCardsHtml(arr);
+  out += renderCardsHtml(arr, matchedAreaName);
 
   document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data area atau paket tidak ditemukan.</div>';
 }
