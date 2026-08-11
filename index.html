@@ -3,119 +3,135 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dashboard Performa & Stok</title>
+<title>Dashboard Performa & Stok Profesional</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}
-.wrap{max-width:1200px;margin:auto;padding:16px 12px 80px}
+:root {
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --primary: #2563eb;
+  --success: #059669;
+  --success-bg: #ecfdf5;
+  --danger: #dc2626;
+  --danger-bg: #fff1f2;
+}
 
-.top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.operator-tabs{display:flex;gap:6px}
-.op-btn{border:0;padding:6px 16px;border-radius:6px;font-weight:800;font-size:12px;cursor:pointer;background:#e2e8f0;color:#64748b}
-.op-btn.active-xl{background:#1d4ed8;color:#fff}
-.op-btn.active-axis{background:#7e22ce;color:#fff}
-.sync-time{font-size:11px;color:#64748b;font-weight:600}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg-main); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; }
+.wrap { max-width: 1200px; margin: auto; padding: 16px 12px 80px; }
 
-.sync-indicator-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
-.sync-left{display:flex;align-items:center;gap:10px}
-.spinner-ball{width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:#0f172a;border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.sync-text{font-size:11px;font-weight:700;color:#0f172a}
-.sync-timer{font-size:11px;font-weight:800;color:#059669;background:#ecfdf5;padding:3px 8px;border-radius:6px}
+.top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.operator-tabs { display: flex; gap: 6px; }
+.op-btn { border: 0; padding: 6px 16px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; background: #e2e8f0; color: var(--text-muted); transition: all 0.2s ease; }
+.op-btn.active-xl { background: #1d4ed8; color: #fff; box-shadow: 0 2px 4px rgba(29,78,216,0.2); }
+.op-btn.active-axis { background: #7e22ce; color: #fff; box-shadow: 0 2px 4px rgba(126,34,206,0.2); }
+.sync-time { font-size: 11px; color: var(--text-muted); font-weight: 600; }
 
-.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
-.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;position:relative;overflow:hidden}
-.stat-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%}
-.stat-card.ready::before{background:#059669}
-.stat-card.sold::before{background:#3b82f6}
-.stat-card.day::before{background:#e11d48}
-.stat-card.sec::before{background:#ec4899}
-.stat-card.rate::before{background:#8b5cf6}
-.stat-card.speed::before{background:#f59e0b}
-.stat-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
-.stat-val{font-size:15px;font-weight:800;color:#0f172a;margin-top:2px}
-.stat-sub{font-size:9px;color:#94a3b8}
+.sync-indicator-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+.sync-left { display: flex; align-items: center; gap: 10px; }
+.spinner-ball { width: 16px; height: 16px; border: 2px solid #cbd5e1; border-top-color: var(--text-main); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.sync-text { font-size: 11px; font-weight: 700; color: var(--text-main); }
+.sync-timer { font-size: 11px; font-weight: 800; color: var(--success); background: var(--success-bg); padding: 3px 8px; border-radius: 6px; }
 
-.checker-panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
-.checker-header{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
-.checker-sub{font-size:11px;color:#64748b;margin-bottom:10px}
-.checker-form{display:flex;gap:6px;flex-wrap:wrap}
-.checker-input{flex:1;min-width:180px;border:1px solid #cbd5e1;border-radius:8px;padding:8px 12px;outline:none;background:#f8fafc;font-size:12px}
-.checker-btn{background:#0f172a;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer}
-.checker-result{margin-top:10px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;display:none}
-.checker-result.active{display:block}
-.checker-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
-.checker-item{background:#fff;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px}
-.checker-item span{display:block;font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
-.checker-item b{font-size:12px;color:#0f172a}
+.stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+.stat-card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+.stat-card.ready::before { background: var(--success); }
+.stat-card.sold::before { background: #3b82f6; }
+.stat-card.day::before { background: #e11d48; }
+.stat-card.sec::before { background: #ec4899; }
+.stat-card.rate::before { background: #8b5cf6; }
+.stat-card.speed::before { background: #f59e0b; }
+.stat-label { font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.stat-val { font-size: 15px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
+.stat-sub { font-size: 9px; color: #94a3b8; }
 
-.package-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:8px}
-.package-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;border-bottom:1px solid #f1f5f9;padding-bottom:5px}
-.package-title{font-size:11px;font-weight:800;color:#0f172a}
-.package-exp{font-size:9px;color:#64748b;font-weight:600}
-.quota-row{margin-top:6px}
-.quota-info{display:flex;justify-content:space-between;font-size:10px;color:#475569;margin-bottom:2px}
-.quota-bar{height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden}
-.quota-progress{height:100%;background:#3b82f6;border-radius:2px}
+.checker-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+.checker-header { font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
+.checker-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+.checker-form { display: flex; gap: 6px; flex-wrap: wrap; }
+.checker-input { flex: 1; min-width: 180px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; outline: none; background: #f8fafc; font-size: 12px; }
+.checker-btn { background: var(--text-main); color: #fff; border: 0; border-radius: 8px; padding: 8px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.checker-result { margin-top: 10px; padding: 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; font-size: 11px; display: none; }
+.checker-result.active { display: block; }
+.checker-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 6px; }
+.checker-item { background: var(--bg-card); padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; }
+.checker-item span { display: block; font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+.checker-item b { font-size: 12px; color: var(--text-main); }
 
-.insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-.insight-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px}
-.insight-title{font-size:12px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.insight-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:11px}
-.insight-item:last-child{border-bottom:0}
-.insight-item b{color:#0f172a}
-.badge-count{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-weight:800;font-size:10px}
-.badge-top{background:#ecfdf5;color:#059669}
-.badge-low{background:#fff1f2;color:#e11d48}
+.package-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-top: 8px; }
+.package-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
+.package-title { font-size: 11px; font-weight: 800; color: var(--text-main); }
+.package-exp { font-size: 9px; color: var(--text-muted); font-weight: 600; }
+.quota-row { margin-top: 6px; }
+.quota-info { display: flex; justify-content: space-between; font-size: 10px; color: #475569; margin-bottom: 2px; }
+.quota-bar { height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden; }
+.quota-progress { height: 100%; background: #3b82f6; border-radius: 2px; }
 
-.chart-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:12px}
-.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
-.chart-header b{font-size:13px;color:#0f172a}
-.chart-header span{font-size:10px;color:#64748b;display:block}
-.date-filter-box{display:flex;gap:4px;align-items:center}
-.date-filter-box input{border:1px solid #cbd5e1;border-radius:6px;padding:4px 6px;font-size:10px;outline:none;background:#f8fafc}
-.date-filter-box button{background:#0f172a;color:#fff;border:0;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:700;cursor:pointer}
+.insight-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+.insight-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+.insight-title { font-size: 12px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.insight-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 11px; }
+.insight-item:last-child { border-bottom: 0; }
+.insight-item b { color: var(--text-main); }
+.badge-count { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 800; font-size: 10px; }
+.badge-top { background: var(--success-bg); color: var(--success); }
+.badge-low { background: var(--danger-bg); color: var(--danger); }
 
-.panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin-bottom:12px}
-.search{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;outline:none;background:#fff;font-size:12px}
-.filters{display:flex;gap:4px;overflow:auto;margin-top:8px}.filter{border:0;background:#f1f5f9;color:#475569;border-radius:6px;padding:6px 10px;font-weight:700;font-size:11px;white-space:nowrap;cursor:pointer}.filter.on{background:#0f172a;color:#fff}
-.head{display:flex;justify-content:space-between;align-items:baseline;padding:12px 6px 6px;border-bottom:1px solid #e2e8f0;margin-bottom:8px}
-.head b{font-size:14px;color:#0f172a}
-.head small{color:#64748b;font-size:10px;font-weight:600}
+.chart-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.chart-header b { font-size: 13px; color: var(--text-main); }
+.chart-header span { font-size: 10px; color: var(--text-muted); display: block; margin-top: 1px; }
+.date-filter-box { display: flex; gap: 4px; align-items: center; }
+.date-filter-box input { border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 6px; font-size: 10px; outline: none; background: #f8fafc; }
+.date-filter-box button { background: var(--text-main); color: #fff; border: 0; border-radius: 6px; padding: 5px 8px; font-size: 10px; font-weight: 700; cursor: pointer; }
 
-.area-detection-banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;margin-bottom:10px;display:none;align-items:center;gap:6px}
-.area-detection-banner.active{display:flex}
+.panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+.search { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; outline: none; background: #fff; font-size: 12px; }
+.filters { display: flex; gap: 4px; overflow: auto; margin-top: 8px; }
+.filter { border: 0; background: #f1f5f9; color: #475569; border-radius: 6px; padding: 6px 10px; font-weight: 700; font-size: 11px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+.filter.on { background: var(--text-main); color: #fff; }
+.head { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 6px 6px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
+.head b { font-size: 14px; color: var(--text-main); }
+.head small { color: var(--text-muted); font-size: 10px; font-weight: 600; }
 
-.grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}
-.card{border:1px solid #e2e8f0;border-radius:10px;padding:10px;cursor:pointer;background:#fff;position:relative;transition:all 0.2s ease}
-.card:hover{border-color:#cbd5e1}
-.card.habis{background:#fafafa;opacity:0.85}
+.area-detection-banner { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; margin-bottom: 10px; display: none; align-items: center; gap: 6px; }
+.area-detection-banner.active { display: flex; }
 
-.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
-.name{font-weight:800;font-size:12px;color:#334155;margin-top:2px}
-.badge-habis{font-size:8px;font-weight:800;border-radius:99px;padding:2px 6px;background:#ffeeee;color:#dc2626}
-.badge-ready{font-size:8px;font-weight:800;border-radius:99px;padding:2px 6px;background:#ecfdf5;color:#059669}
+/* Grid Card yang Konsisten & Sejajar Sempurna */
+.grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; align-items: stretch !important; }
+.card { border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; cursor: pointer; background: var(--bg-card); position: relative; transition: all 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.01); }
+.card:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 
-.slot-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
-.slot-val{font-size:15px;font-weight:800;color:#1d4ed8;margin:2px 0 6px 0}
+.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.name { font-weight: 800; font-size: 12px; color: #334155; margin-top: 2px; }
+.badge-habis { font-size: 8px; font-weight: 800; border-radius: 99px; padding: 2px 7px; background: var(--danger-bg); color: var(--danger); letter-spacing: 0.3px; }
+.badge-ready { font-size: 8px; font-weight: 800; border-radius: 99px; padding: 2px 7px; background: var(--success-bg); color: var(--success); letter-spacing: 0.3px; }
 
-/* Kotak Stok Rapi & Proporsional (Disembunyikan khusus kode PDA) */
-.stock-box{border-top:1px solid #f1f5f9;padding-top:4px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
-.stock-box-label{font-size:8px;font-weight:700;color:#64748b;letter-spacing:0.2px}
-.stock-box-val{font-size:10px;font-weight:700}
+.slot-label { font-size: 8px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.slot-val { font-size: 14px; font-weight: 800; color: #1d4ed8; margin: 2px 0 4px 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
-.card.expanded .area-list{display:block}
-.area-row{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#475569;padding:3px 0;border-bottom:1px dashed #f8fafc}
-.area-row:last-child{border-bottom:0}
-.area-row b{color:#0f172a;background:#f8fafc;padding:1px 5px;border-radius:3px;border:1px solid #e2e8f0;font-size:9px}
+.stock-box { border-top: 1px solid #f1f5f9; padding-top: 6px; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
+.stock-box-label { font-size: 8px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.2px; }
+.stock-box-val { font-size: 10px; font-weight: 700; }
 
-.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
-.toggle-detail.ready-text{color:#059669}
-.footer-brand{text-align:center;font-size:10px;color:#94a3b8;margin-top:20px;font-weight:600}
+.area-list { border-top: 1px solid #f1f5f9; padding-top: 6px; margin-top: 6px; display: none; }
+.card.expanded .area-list { display: block; }
+.area-row { display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #475569; padding: 3px 0; border-bottom: 1px dashed #f8fafc; }
+.area-row:last-child { border-bottom: 0; }
+.area-row b { color: var(--text-main); background: #f8fafc; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color); font-size: 9px; }
 
-@media(max-width:1024px){.stats-grid{grid-template-columns:repeat(3,1fr)}.insight-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:8px}.name{font-size:11px}.slot-val{font-size:13px}}
+.toggle-detail { display: flex; justify-content: space-between; align-items: center; font-size: 9px; font-weight: 700; color: var(--danger); border-top: 1px solid #f1f5f9; padding-top: 6px; margin-top: 6px; }
+.toggle-detail.ready-text { color: var(--success); }
+.footer-brand { text-align: center; font-size: 10px; color: #94a3b8; margin-top: 20px; font-weight: 600; }
+
+@media(max-width:1024px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } .insight-grid { grid-template-columns: 1fr; } }
+@media(max-width:640px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; } .card { padding: 8px; } .name { font-size: 11px; } .slot-val { font-size: 12px; } }
 </style>
 </head>
 <body>
@@ -133,7 +149,7 @@
       <div class="spinner-ball"></div>
       <div>
         <div class="sync-text">Sinkronisasi Real-Time Display Stok</div>
-        <div style="font-size:9px;color:#64748b;">Pembaruan data otomatis setiap 1 detik</div>
+        <div style="font-size:9px;color:var(--text-muted);">Pembaruan data otomatis setiap 1 detik</div>
       </div>
     </div>
     <div class="sync-timer" id="syncTimerBadge">1s</div>
@@ -203,10 +219,10 @@
       </div>
       <div class="date-filter-box">
         <input type="date" id="startDateFilter">
-        <span style="font-size:10px;color:#64748b">s/d</span>
+        <span style="font-size:10px;color:var(--text-muted)">s/d</span>
         <input type="date" id="endDateFilter">
         <button onclick="applyDateFilter()">Filter</button>
-        <button onclick="resetDateFilter()" style="background:#64748b">Reset</button>
+        <button onclick="resetDateFilter()" style="background:var(--text-muted)">Reset</button>
       </div>
     </div>
     <div style="position: relative; height: 220px; width: 100%;">
@@ -217,12 +233,12 @@
   <div class="panel" style="padding:10px 12px;">
     <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten atau Area (Contoh: Kediri, Salatiga, Area 4)...">
     <div class="filters">
-      <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
+      <button class="filter" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
       <button class="filter" data-v="V2" onclick="setFilter('V2', this)">V2</button>
       <button class="filter" data-v="V3" onclick="setFilter('V3', this)">V3</button>
       <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
-      <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
+      <button class="filter on" data-v="V5" onclick="setFilter('V5', this)">V5</button>
     </div>
   </div>
 
@@ -330,7 +346,7 @@ let initialStockMap = JSON.parse(localStorage.getItem("ic_initial_stock")) || {}
 let previousTotalSold = 0;
 let productSoldMap = {}; 
 let totalSoldUnits = 0;   
-let activeVersion = "ALL";
+let activeVersion = "V5";
 let activeOperator = "AXIS";
 let totalSoldAtStartOfDay = 0; 
 let lastDate = new Date().getDate();
@@ -361,15 +377,16 @@ function initChart() {
     data: {
       labels: [],
       datasets: [
-        { label: 'V1 (XLA)', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V2 (XDA)', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V3 (KDA)', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-        { label: 'V4 (XLF)', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
+        { label: 'V1 (XLA)', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.08)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V2 (XDA)', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.08)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V3 (KDA)', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.08)', borderWidth: 2, tension: 0.3, fill: true },
+        { label: 'V4 (XLF)', data: [], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.08)', borderWidth: 2, tension: 0.3, fill: true }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { top: 10, right: 10, bottom: 0, left: 0 } },
       plugins: { 
         legend: { 
           display: true,
@@ -377,7 +394,10 @@ function initChart() {
           labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
         } 
       },
-      scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }
+      scales: { 
+        y: { beginAtZero: true, ticks: { precision: 0 } }, 
+        x: { grid: { display: false } } 
+      }
     }
   });
   renderChartFiltered();
@@ -395,7 +415,7 @@ function getMinGbFromText(text) {
 function cleanAreaValue(rawLine) {
   let cleaned = rawLine.replace(/^(?:area|total\s*area)\s*\d*\s*[:\-]?\s*/i, "").trim();
   const matchRange = cleaned.match(/(\d+)\s*-\s*(\d+)\s*(?:gb|g)/i);
-  if (matchRange) return `${matchRange[1]} GB`;
+  if (matchRange) return `${matchRange[1]} - ${matchRange[2]} GB`;
   const matchSingle = cleaned.match(/(\d+)\s*(?:gb|g)/i);
   if (matchSingle) return `${matchSingle[1]} GB`;
   return cleaned || "-";
@@ -427,19 +447,16 @@ async function fetchProducts() {
 
         let currentStock = item.stock !== undefined ? Number(item.stock) : 0;
         
-        if (currentStock > 50) {
-          currentStock = 50;
-        }
-
         let soldQty = 0;
-
         if (v !== "V5") {
+          // Tetapkan basis stok awal yang akurat agar selisih perhitungan penjualan murni berdasarkan penurunan stok
           if (!(code in initialStockMap)) {
             initialStockMap[code] = currentStock;
             localStorage.setItem("ic_initial_stock", JSON.stringify(initialStockMap));
           }
           let diff = initialStockMap[code] - currentStock;
           if (diff > 0) soldQty = diff;
+          
           currentSoldDiff += soldQty;
           if (v in vSoldCounts) vSoldCounts[v] += soldQty;
           productSoldMap[code] = soldQty;
@@ -526,9 +543,9 @@ function updateStatistics() {
   document.getElementById("statReadyVariant").textContent = `${readyVariantCount} varian aktif`;
   document.getElementById("statSold").textContent = totalSoldUnits.toLocaleString("id-ID");
   document.getElementById("statDay").textContent = soldToday.toLocaleString("id-ID");
-  document.getElementById("statSec").textContent = lastSecond;
-  document.getElementById("statMin").textContent = lastMinute;
-  document.getElementById("statHour").textContent = lastHour;
+  document.getElementById("statSec").textContent = lastSecond.toLocaleString("id-ID");
+  document.getElementById("statMin").textContent = lastMinute.toLocaleString("id-ID");
+  document.getElementById("statHour").textContent = lastHour.toLocaleString("id-ID");
 
   const nowTime = new Date();
   const timeString = `Sinkron: ${String(nowTime.getHours()).padStart(2, '0')}.${String(nowTime.getMinutes()).padStart(2, '0')}.${String(nowTime.getSeconds()).padStart(2, '0')}`;
@@ -623,21 +640,21 @@ async function cekInfoDompul() {
       });
 
       contentBox.innerHTML = `
-        <div style="font-weight:800;color:#059669;margin-bottom:6px;font-size:12px;">✅ ${resJson.keterangan || "Berhasil mengambil data"}</div>
+        <div style="font-weight:800;color:var(--success);margin-bottom:6px;font-size:12px;">✅ ${resJson.keterangan || "Berhasil mengambil data"}</div>
         <div class="checker-grid">
           <div class="checker-item"><span>Nomor</span><b>${info.msisdn || nomor}</b></div>
           <div class="checker-item"><span>Operator</span><b>${info.operator || "XL / AXIS"}</b></div>
           <div class="checker-item"><span>Masa Aktif</span><b>${info.masa_aktif || "-"}</b></div>
           <div class="checker-item"><span>Tenggang</span><b>${info.masa_tenggang || "-"}</b></div>
         </div>
-        <div style="margin-top:10px;font-weight:800;font-size:11px;color:#0f172a;">Paket Aktif:</div>
+        <div style="margin-top:10px;font-weight:800;font-size:11px;color:var(--text-main);">Paket Aktif:</div>
         ${paketHtml || '<div style="font-size:10px;color:#94a3b8;margin-top:4px;">Tidak ada paket aktif.</div>'}
       `;
     } else {
-      contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Gagal: ${resJson.keterangan || resJson.message || "Data tidak valid."}</span>`;
+      contentBox.innerHTML = `<span style="color:var(--danger);font-size:11px;">Gagal: ${resJson.keterangan || resJson.message || "Data tidak valid."}</span>`;
     }
   } catch (e) {
-    contentBox.innerHTML = `<span style="color:#dc2626;font-size:11px;">Koneksi error: ${e.message}</span>`;
+    contentBox.innerHTML = `<span style="color:var(--danger);font-size:11px;">Koneksi error: ${e.message}</span>`;
   }
 }
 
@@ -758,7 +775,6 @@ function renderCardsHtml(items, targetAreaKey) {
   items.forEach(p => {
     const isPDA = p.v === "V5";
     const isReady = p.stock > 0;
-    const cardClass = isReady ? 'card' : 'card habis';
     const isPdaCode = p.code.toUpperCase().startsWith("PDA");
     
     let displayQuota = p.areas.a4; 
@@ -775,35 +791,38 @@ function renderCardsHtml(items, targetAreaKey) {
       displayLabel = "KUOTA AREA 1";
     }
 
-    // Kotak stok disembunyikan total untuk kode PDA (V5)
     let stockBoxHtml = "";
     if (!isPdaCode) {
       stockBoxHtml = `
       <div class="stock-box">
         <span class="stock-box-label">STOK</span>
-        <span class="stock-box-val" style="color:${isReady ? '#059669' : '#dc2626'}">${p.stock} Unit</span>
+        <span class="stock-box-val" style="color:${isReady ? 'var(--success)' : 'var(--danger)'}">${p.stock} Unit</span>
       </div>`;
     }
 
-    out += `<div class="${cardClass}" onclick="toggleCard(this)">
-      <div class="card-top">
-        <div class="slot-label">${displayLabel}</div>
-        <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
+    out += `<div class="card" onclick="toggleCard(this)">
+      <div>
+        <div class="card-top">
+          <div class="slot-label">${displayLabel}</div>
+          <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
+        </div>
+        <div class="slot-val">${displayQuota}</div>
+        <div class="name">${p.code}</div>
       </div>
-      <div class="slot-val">${displayQuota}</div>
-      <div class="name">${p.code}</div>
       
-      ${stockBoxHtml}
+      <div>
+        ${stockBoxHtml}
 
-      <div class="area-list">
-        <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
-        <div class="area-row"><span>Area 2</span><b>${p.areas.a2}</b></div>
-        <div class="area-row"><span>Area 3</span><b>${p.areas.a3}</b></div>
-        <div class="area-row"><span>Area 4</span><b>${p.areas.a4}</b></div>
-      </div>
-      
-      <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
-        Detail Area <span>▼</span>
+        <div class="area-list">
+          <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
+          <div class="area-row"><span>Area 2</span><b>${p.areas.a2}</b></div>
+          <div class="area-row"><span>Area 3</span><b>${p.areas.a3}</b></div>
+          <div class="area-row"><span>Area 4</span><b>${p.areas.a4}</b></div>
+        </div>
+        
+        <div class="toggle-detail ${isReady ? 'ready-text' : ''}">
+          Detail Area <span>▼</span>
+        </div>
       </div>
     </div>`;
   });
@@ -883,16 +902,16 @@ function renderStock(){
   let totalFilteredUnits = 0;
   let totalActiveVariants = 0;
   arr.forEach(i => {
-    if (i.stock > 0) {
+    if (i.stock > 0 || activeVersion === "V5") {
       totalFilteredUnits += i.stock;
       totalActiveVariants++;
     }
   });
 
-  out += `<div class="head"><b>${displayTitle}</b> <small style="color:#059669; font-weight:800;">${totalActiveVariants} aktif (${totalFilteredUnits.toLocaleString("id-ID")} unit)</small></div>`;
+  out += `<div class="head"><b>${displayTitle}</b> <small style="color:var(--success); font-weight:800;">${totalActiveVariants} aktif (${totalFilteredUnits} unit)</small></div>`;
   out += renderCardsHtml(arr, matchedAreaKey);
 
-  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data area atau paket tidak ditemukan.</div>';
+  document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid var(--border-color);">Data area atau paket tidak ditemukan.</div>';
 }
 
 initChart();
