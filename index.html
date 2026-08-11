@@ -99,7 +99,7 @@
 .slot-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
 .slot-val{font-size:15px;font-weight:800;color:#1d4ed8;margin:2px 0 6px 0}
 
-/* Perbaikan Kotak Stok Menjadi Kecil dan Proporsional */
+/* Kotak Stok Rapi & Proporsional (Disembunyikan khusus kode PDA) */
 .stock-box{border-top:1px solid #f1f5f9;padding-top:4px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
 .stock-box-label{font-size:8px;font-weight:700;color:#64748b;letter-spacing:0.2px}
 .stock-box-val{font-size:10px;font-weight:700}
@@ -427,7 +427,6 @@ async function fetchProducts() {
 
         let currentStock = item.stock !== undefined ? Number(item.stock) : 0;
         
-        // Slot buatan 50 unit jika stok asli bernilai besar
         if (currentStock > 50) {
           currentStock = 50;
         }
@@ -776,7 +775,7 @@ function renderCardsHtml(items, targetAreaKey) {
       displayLabel = "KUOTA AREA 1";
     }
 
-    // Jika kode PDA, sembunyikan kotak informasi stok
+    // Kotak stok disembunyikan total untuk kode PDA (V5)
     let stockBoxHtml = "";
     if (!isPdaCode) {
       stockBoxHtml = `
