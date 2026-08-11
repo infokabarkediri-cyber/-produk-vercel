@@ -415,7 +415,7 @@ function getMinGbFromText(text) {
 function cleanAreaValue(rawLine) {
   let cleaned = rawLine.replace(/^(?:area|total\s*area)\s*\d*\s*[:\-]?\s*/i, "").trim();
   const matchRange = cleaned.match(/(\d+)\s*-\s*(\d+)\s*(?:gb|g)/i);
-  if (matchRange) return `${matchRange[1]} - ${matchRange[2]} GB`;
+  if (matchRange) return `${matchRange[1]} GB`; // Hanya ambil angka depan saja secara seragam
   const matchSingle = cleaned.match(/(\d+)\s*(?:gb|g)/i);
   if (matchSingle) return `${matchSingle[1]} GB`;
   return cleaned || "-";
@@ -449,7 +449,6 @@ async function fetchProducts() {
         
         let soldQty = 0;
         if (v !== "V5") {
-          // Tetapkan basis stok awal yang akurat agar selisih perhitungan penjualan murni berdasarkan penurunan stok
           if (!(code in initialStockMap)) {
             initialStockMap[code] = currentStock;
             localStorage.setItem("ic_initial_stock", JSON.stringify(initialStockMap));
@@ -460,6 +459,9 @@ async function fetchProducts() {
           currentSoldDiff += soldQty;
           if (v in vSoldCounts) vSoldCounts[v] += soldQty;
           productSoldMap[code] = soldQty;
+        } else {
+          // PDA di sistem tetap dihitung stok 1 unit sesuai ketentuan
+          currentStock = 1;
         }
 
         let desc = item.description || "";
@@ -775,7 +777,6 @@ function renderCardsHtml(items, targetAreaKey) {
   items.forEach(p => {
     const isPDA = p.v === "V5";
     const isReady = p.stock > 0;
-    const isPdaCode = p.code.toUpperCase().startsWith("PDA");
     
     let displayQuota = p.areas.a4; 
     let displayLabel = "KUOTA AREA 4";
@@ -791,14 +792,12 @@ function renderCardsHtml(items, targetAreaKey) {
       displayLabel = "KUOTA AREA 1";
     }
 
-    let stockBoxHtml = "";
-    if (!isPdaCode) {
-      stockBoxHtml = `
-      <div class="stock-box">
+    // Stok khusus PDA disembunyikan teksnya via visibility hidden agar struktur template tetap sama persis & rapi
+    let stockBoxHtml = `
+      <div class="stock-box" ${isPDA ? 'style="visibility: hidden;"' : ''}>
         <span class="stock-box-label">STOK</span>
         <span class="stock-box-val" style="color:${isReady ? 'var(--success)' : 'var(--danger)'}">${p.stock} Unit</span>
       </div>`;
-    }
 
     out += `<div class="card" onclick="toggleCard(this)">
       <div>
