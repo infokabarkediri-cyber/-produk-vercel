@@ -83,7 +83,6 @@
 .head b{font-size:14px;color:#0f172a}
 .head small{color:#64748b;font-size:10px;font-weight:600}
 
-/* Info Banner untuk Deteksi Area */
 .area-detection-banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;margin-bottom:10px;display:none;align-items:center;gap:6px}
 .area-detection-banner.active{display:flex}
 
@@ -100,10 +99,10 @@
 .slot-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
 .slot-val{font-size:15px;font-weight:800;color:#1d4ed8;margin:2px 0 6px 0}
 
-/* Perbaikan Kotak Stok Real-Time agar Proporsional & Profesional */
-.stock-box{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
-.stock-box-label{font-size:9px;font-weight:700;color:#64748b;letter-spacing:0.3px}
-.stock-box-val{font-size:12px;font-weight:800}
+/* Perbaikan Kotak Stok Menjadi Kecil dan Proporsional */
+.stock-box{border-top:1px solid #f1f5f9;padding-top:4px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
+.stock-box-label{font-size:8px;font-weight:700;color:#64748b;letter-spacing:0.2px}
+.stock-box-val{font-size:10px;font-weight:700}
 
 .area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
@@ -427,6 +426,12 @@ async function fetchProducts() {
         else if (code.startsWith("PDA")) v = "V5";
 
         let currentStock = item.stock !== undefined ? Number(item.stock) : 0;
+        
+        // Slot buatan 50 unit jika stok asli bernilai besar
+        if (currentStock > 50) {
+          currentStock = 50;
+        }
+
         let soldQty = 0;
 
         if (v !== "V5") {
@@ -755,6 +760,7 @@ function renderCardsHtml(items, targetAreaKey) {
     const isPDA = p.v === "V5";
     const isReady = p.stock > 0;
     const cardClass = isReady ? 'card' : 'card habis';
+    const isPdaCode = p.code.toUpperCase().startsWith("PDA");
     
     let displayQuota = p.areas.a4; 
     let displayLabel = "KUOTA AREA 4";
@@ -770,6 +776,16 @@ function renderCardsHtml(items, targetAreaKey) {
       displayLabel = "KUOTA AREA 1";
     }
 
+    // Jika kode PDA, sembunyikan kotak informasi stok
+    let stockBoxHtml = "";
+    if (!isPdaCode) {
+      stockBoxHtml = `
+      <div class="stock-box">
+        <span class="stock-box-label">STOK</span>
+        <span class="stock-box-val" style="color:${isReady ? '#059669' : '#dc2626'}">${p.stock} Unit</span>
+      </div>`;
+    }
+
     out += `<div class="${cardClass}" onclick="toggleCard(this)">
       <div class="card-top">
         <div class="slot-label">${displayLabel}</div>
@@ -778,10 +794,7 @@ function renderCardsHtml(items, targetAreaKey) {
       <div class="slot-val">${displayQuota}</div>
       <div class="name">${p.code}</div>
       
-      <div class="stock-box">
-        <span class="stock-box-label">STOK REAL-TIME</span>
-        <span class="stock-box-val" style="color:${isReady ? '#059669' : '#dc2626'}">${p.stock} Unit</span>
-      </div>
+      ${stockBoxHtml}
 
       <div class="area-list">
         <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
@@ -824,7 +837,6 @@ function renderStock(){
     }
   }
 
-  // Update banner informasi deteksi area secara profesional
   const banner = document.getElementById("areaDetectionBanner");
   const bannerText = document.getElementById("areaDetectionText");
   if (q.length > 0) {
