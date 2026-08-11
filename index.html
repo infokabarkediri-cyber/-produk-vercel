@@ -83,17 +83,27 @@
 .head b{font-size:14px;color:#0f172a}
 .head small{color:#64748b;font-size:10px;font-weight:600}
 
+/* Info Banner untuk Deteksi Area */
+.area-detection-banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;margin-bottom:10px;display:none;align-items:center;gap:6px}
+.area-detection-banner.active{display:flex}
+
 .grid{display:grid !important;grid-template-columns:repeat(3, 1fr) !important;gap:8px !important}
-.card{border:1px solid #e2e8f0;border-radius:10px;padding:8px;cursor:pointer;background:#fff;position:relative;transition:all 0.2s ease}
+.card{border:1px solid #e2e8f0;border-radius:10px;padding:10px;cursor:pointer;background:#fff;position:relative;transition:all 0.2s ease}
 .card:hover{border-color:#cbd5e1}
 .card.habis{background:#fafafa;opacity:0.85}
 
-.card-top{display:flex;justify-content:space-between;align-items:flex-start}
-.name{font-weight:800;font-size:11px;color:#64748b}
-.badge-habis{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ffeeee;color:#dc2626}
-.badge-ready{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ecfdf5;color:#059669}
-.slot-label{font-size:8px;color:#64748b;font-weight:700;margin-top:4px;text-transform:uppercase}
-.slot-val{font-size:13px;font-weight:800;color:#1d4ed8;margin-bottom:2px}
+.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.name{font-weight:800;font-size:12px;color:#334155;margin-top:2px}
+.badge-habis{font-size:8px;font-weight:800;border-radius:99px;padding:2px 6px;background:#ffeeee;color:#dc2626}
+.badge-ready{font-size:8px;font-weight:800;border-radius:99px;padding:2px 6px;background:#ecfdf5;color:#059669}
+
+.slot-label{font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase}
+.slot-val{font-size:15px;font-weight:800;color:#1d4ed8;margin:2px 0 6px 0}
+
+/* Perbaikan Kotak Stok Real-Time agar Proporsional & Profesional */
+.stock-box{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.stock-box-label{font-size:9px;font-weight:700;color:#64748b;letter-spacing:0.3px}
+.stock-box-val{font-size:12px;font-weight:800}
 
 .area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
@@ -101,12 +111,12 @@
 .area-row:last-child{border-bottom:0}
 .area-row b{color:#0f172a;background:#f8fafc;padding:1px 5px;border-radius:3px;border:1px solid #e2e8f0;font-size:9px}
 
-.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:4px;margin-top:4px}
+.toggle-detail{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;color:#dc2626;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px}
 .toggle-detail.ready-text{color:#059669}
 .footer-brand{text-align:center;font-size:10px;color:#94a3b8;margin-top:20px;font-weight:600}
 
 @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(3,1fr)}.insight-grid{grid-template-columns:1fr}}
-@media(max-width:640px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:6px}.name{font-size:10px}.slot-val{font-size:11px}}
+@media(max-width:640px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(3, 1fr) !important;gap:6px !important}.card{padding:8px}.name{font-size:11px}.slot-val{font-size:13px}}
 </style>
 </head>
 <body>
@@ -206,7 +216,7 @@
   </div>
 
   <div class="panel" style="padding:10px 12px;">
-    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten atau Area (Contoh: Salatiga, Area 4)...">
+    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten atau Area (Contoh: Kediri, Salatiga, Area 4)...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -215,6 +225,10 @@
       <button class="filter" data-v="V4" onclick="setFilter('V4', this)">V4</button>
       <button class="filter" data-v="V5" onclick="setFilter('V5', this)">V5</button>
     </div>
+  </div>
+
+  <div id="areaDetectionBanner" class="area-detection-banner">
+    <span>ℹ️</span> <span id="areaDetectionText">Wilayah terdeteksi masuk dalam sistem.</span>
   </div>
 
   <div id="stockList"></div>
@@ -286,7 +300,7 @@ const areaDatabase = [
     provinces: [
       { name: "Jawa Barat", cities: ["Kab. Cianjur", "Kab. Pangandaran", "Kab. Karawang", "Kota Sukabumi", "Kab. Sukabumi"] },
       { name: "Jawa Tengah", cities: ["Kab. Tegal", "Kota Surakarta", "Kota Tegal", "Kab. Brebes", "Kab. Kebumen", "Kab. Pemalang", "Kota Semarang", "Kota Pekalongan", "Kab. Pekalongan", "Kab. Batang", "Kab. Purbalingga", "Kab. Kudus", "Kab. Sukoharjo", "Kab. Klaten", "Kota Magelang", "Kab. Banyumas", "Kab. Magelang", "Kab. Temanggung", "Kab. Sragen", "Kab. Banjarnegara", "Kab. Karanganyar", "Kab. Wonosobo", "Kab. Jepara", "Kab. Demak", "Kab. Purworejo", "Kab. Blora", "Kab. Wonogiri", "Kab. Pati"] },
-      { name: "Jawa Timur", cities: ["Kab. Jombang", "Kota Blitar", "Kab. Blitar", "Kota Kediri", "Kab. Lamongan", "Kab. Kediri", "Kab. Ngawi", "Kab. Mojokerto", "Kota Mojokerto", "Kab. Magetan", "Kab. Gresik", "Kab. Tulungagung", "Kab. Nganjuk", "Kab. Pasuruan", "Kota Pasuruan", "Kab. Bojonegoro", "Kab. Madiun", "Kab. Bondowoso", "Kab. Tuban", "Kota Madiun", "Kab. Situbondo", "Kab. Jember", "Kota Malang", "Kab. Malang", "Kab. Ponorogo", "Kota Batu", "Kab. Trenggalek"] },
+      { name: "Jawa Timur", cities: ["Kab. Jombang", "Kota Blitar", "Kab. Blitar", "Kota Kediri", "Kab. Kediri", "Kab. Lamongan", "Kab. Ngawi", "Kab. Mojokerto", "Kota Mojokerto", "Kab. Magetan", "Kab. Gresik", "Kab. Tulungagung", "Kab. Nganjuk", "Kab. Pasuruan", "Kota Pasuruan", "Kab. Bojonegoro", "Kab. Madiun", "Kab. Bondowoso", "Kab. Tuban", "Kota Madiun", "Kab. Situbondo", "Kab. Jember", "Kota Malang", "Kab. Malang", "Kab. Ponorogo", "Kota Batu", "Kab. Trenggalek"] },
       { name: "Bengkulu", cities: ["Kab. Bengkulu Selatan", "Kab. Kaur", "Kab. Lebong", "Kab. Rejang Lebong", "Kab. Bengkulu Tengah", "Kota Bengkulu", "Kab. Bengkulu Utara", "Kab. Kepahiang", "Kab. Muko Muko"] },
       { name: "Jambi", cities: ["Kab. Tanjung Jabung Timur", "Kab. Kerinci", "Kab. Bungo", "Kab. Tebo", "Kab. Merangin", "Kota Sungai Penuh"] },
       { name: "Kepulauan Riau", cities: ["Kab. Lingga", "Kab. Kepulauan Anambas", "Kab. Natuna"] },
@@ -758,15 +772,15 @@ function renderCardsHtml(items, targetAreaKey) {
 
     out += `<div class="${cardClass}" onclick="toggleCard(this)">
       <div class="card-top">
-        <div class="slot-label" style="margin-top:0;">${displayLabel}</div>
+        <div class="slot-label">${displayLabel}</div>
         <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
       </div>
       <div class="slot-val">${displayQuota}</div>
       <div class="name">${p.code}</div>
       
-      <div style="border-top:1px solid #f1f5f9; padding-top:6px; margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:9px; font-weight:700; color:#64748b;">STOK REAL-TIME</span>
-        <b style="font-size:11px; color:${isReady ? '#059669' : '#dc2626'}">${p.stock} Unit</b>
+      <div class="stock-box">
+        <span class="stock-box-label">STOK REAL-TIME</span>
+        <span class="stock-box-val" style="color:${isReady ? '#059669' : '#dc2626'}">${p.stock} Unit</span>
       </div>
 
       <div class="area-list">
@@ -790,25 +804,43 @@ function renderStock(){
   const q = rawQ.toLowerCase();
 
   let matchedAreaKey = "area 4"; 
+  let foundAreaName = "";
+  let foundCityName = "";
+
   if (q.length > 0) {
     for (let group of areaDatabase) {
       for (let prov of group.provinces) {
         for (let city of prov.cities) {
           if (city.toLowerCase().includes(q) || group.area.toLowerCase().includes(q)) {
             matchedAreaKey = group.area.toLowerCase();
+            foundAreaName = group.area;
+            foundCityName = city;
             break;
           }
         }
-        if (matchedAreaKey !== "area 4") break;
+        if (matchedAreaKey !== "area 4" || foundCityName) break;
       }
-      if (matchedAreaKey !== "area 4") break;
+      if (matchedAreaKey !== "area 4" || foundCityName) break;
     }
+  }
+
+  // Update banner informasi deteksi area secara profesional
+  const banner = document.getElementById("areaDetectionBanner");
+  const bannerText = document.getElementById("areaDetectionText");
+  if (q.length > 0) {
+    banner.classList.add("active");
+    if (foundCityName) {
+      bannerText.innerHTML = `Wilayah <b>${foundCityName}</b> terdeteksi masuk ke dalam <b>${foundAreaName}</b>. Menampilkan kuota dan stok yang sesuai.`;
+    } else {
+      bannerText.innerHTML = `Pencarian aktif untuk filter: <b>${rawQ}</b> (Menyesuaikan dengan <b>${matchedAreaKey.toUpperCase()}</b>).`;
+    }
+  } else {
+    banner.classList.remove("active");
   }
 
   const arr = products.filter(p => {
     const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
     
-    // Perbaikan pencarian universal ke seluruh kota di database, kode, nama, dan deskripsi produk
     let matchesDatabaseCity = false;
     if (q.length > 0) {
       for (let group of areaDatabase) {
