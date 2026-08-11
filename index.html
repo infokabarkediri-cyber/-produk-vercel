@@ -721,9 +721,9 @@ function toggleCard(elem) {
   elem.classList.toggle("expanded");
   const toggleText = elem.querySelector(".toggle-detail");
   if (elem.classList.contains("expanded")) {
-    toggleText.innerHTML = `Tutup <span>▲</span>`;
+    toggleText.innerHTML = `Tutup Area <span>▲</span>`;
   } else {
-    toggleText.innerHTML = `Detail <span>▼</span>`;
+    toggleText.innerHTML = `Detail Area <span>▼</span>`;
   }
 }
 
@@ -764,6 +764,11 @@ function renderCardsHtml(items, targetAreaKey) {
       <div class="slot-val">${displayQuota}</div>
       <div class="name">${p.code}</div>
       
+      <div style="border-top:1px solid #f1f5f9; padding-top:6px; margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:9px; font-weight:700; color:#64748b;">STOK REAL-TIME</span>
+        <b style="font-size:11px; color:${isReady ? '#059669' : '#dc2626'}">${p.stock} Unit</b>
+      </div>
+
       <div class="area-list">
         <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
         <div class="area-row"><span>Area 2</span><b>${p.areas.a2}</b></div>
@@ -802,14 +807,30 @@ function renderStock(){
 
   const arr = products.filter(p => {
     const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
+    
+    // Perbaikan pencarian universal ke seluruh kota di database, kode, nama, dan deskripsi produk
+    let matchesDatabaseCity = false;
+    if (q.length > 0) {
+      for (let group of areaDatabase) {
+        for (let prov of group.provinces) {
+          for (let city of prov.cities) {
+            if (city.toLowerCase().includes(q)) {
+              matchesDatabaseCity = true;
+              break;
+            }
+          }
+          if (matchesDatabaseCity) break;
+        }
+        if (matchesDatabaseCity) break;
+      }
+    }
+
     const matchesQuery = p.code.toLowerCase().includes(q) || 
                          p.name.toLowerCase().includes(q) || 
                          p.descText.includes(q) || 
-                         p.areas.a1.toLowerCase().includes(q) ||
-                         p.areas.a2.toLowerCase().includes(q) ||
-                         p.areas.a3.toLowerCase().includes(q) ||
-                         p.areas.a4.toLowerCase().includes(q) ||
+                         matchesDatabaseCity ||
                          q === "";
+                         
     return matchesCategory && matchesQuery;
   });
   
