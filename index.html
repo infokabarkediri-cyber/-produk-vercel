@@ -89,11 +89,11 @@
 .card.habis{background:#fafafa;opacity:0.85}
 
 .card-top{display:flex;justify-content:space-between;align-items:flex-start}
-.name{font-weight:800;font-size:11px;color:#0f172a}
+.name{font-weight:800;font-size:11px;color:#64748b}
 .badge-habis{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ffeeee;color:#dc2626}
 .badge-ready{font-size:7px;font-weight:800;border-radius:99px;padding:2px 5px;background:#ecfdf5;color:#059669}
 .slot-label{font-size:8px;color:#64748b;font-weight:700;margin-top:4px;text-transform:uppercase}
-.slot-val{font-size:13px;font-weight:800;color:#0f172a;margin-bottom:2px}
+.slot-val{font-size:13px;font-weight:800;color:#1d4ed8;margin-bottom:2px}
 
 .area-list{border-top:1px solid #f1f5f9;padding-top:6px;margin-top:6px;display:none}
 .card.expanded .area-list{display:block}
@@ -113,8 +113,8 @@
 <main class="wrap">
   <div class="top-nav">
     <div class="operator-tabs">
-      <button class="op-btn active-xl" id="btnXl" onclick="switchOperator('XL')">XL</button>
-      <button class="op-btn" id="btnAxis" onclick="switchOperator('AXIS')">AXIS</button>
+      <button class="op-btn" id="btnXl" onclick="switchOperator('XL')">XL</button>
+      <button class="op-btn active-axis" id="btnAxis" onclick="switchOperator('AXIS')">AXIS</button>
     </div>
     <div class="sync-time" id="syncClockTime">Sinkron: --.--.--</div>
   </div>
@@ -189,7 +189,7 @@
   <div class="chart-container">
     <div class="chart-header">
       <div>
-        <b>📈 Grafik Penjualan Per Hari</b>
+        <b>📈 Grafik Rata-Rata Penjualan Per Hari</b>
         <span>Analisis tren harian & filter rentang tanggal</span>
       </div>
       <div class="date-filter-box">
@@ -206,7 +206,8 @@
   </div>
 
   <div class="panel" style="padding:10px 12px;">
-    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten (Contoh: Bandung, Surabaya)...">
+    <!-- Diubah default value menjadi Area 4 agar langsung menampilkan Area 4 -->
+    <input id="stockSearch" class="search" value="Area 4" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten atau Area (Contoh: Area 4, Kediri)...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -318,7 +319,7 @@ let previousTotalSold = 0;
 let productSoldMap = {}; 
 let totalSoldUnits = 0;   
 let activeVersion = "ALL";
-let activeOperator = "XL";
+let activeOperator = "AXIS";
 let totalSoldAtStartOfDay = 0; 
 let lastDate = new Date().getDate();
 
@@ -423,17 +424,34 @@ async function fetchProducts() {
 
         let desc = item.description || "";
         let areas = { a1: "-", a2: "-", a3: "-", a4: "-" };
+        let area4GbText = "0 GB"; // Targetkan pengambilan khusus Area 4
+        
         const lines = desc.split("\n");
         let idx = 1;
         lines.forEach(l => {
           if (/kuota\s*sesuai/i.test(l)) return;
+          let cleanedArea = cleanAreaValue(l);
           if (/area/i.test(l) || /(\d+)\s*(?:gb|g)/i.test(l)) {
             if (idx <= 4) {
-              areas['a' + idx] = cleanAreaValue(l);
+              areas['a' + idx] = cleanedArea;
+              if (idx === 4) area4GbText = cleanedArea; // Ambil nilai Area 4 untuk kartu utama
               idx++;
             }
           }
         });
+
+        // Fallback jika baris area tidak terindeks berurutan
+        if (area4GbText === "0 GB") {
+          lines.forEach(l => {
+            if (/area\s*4/i.test(l)) {
+              area4GbText = cleanAreaValue(l);
+            }
+          });
+        }
+
+        if (area4GbText === "0 GB" && getMinGbFromText(desc) !== 999999) {
+          area4GbText = `${getMinGbFromText(desc)} GB`;
+        }
 
         const combinedAreasText = `${areas.a1} ${areas.a2} ${areas.a3} ${areas.a4}`.toLowerCase();
         const minGb = getMinGbFromText(desc);
@@ -447,7 +465,8 @@ async function fetchProducts() {
           descText: desc.toLowerCase(),
           areasText: combinedAreasText,
           minGb: minGb,
-          areas: areas
+          areas: areas,
+          quotaDisplay: area4GbText
         };
       }).filter(p => p.v !== "OTHER");
       
@@ -736,14 +755,11 @@ function renderCardsHtml(items) {
     
     out += `<div class="${cardClass}" onclick="toggleCard(this)">
       <div class="card-top">
-        <div class="name">${p.code}</div>
+        <div class="slot-label" style="margin-top:0;">KUOTA AREA 4</div>
         <span class="${isReady ? 'badge-ready' : 'badge-habis'}">${isReady ? (isPDA ? 'OPEN' : 'READY') : (isPDA ? 'CLOSE' : 'HABIS')}</span>
       </div>
-      <div class="slot-label">${isPDA ? 'Status' : 'Slot'}</div>
-      <div class="slot-val" style="color:${isReady ? '#0f172a' : '#dc2626'}">
-        ${isPDA ? (isReady ? 'OPEN' : 'CLOSE') : (isReady ? p.stock.toLocaleString("id-ID") : 'Habis')}
-      </div>
-      <div style="font-size:9px; color:#3b82f6; font-weight:700; margin-top:1px;">Terjual: ${p.sold}</div>
+      <div class="slot-val">${p.quotaDisplay}</div>
+      <div class="name">${p.code}</div>
       
       <div class="area-list">
         <div class="area-row"><span>Area 1</span><b>${p.areas.a1}</b></div>
@@ -796,13 +812,20 @@ function renderStock(){
   arr.forEach(p => (groups[p.v] ??=[]).push(p));
   
   let out = "";
-  for(const [v, items] of Object.entries(groups)){
-    let totalStockInGroup = items.reduce((acc, curr) => acc + (curr.stock > 0 ? curr.stock : 0), 0);
-    let readyVariantCount = items.filter(i => i.stock > 0).length;
-    
-    out += `<div class="head"><b>Kategori ${v}</b> ${matchedAreaName ? `<small style="color:#059669; font-weight:800;">(Rekomendasi untuk ${rawQ} -> ${matchedAreaName.toUpperCase()})</small>` : ''}<small>${readyVariantCount} aktif (${totalStockInGroup.toLocaleString("id-ID")} unit)</small></div>`;
-    out += renderCardsHtml(items);
-  }
+  const displayTitle = rawQ ? rawQ.charAt(0).toUpperCase() + rawQ.slice(1) : "Area 4";
+
+  let totalFilteredUnits = 0;
+  let totalActiveVariants = 0;
+  arr.forEach(i => {
+    if (i.stock > 0) {
+      totalFilteredUnits += i.stock;
+      totalActiveVariants++;
+    }
+  });
+
+  out += `<div class="head"><b>${displayTitle}</b> <small style="color:#059669; font-weight:800;">${totalActiveVariants} aktif (${totalFilteredUnits.toLocaleString("id-ID")} unit)</small></div>`;
+  out += renderCardsHtml(arr);
+
   document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data area atau paket tidak ditemukan.</div>';
 }
 
