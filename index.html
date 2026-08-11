@@ -206,8 +206,7 @@
   </div>
 
   <div class="panel" style="padding:10px 12px;">
-    <!-- Default diset Area 4, namun jika diketik "Salatiga" akan mencari Area yang sesuai -->
-    <input id="stockSearch" class="search" value="Area 4" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten atau Area (Contoh: Area 4, Salatiga)...">
+    <input id="stockSearch" class="search" placeholder="🏙️ Cek Area: Ketik nama Kota / Kabupaten atau Area (Contoh: Salatiga, Area 4)...">
     <div class="filters">
       <button class="filter on" data-v="ALL" onclick="setFilter('ALL', this)">SEMUA</button>
       <button class="filter" data-v="V1" onclick="setFilter('V1', this)">V1</button>
@@ -737,8 +736,7 @@ function renderCardsHtml(items, targetAreaKey) {
     const isReady = p.stock > 0;
     const cardClass = isReady ? 'card' : 'card habis';
     
-    // Menyesuaikan tampilan kartu berdasarkan area yang sedang dicari/dipilih (misal: Salatiga masuk Area 3 -> ambil p.areas.a3)
-    let displayQuota = p.areas.a4; // Default Area 4
+    let displayQuota = p.areas.a4; 
     let displayLabel = "KUOTA AREA 4";
     
     if (targetAreaKey === "area 3") {
@@ -780,39 +778,33 @@ function renderStock(){
   const rawQ = (document.getElementById("stockSearch").value || "").trim();
   const q = rawQ.toLowerCase();
 
-  let matchedAreaName = "";
+  let matchedAreaKey = "area 4"; 
   if (q.length > 0) {
     for (let group of areaDatabase) {
       for (let prov of group.provinces) {
         for (let city of prov.cities) {
           if (city.toLowerCase().includes(q) || group.area.toLowerCase().includes(q)) {
-            matchedAreaName = group.area.toLowerCase();
+            matchedAreaKey = group.area.toLowerCase();
             break;
           }
         }
-        if (matchedAreaName) break;
+        if (matchedAreaKey !== "area 4") break;
       }
-      if (matchedAreaName) break;
+      if (matchedAreaKey !== "area 4") break;
     }
-  }
-  
-  if (!matchedAreaName && q.includes("area")) {
-    matchedAreaName = q;
   }
 
   const arr = products.filter(p => {
     const matchesCategory = (activeVersion === "ALL" || p.v === activeVersion);
-    let matchesArea = false;
-    if (matchedAreaName) {
-      matchesArea = p.areasText.includes(matchedAreaName) || p.descText.includes(q);
-    } else {
-      matchesArea = p.areasText.includes(q) || p.descText.includes(q) || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
-    }
-    return matchesCategory && matchesArea;
+    const matchesQuery = p.code.toLowerCase().includes(q) || 
+                         p.name.toLowerCase().includes(q) || 
+                         p.descText.includes(q) || 
+                         q === "";
+    return matchesCategory && matchesQuery;
   });
   
   let out = "";
-  const displayTitle = rawQ ? rawQ.charAt(0).toUpperCase() + rawQ.slice(1) : "Area 4";
+  const displayTitle = rawQ ? rawQ.charAt(0).toUpperCase() + rawQ.slice(1) : "Semua Produk";
 
   let totalFilteredUnits = 0;
   let totalActiveVariants = 0;
@@ -824,7 +816,7 @@ function renderStock(){
   });
 
   out += `<div class="head"><b>${displayTitle}</b> <small style="color:#059669; font-weight:800;">${totalActiveVariants} aktif (${totalFilteredUnits.toLocaleString("id-ID")} unit)</small></div>`;
-  out += renderCardsHtml(arr, matchedAreaName);
+  out += renderCardsHtml(arr, matchedAreaKey);
 
   document.getElementById("stockList").innerHTML = out || '<div style="text-align:center;padding:30px;color:#94a3b8;font-size:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">Data area atau paket tidak ditemukan.</div>';
 }
